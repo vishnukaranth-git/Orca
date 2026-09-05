@@ -575,30 +575,87 @@
       <!-- VIEW 5: SATELLITE LAB (Multispectral Slider & Coastal Change) -->
       <div class="view-panel" id="view-satellite">
         <div class="satellite-lab-overlay-card">
+          <!-- Top Mission Header -->
           <div class="sat-lab-header">
-            <div>
+            <div class="sat-title-group">
+              <span class="sat-badge"><i data-lucide="satellite" style="width:11px;height:11px;"></i> COPERNICUS &amp; ISRO EO SATELLITE LAB</span>
               <h2>SATELLITE INTELLIGENCE LAB</h2>
-              <p class="subtitle">Copernicus Sentinel-1 SAR & Sentinel-3 OLCI Multispectral Analysis</p>
+              <p class="subtitle">Multispectral Earth Observation · Sentinel-1 SAR, Sentinel-2 Optical &amp; Sentinel-3 OLCI/SLSTR</p>
             </div>
-            <div class="sat-band-buttons">
-              <button class="sat-band-btn active" data-band="sst">SST Thermal Anomaly</button>
-              <button class="sat-band-btn" data-band="chl">Chlorophyll-a Color</button>
-              <button class="sat-band-btn" data-band="flood">SAR Flood Extent</button>
-              <button class="sat-band-btn" data-band="optical">True Color Optical</button>
+
+            <div class="sat-header-controls">
+              <!-- Sector Selector Dropdown -->
+              <div class="sat-sector-select-wrap">
+                <label><i data-lucide="map-pin" style="width:12px;height:12px;color:var(--accent-aqua);"></i> SECTOR:</label>
+                <select id="sat-sector-select" class="sat-sector-dropdown" onchange="orcaApp.satelliteLab && orcaApp.satelliteLab.setSector(this.value)">
+                  <option value="mangalore">Malpe Shelf &amp; Mangalore (Arabian Sea)</option>
+                  <option value="veraval">Saurashtra / Veraval Bank (Gujarat)</option>
+                  <option value="mannar">Gulf of Mannar &amp; Palk Strait</option>
+                  <option value="bengal">Sundarbans Estuary &amp; Delta (Bay of Bengal)</option>
+                  <option value="andaman">Port Blair &amp; Barren Island (Andaman Sea)</option>
+                </select>
+              </div>
+
+              <!-- Band Selector Buttons -->
+              <div class="sat-band-buttons">
+                <button class="sat-band-btn active" data-band="sst"><i data-lucide="flame" style="width:12px;height:12px;"></i> SST Anomaly</button>
+                <button class="sat-band-btn" data-band="chl"><i data-lucide="waves" style="width:12px;height:12px;"></i> Chlorophyll-a</button>
+                <button class="sat-band-btn" data-band="flood"><i data-lucide="shield-alert" style="width:12px;height:12px;"></i> SAR Flood Radar</button>
+                <button class="sat-band-btn" data-band="optical"><i data-lucide="eye" style="width:12px;height:12px;"></i> True Color Optical</button>
+              </div>
+
+              <!-- Action button to plot anomaly on live tactical map -->
+              <button class="sat-plot-map-btn" onclick="orcaApp.satelliteLab && orcaApp.satelliteLab.plotCurrentSectorOnMap()" title="Plot this satellite observation directly onto the tactical map">
+                <i data-lucide="crosshair" style="width:13px;height:13px;"></i>
+                <span>PLOT ON MAP</span>
+              </button>
             </div>
           </div>
 
           <!-- Interactive Before/After Split Viewer -->
           <div class="satellite-split-viewer-container" id="satellite-split-viewer">
+            <!-- Layers -->
             <div class="sat-layer sat-layer-after" id="sat-layer-after">
               <canvas id="sat-canvas-after"></canvas>
             </div>
             <div class="sat-layer sat-layer-before" id="sat-layer-before">
               <canvas id="sat-canvas-before"></canvas>
             </div>
+
+            <!-- Sliding Divider -->
             <div class="sat-split-divider" id="sat-split-divider">
               <div class="divider-handle">
                 <i data-lucide="chevrons-left-right"></i>
+              </div>
+            </div>
+
+            <!-- Split Ratio Badge (Center Top) -->
+            <div class="sat-split-ratio-tag" id="sat-split-ratio-tag">SPLIT: 50%</div>
+
+            <!-- Floating Satellite Telemetry Overlays -->
+            <div class="sat-hud-tag pre" id="sat-hud-pre-tag">
+              <span class="live-dot" style="background:#64748b;"></span>
+              <span id="sat-hud-pre-label">PRE-EVENT BASELINE (04:00 UTC)</span>
+            </div>
+            <div class="sat-hud-tag post" id="sat-hud-post-tag">
+              <span class="live-dot" style="background:#22d3b6;"></span>
+              <span id="sat-hud-post-label">LIVE ORBITAL PASS (10:45 UTC)</span>
+            </div>
+
+            <!-- Real-time Cursor Sounding Telemetry (Bottom Left) -->
+            <div class="sat-cursor-telemetry" id="sat-cursor-telemetry">
+              <i data-lucide="crosshair" style="width:12px;height:12px;color:var(--accent-aqua);flex-shrink:0;"></i>
+              <span id="sat-cursor-telemetry-text">CURSOR SOUNDING: Move cursor across satellite swath to inspect pixel telemetry</span>
+            </div>
+
+            <!-- Scientific Scale Bar Legend (Bottom Right) -->
+            <div class="sat-legend-box" id="sat-legend-box">
+              <div class="sat-legend-title" id="sat-legend-title">SST THERMAL GRADIENT (°C)</div>
+              <div class="sat-legend-ramp" id="sat-legend-ramp"></div>
+              <div class="sat-legend-labels">
+                <span id="sat-legend-min">26.0°C</span>
+                <span id="sat-legend-mid">28.5°C</span>
+                <span id="sat-legend-max">31.0°C</span>
               </div>
             </div>
           </div>
@@ -606,7 +663,10 @@
           <!-- Telemetry Metadata Strip -->
           <div class="sat-meta-bar">
             <div class="sat-meta-text">
-              <h4 id="sat-meta-title">Sea Surface Temperature (SST) Thermal Anomaly</h4>
+              <div class="sat-meta-top-line">
+                <h4 id="sat-meta-title">Sea Surface Temperature (SST) Thermal Anomaly</h4>
+                <span class="sat-sensor-tag" id="sat-sensor-tag">SENSOR: SENTINEL-3 SLSTR + VIIRS (1km)</span>
+              </div>
               <p id="sat-meta-desc">MODIS + VIIRS Sensor fusion at 1km resolution. Thermal front gradient detected off Mangalore Shelf.</p>
             </div>
             <div class="sat-change-stat" id="sat-meta-change">
