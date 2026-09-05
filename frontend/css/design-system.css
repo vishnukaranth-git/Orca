@@ -6,7 +6,51 @@
             amber (#FFB020), and coral (#FF3D7F).
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+/* --------------------------------------------------------------------------
+   Valley Sans Font Loading
+   -------------------------------------------------------------------------- */
+@font-face {
+  font-family: 'Valley Sans';
+  src: url('../fonts/ValleySans-Variable.woff2') format('woff2-variations'),
+       url('../fonts/ValleySans-Variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Valley Sans';
+  src: url('../fonts/ValleySans-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Valley Sans';
+  src: url('../fonts/ValleySans-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Valley Sans';
+  src: url('../fonts/ValleySans-SemiBold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Valley Sans';
+  src: url('../fonts/ValleySans-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
 
 :root {
   /* Abyssal Ocean Depths Base Palette */
@@ -68,9 +112,10 @@
   --text-muted: #537588;
   --text-dim: #3a5566;
 
-  /* Font Families */
-  --font-display: 'Orbitron', 'Space Grotesk', 'Rajdhani', sans-serif;
-  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  /* Font Families: Valley Sans */
+  --font-display: 'Valley Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-body: 'Valley Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-sans: 'Valley Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', 'Courier New', monospace;
 
   --radius-sm: 4px;
@@ -95,6 +140,20 @@ html, body {
   line-height: 1.45;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Universal Valley Sans Typography Rules */
+h1, h2, h3, h4, h5, h6,
+p, span, a, label, button, input, select, textarea,
+table, th, td,
+.nav-tab-btn,
+.brand-title-group,
+.status-badge,
+.telemetry-pill,
+.map-ctrl-btn,
+.region-selector-pill,
+.filter-btn {
+  font-family: var(--font-body);
 }
 
 /* Background Atmosphere Canvas */
