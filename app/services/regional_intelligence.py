@@ -214,7 +214,7 @@ class RegionalIntelligenceService:
             },
             "gulf_of_sri_lanka": {
                 "id": "gulf_of_sri_lanka",
-                "name": "Gulf of Sri Lanka / Palk Strait",
+                "name": "Palk Strait / Palk Bay",
                 "basin": "Palk Strait & Palk Bay Maritime Corridor",
                 "iho_designation": "Palk Strait & Palk Bay Sector",
                 "center": Coordinates(latitude=9.8000, longitude=79.8500),

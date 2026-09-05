@@ -114,32 +114,53 @@
 }
 
 /* --------------------------------------------------------------------------
-   Top Geographic Region Selector Bar (Top Center)
+   Top Geographic Region Selector Bar (Row 2, docked left under map controls)
    -------------------------------------------------------------------------- */
 .map-region-selector-bar {
   position: absolute;
-  top: 14px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 1000;
-  background: rgba(2, 11, 20, 0.9);
+  top: 56px;
+  left: 18px;
+  z-index: 990;
+  background: rgba(2, 11, 20, 0.92);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--border-panel);
-  border-radius: 24px;
+  border-radius: 20px;
   padding: 3px 8px;
   display: flex;
   align-items: center;
   gap: 4px;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.7);
   pointer-events: auto;
-  max-width: calc(100vw - 380px);
+  max-width: calc(100% - 500px);
   overflow-x: auto;
   scrollbar-width: none;
+  white-space: nowrap;
 }
 
 .map-region-selector-bar::-webkit-scrollbar {
   display: none;
+}
+
+.region-selector-tag {
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--accent-aqua);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 6px 0 2px;
+  opacity: 0.9;
+  user-select: none;
+  border-right: 1px solid rgba(34, 211, 182, 0.2);
+  margin-right: 2px;
+}
+
+.main-view-container:not(:has(#view-command.active)) .map-region-selector-bar,
+.main-view-container:has(#marine-region-inspector.collapsed) .map-region-selector-bar {
+  max-width: calc(100% - 36px);
 }
 
 .region-selector-pill {
@@ -174,9 +195,9 @@
    -------------------------------------------------------------------------- */
 .map-layers-popover {
   position: absolute;
-  top: 50px;
-  left: 18px;
-  z-index: 1001;
+  top: 52px;
+  left: 230px;
+  z-index: 1005;
   background: rgba(2, 11, 20, 0.96);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);

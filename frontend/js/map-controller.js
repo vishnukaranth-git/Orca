@@ -7,7 +7,7 @@
  * - Lakshadweep Sea (IHO Area 41)
  * - Andaman Sea (IHO Area 44)
  * - Gulf of Mannar (IHO Area 45)
- * - Gulf of Sri Lanka / Palk Strait
+ * - Palk Strait / Palk Bay (IHO Sector)
  * - Equatorial Indian Ocean
  *
  * Strict Data Provenance Architecture:
@@ -221,8 +221,8 @@ class OrcaMapController {
       },
       'gulf_of_sri_lanka': {
         id: 'gulf_of_sri_lanka',
-        name: 'Gulf of Sri Lanka / Palk Strait',
-        sub: 'Palk Bay & Palk Strait Maritime Corridor',
+        name: 'Palk Strait / Palk Bay',
+        sub: 'IHO Sector · Indo-Sri Lanka Maritime Corridor',
         center: [9.8000, 79.8500],
         zoom: 8.0,
         bounds: [[9.2, 79.0], [10.5, 80.5]],
