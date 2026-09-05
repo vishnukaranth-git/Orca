@@ -45,6 +45,7 @@ class OrcaApp {
 
     this.bindNavigation();
     this.bindRouteControls();
+    this.bindHistoricalControls();
     this.bindPFZSorting();
     this.startClock();
     this.checkBackendHealth();
@@ -231,6 +232,31 @@ class OrcaApp {
       setTimeout(() => {
         this.mapController.map.invalidateSize();
       }, 100);
+
+      // Manage view-specific map layers (so routes only appear on safe-routes view, etc.)
+      if (this.mapController.layers.routes) {
+        if (viewId === 'routes') {
+          if (!this.mapController.map.hasLayer(this.mapController.layers.routes)) {
+            this.mapController.layers.routes.addTo(this.mapController.map);
+          }
+        } else {
+          if (this.mapController.map.hasLayer(this.mapController.layers.routes)) {
+            this.mapController.layers.routes.remove();
+          }
+        }
+      }
+
+      if (this.mapController.layers.historicalStations) {
+        if (viewId === 'historical') {
+          if (!this.mapController.map.hasLayer(this.mapController.layers.historicalStations)) {
+            this.mapController.layers.historicalStations.addTo(this.mapController.map);
+          }
+        } else {
+          if (this.mapController.map.hasLayer(this.mapController.layers.historicalStations)) {
+            this.mapController.layers.historicalStations.remove();
+          }
+        }
+      }
     }
 
     if (viewId === 'pfz') {
@@ -251,7 +277,13 @@ class OrcaApp {
         if (this.simulator) this.simulator.runSimulation();
       }, 100);
     } else if (viewId === 'historical') {
-      this.loadHistoricalTrends();
+      const select = document.getElementById('hist-station-select');
+      if (select) {
+        const parts = select.value.split(',');
+        this.loadHistoricalTrends(parseFloat(parts[0]), parseFloat(parts[1]));
+      } else {
+        this.loadHistoricalTrends(12.9141, 74.8560);
+      }
     } else if (viewId === 'routes') {
       setTimeout(() => {
         if (this.mapController) {
@@ -715,13 +747,60 @@ class OrcaApp {
     }
   }
 
-  async loadHistoricalTrends() {
+  bindHistoricalControls() {
+    const select = document.getElementById('hist-station-select');
+    if (!select) return;
+    select.addEventListener('change', (e) => {
+      const parts = e.target.value.split(',');
+      const lat = parseFloat(parts[0]);
+      const lon = parseFloat(parts[1]);
+      this.loadHistoricalTrends(lat, lon);
+      if (this.mapController) {
+        this.mapController.flyTo(lat, lon, 8.5);
+      }
+    });
+  }
+
+  selectHistoricalStation(stationId, lat, lon, name) {
+    const select = document.getElementById('hist-station-select');
+    if (select) {
+      for (let i = 0; i < select.options.length; i++) {
+        if (select.options[i].dataset.id === stationId) {
+          select.selectedIndex = i;
+          break;
+        }
+      }
+    }
+    this.loadHistoricalTrends(lat, lon);
+    if (this.mapController) {
+      this.mapController.flyTo(lat, lon, 8.5);
+    }
+  }
+
+  async loadHistoricalTrends(lat = 12.9141, lon = 74.8560) {
     try {
-      const resp = await fetch(`${this.getApiBase()}/api/marine/historical`);
+      const resp = await fetch(`${this.getApiBase()}/api/marine/historical?latitude=${lat}&longitude=${lon}`);
       if (resp.ok) {
         const json = await resp.json();
         const data = json.data;
         this.renderHistoricalCharts(data);
+
+        // Update mini telemetry summary
+        if (data.wave_heights_m && data.wave_heights_m.length > 0) {
+          const meanSwell = (data.wave_heights_m.reduce((a, b) => a + b, 0) / data.wave_heights_m.length).toFixed(2);
+          const maxWave = Math.max(...data.wave_heights_m).toFixed(2);
+          const meanSst = (data.sst_celsius && data.sst_celsius.length > 0)
+            ? (data.sst_celsius.reduce((a, b) => a + b, 0) / data.sst_celsius.length).toFixed(1)
+            : '28.4';
+
+          const meanSwellEl = document.getElementById('hist-mean-swell');
+          const maxWaveEl = document.getElementById('hist-max-wave');
+          const meanSstEl = document.getElementById('hist-mean-sst');
+
+          if (meanSwellEl) meanSwellEl.textContent = `${meanSwell} m`;
+          if (maxWaveEl) maxWaveEl.textContent = `${maxWave} m`;
+          if (meanSstEl) meanSstEl.textContent = `${meanSst} °C`;
+        }
       }
     } catch (e) {
       console.warn("Historical trends error.", e);

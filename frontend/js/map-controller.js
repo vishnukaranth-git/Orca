@@ -37,7 +37,8 @@ class OrcaMapController {
       vessels: L.layerGroup(),
       routes: L.layerGroup(),
       eez: L.layerGroup(),
-      streetviewCoverage: L.layerGroup()
+      streetviewCoverage: L.layerGroup(),
+      historicalStations: L.layerGroup()
     };
 
     // Real Google Maps Street View & Alternative 360 State
@@ -318,6 +319,7 @@ class OrcaMapController {
     this.renderVessels();
     this.renderEEZBoundary();
     this.renderStreetViewCoverageLayer();
+    this.renderHistoricalStations();
 
     // Bind Map Events & Keyboard Shortcuts
     this.bindMapEvents();
@@ -1825,6 +1827,61 @@ class OrcaMapController {
         200 Nautical Mile Sovereign Marine Economic Sector
       </div>
     `);
+  }
+
+  renderHistoricalStations() {
+    this.layers.historicalStations.clearLayers();
+
+    const stations = [
+      { id: 'mangalore', name: "Mangalore Offshore Buoy BD02", pos: [12.9141, 74.8560], depth: "42m", region: "Arabian Sea" },
+      { id: 'kochi', name: "Kochi Deepwater Buoy CB02", pos: [9.9312, 76.2673], depth: "58m", region: "Lakshadweep Basin" },
+      { id: 'mumbai', name: "Mumbai High Climatology Rig", pos: [18.9500, 72.8200], depth: "75m", region: "Maharashtra Shelf" },
+      { id: 'cape', name: "Wadge Bank Ocean Observatory", pos: [7.8500, 77.3000], depth: "64m", region: "Cape Comorin" },
+      { id: 'chennai', name: "Chennai Coastal Buoy BD08", pos: [13.0827, 80.2707], depth: "50m", region: "Bay of Bengal" },
+      { id: 'vizag', name: "Visakhapatnam Deep Trench", pos: [17.6868, 83.2185], depth: "110m", region: "Andhra Basin" }
+    ];
+
+    stations.forEach(st => {
+      const buoyIcon = L.divIcon({
+        className: 'historical-buoy-div-icon',
+        html: `
+          <div class="orca-buoy-marker" title="${st.name}">
+            <div class="buoy-pulse-ring"></div>
+            <div class="buoy-core">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+              </svg>
+            </div>
+            <div class="buoy-pill">${st.id.toUpperCase()} BUOY</div>
+          </div>
+        `,
+        iconSize: [110, 32],
+        iconAnchor: [16, 16]
+      });
+
+      const marker = L.marker(st.pos, { icon: buoyIcon }).addTo(this.layers.historicalStations);
+      marker.bindPopup(`
+        <div style="font-family:var(--font-body);padding:4px;font-size:12px;">
+          <div style="font-family:var(--font-display);font-weight:700;color:#22d3b6;font-size:13px;margin-bottom:2px;">
+            ${st.name}
+          </div>
+          <div style="color:#94a3b8;font-size:11px;">Region: <b>${st.region}</b> · Depth: <b>${st.depth}</b></div>
+          <div style="font-family:var(--font-mono);font-size:10.5px;color:#38bdf8;margin-top:4px;">
+            Coordinates: ${st.pos[0]}°N, ${st.pos[1]}°E
+          </div>
+          <button onclick="orcaApp.selectHistoricalStation('${st.id}', ${st.pos[0]}, ${st.pos[1]}, '${st.name}')" style="margin-top:8px;width:100%;background:rgba(34,211,182,0.18);border:1px solid #22d3b6;color:#22d3b6;padding:4px 8px;border-radius:4px;cursor:pointer;font-family:var(--font-mono);font-size:10.5px;font-weight:600;">
+            VIEW 7-DAY TELEMETRY
+          </button>
+        </div>
+      `, { className: 'orca-context-popup', autoPan: false });
+
+      marker.on('click', () => {
+        if (window.orcaApp) {
+          window.orcaApp.selectHistoricalStation(st.id, st.pos[0], st.pos[1], st.name);
+        }
+      });
+    });
   }
 
   generateCorridorBuffer(points, bufferDeg = 0.035) {

@@ -726,24 +726,52 @@
 
       <!-- VIEW 7: HISTORICAL TRENDS (7-Day Marine Memory) -->
       <div class="view-panel" id="view-historical">
-        <div class="side-dock-panel left-side-dock" style="width:580px;">
+        <div class="side-dock-panel left-side-dock" style="width:540px;">
           <div class="panel-header-bar">
             <div>
               <h2>7-DAY HISTORICAL TREND ANALYSIS</h2>
-              <p class="subtitle">Open-Meteo Marine Archive & Climatological Observation</p>
+              <p class="subtitle">Open-Meteo Marine Archive &amp; Climatological Observation</p>
+            </div>
+          </div>
+
+          <!-- Station Selector & Telemetry Summary -->
+          <div class="hist-controls-box" style="display:flex;flex-direction:column;gap:8px;">
+            <div class="input-field-group">
+              <label>OBSERVATION BUOY / CLIMATOLOGICAL SECTOR</label>
+              <select id="hist-station-select" class="orca-select">
+                <option value="12.9141,74.8560" data-id="mangalore" selected>Mangalore Offshore Buoy BD02 (Arabian Sea)</option>
+                <option value="9.9312,76.2673" data-id="kochi">Kochi Deepwater Buoy CB02 (Lakshadweep Basin)</option>
+                <option value="18.9500,72.8200" data-id="mumbai">Mumbai High Climatology Rig (Maharashtra Shelf)</option>
+                <option value="7.8500,77.3000" data-id="cape">Wadge Bank Ocean Observatory (Cape Comorin)</option>
+                <option value="13.0827,80.2707" data-id="chennai">Chennai Coastal Buoy BD08 (Bay of Bengal)</option>
+                <option value="17.6868,83.2185" data-id="vizag">Visakhapatnam Deep Trench (Andhra Basin)</option>
+              </select>
+            </div>
+
+            <!-- Mini Telemetry Strip -->
+            <div id="hist-telemetry-strip" style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;font-size:11.5px;background:rgba(3,14,24,0.7);padding:8px;border-radius:4px;border:1px solid rgba(36,160,200,0.18);">
+              <div><span style="color:var(--text-muted);">7-Day Mean Swell:</span> <b id="hist-mean-swell" style="font-family:var(--font-mono);color:#22d3b6;">1.32 m</b></div>
+              <div><span style="color:var(--text-muted);">Max Significant:</span> <b id="hist-max-wave" style="font-family:var(--font-mono);color:#fbbf24;">1.65 m</b></div>
+              <div><span style="color:var(--text-muted);">Mean SST Temp:</span> <b id="hist-mean-sst" style="font-family:var(--font-mono);color:#38bdf8;">28.4 °C</b></div>
             </div>
           </div>
 
           <div class="chart-box-card">
-            <h4 style="font-size:12px;margin-bottom:8px;color:#d1e8f2;">Wave Height & Swell Dynamics (Last 7 Days)</h4>
-            <div style="height:170px;position:relative;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+              <h4 style="font-size:12px;color:#d1e8f2;margin:0;">Wave Height &amp; Swell Dynamics (Last 7 Days)</h4>
+              <span class="telemetry-tag" style="color:#22d3b6;">HISTORICAL ARCHIVE</span>
+            </div>
+            <div style="height:155px;position:relative;">
               <canvas id="hist-wave-chart"></canvas>
             </div>
           </div>
 
-          <div class="chart-box-card" style="margin-top:12px;">
-            <h4 style="font-size:12px;margin-bottom:8px;color:#d1e8f2;">Sea Surface Temperature (SST °C) Trend</h4>
-            <div style="height:170px;position:relative;">
+          <div class="chart-box-card" style="margin-top:8px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+              <h4 style="font-size:12px;color:#d1e8f2;margin:0;">Sea Surface Temperature (SST °C) Trend</h4>
+              <span class="telemetry-tag" style="color:#f59e0b;">THERMAL MEMORY</span>
+            </div>
+            <div style="height:155px;position:relative;">
               <canvas id="hist-sst-chart"></canvas>
             </div>
           </div>
@@ -752,68 +780,131 @@
 
       <!-- VIEW 8: WHAT-IF SIMULATOR -->
       <div class="view-panel" id="view-simulator">
-        <div class="simulator-main-overlay">
+        <div class="simulator-full-browser-container">
+          <!-- Mission Control Header -->
           <div class="sim-header">
-            <div>
+            <div class="sim-title-wrap">
+              <span class="sim-browser-badge"><i data-lucide="gauge" style="width:12px;height:12px;"></i> DECISION INTELLIGENCE · MULTI-SCENARIO PROJECTION</span>
               <h2>WHAT-IF DEPARTURE TIME SIMULATOR</h2>
-              <p class="subtitle">Hourly Forecast Comparison & Multi-Dimensional Risk Radar</p>
+              <p class="subtitle">Multi-Dimensional Risk Radar &amp; Hourly Forecast Tradeoff Analysis</p>
             </div>
-            <div class="sim-selectors-row">
+            <div class="sim-header-controls">
+              <!-- Location Sector Selector -->
               <div class="sim-select-block">
-                <span>SCENARIO A:</span>
+                <label><i data-lucide="map-pin" style="width:12px;height:12px;color:var(--accent-aqua);"></i> SECTOR:</label>
+                <select id="sim-location-select" class="orca-select small">
+                  <option value="12.9141,74.8560" selected>Mangalore Shelf (Arabian Sea)</option>
+                  <option value="9.9312,76.2673">Kochi Offshore (Lakshadweep Basin)</option>
+                  <option value="18.9500,72.8200">Mumbai High (Maharashtra Shelf)</option>
+                  <option value="7.8500,77.3000">Wadge Bank (Cape Comorin)</option>
+                  <option value="13.0827,80.2707">Chennai Outer Harbor (Bay of Bengal)</option>
+                  <option value="17.6868,83.2185">Visakhapatnam Shelf (Andhra Basin)</option>
+                </select>
+              </div>
+              <div class="sim-select-block">
+                <span style="color:#22d3b6;">SCENARIO A:</span>
                 <select id="sim-time-a" class="orca-select small">
                   <option value="05:00" selected>05:00 AM (Dawn)</option>
-                  <option value="07:00">07:00 AM (Early)</option>
+                  <option value="07:00">07:00 AM (Early Morning)</option>
                   <option value="09:00">09:00 AM (Mid Morning)</option>
                   <option value="12:00">12:00 PM (Noon)</option>
                   <option value="15:00">03:00 PM (Afternoon)</option>
                 </select>
               </div>
               <div class="sim-select-block">
-                <span>SCENARIO B:</span>
+                <span style="color:#f59e0b;">SCENARIO B:</span>
                 <select id="sim-time-b" class="orca-select small">
                   <option value="05:00">05:00 AM (Dawn)</option>
-                  <option value="07:00">07:00 AM (Early)</option>
+                  <option value="07:00">07:00 AM (Early Morning)</option>
                   <option value="09:00">09:00 AM (Mid Morning)</option>
                   <option value="10:00" selected>10:00 AM (Mid-Late)</option>
                   <option value="14:00">02:00 PM (Afternoon)</option>
+                  <option value="17:00">05:00 PM (Dusk)</option>
                 </select>
               </div>
             </div>
           </div>
 
+          <!-- Recommendation Banner Across Top -->
+          <div class="sim-recommendation-bar" id="sim-recommendation-bar">
+            <div class="rec-icon-box">
+              <i data-lucide="shield-check" style="width:20px;height:20px;color:#22d3b6;"></i>
+            </div>
+            <div class="rec-text-wrap">
+              <div class="rec-headline">AI MARITIME DISPATCH RECOMMENDATION</div>
+              <div class="rec-message" id="sim-delta-risk">Evaluating live hourly marine forecast models...</div>
+            </div>
+          </div>
+
           <div class="sim-body-grid">
+            <!-- Scenario A Card -->
             <div class="sim-scenario-card" id="sc-a">
               <div class="sc-header sc-a-border">
-                <span class="sc-badge">SCENARIO A</span>
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <span class="sc-badge">SCENARIO A</span>
+                  <span class="sc-tag-time" style="color:#22d3b6;">DAWN WINDOW</span>
+                </div>
                 <h3 class="sc-time-label">Departure: 05:00 AM</h3>
               </div>
               <div class="sc-metrics">
                 <div class="sc-metric-row"><span>Risk Score:</span><b class="sc-risk-val" style="color:#22d3b6;">24/100</b></div>
                 <div class="sc-metric-row"><span>Wave Swell:</span><b class="sc-wave-val">1.1 m</b></div>
-                <div class="sc-metric-row"><span>Surface Wind:</span><b class="sc-wind-val">12 km/h</b></div>
+                <div class="sc-metric-row"><span>Wave Period:</span><b class="sc-period-val">7.8 s</b></div>
+                <div class="sc-metric-row"><span>Surface Wind:</span><b class="sc-wind-val">12 km/h (6.5 kn)</b></div>
+                <div class="sc-metric-row"><span>Wind Gusts:</span><b class="sc-gust-val">15 km/h</b></div>
                 <div class="sc-metric-row"><span>Catch Potential:</span><b class="sc-fish-val">92%</b></div>
+                <div class="sc-metric-row"><span>Fuel Efficiency:</span><b class="sc-fuel-val" style="color:#22d3b6;">94%</b></div>
                 <div class="sc-safety-status low">LOW RISK (FAVORABLE)</div>
               </div>
             </div>
 
-            <div class="sim-chart-container">
-              <canvas id="sim-chart-canvas"></canvas>
-              <div class="sim-delta-banner" id="sim-delta-risk">
-                Comparing live hourly marine forecast models...
+            <!-- Center Visual Radar & Head-to-Head Comparison -->
+            <div class="sim-center-panel">
+              <div class="sim-chart-card">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                  <span style="font-family:var(--font-display);font-size:13px;font-weight:700;color:#fff;">MULTI-DIMENSIONAL MARITIME RADAR</span>
+                  <span style="font-family:var(--font-mono);font-size:10px;color:#94a3b8;">NORMALIZED METRICS (0 - 100)</span>
+                </div>
+                <div class="sim-radar-canvas-wrap">
+                  <canvas id="sim-chart-canvas"></canvas>
+                </div>
+              </div>
+
+              <!-- Head-to-Head Metric Comparison Table -->
+              <div class="sim-comparison-table-card">
+                <table class="sim-comp-table">
+                  <thead>
+                    <tr>
+                      <th>PARAMETER</th>
+                      <th style="color:#22d3b6;text-align:center;">SCENARIO A</th>
+                      <th style="color:#f59e0b;text-align:center;">SCENARIO B</th>
+                      <th style="text-align:right;">VARIANCE / ADVANTAGE</th>
+                    </tr>
+                  </thead>
+                  <tbody id="sim-comp-tbody">
+                    <!-- Populated dynamically -->
+                  </tbody>
+                </table>
               </div>
             </div>
 
+            <!-- Scenario B Card -->
             <div class="sim-scenario-card" id="sc-b">
               <div class="sc-header sc-b-border">
-                <span class="sc-badge" style="background:rgba(245,158,11,0.2);color:#fbbf24;border-color:#fbbf24;">SCENARIO B</span>
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <span class="sc-badge" style="background:rgba(245,158,11,0.2);color:#fbbf24;border-color:#fbbf24;">SCENARIO B</span>
+                  <span class="sc-tag-time" style="color:#f59e0b;">MID-DAY WINDOW</span>
+                </div>
                 <h3 class="sc-time-label">Departure: 10:00 AM</h3>
               </div>
               <div class="sc-metrics">
                 <div class="sc-metric-row"><span>Risk Score:</span><b class="sc-risk-val" style="color:#fbbf24;">48/100</b></div>
                 <div class="sc-metric-row"><span>Wave Swell:</span><b class="sc-wave-val">1.6 m</b></div>
-                <div class="sc-metric-row"><span>Surface Wind:</span><b class="sc-wind-val">22 km/h</b></div>
+                <div class="sc-metric-row"><span>Wave Period:</span><b class="sc-period-val">6.5 s</b></div>
+                <div class="sc-metric-row"><span>Surface Wind:</span><b class="sc-wind-val">22 km/h (11.8 kn)</b></div>
+                <div class="sc-metric-row"><span>Wind Gusts:</span><b class="sc-gust-val">28 km/h</b></div>
                 <div class="sc-metric-row"><span>Catch Potential:</span><b class="sc-fish-val">84%</b></div>
+                <div class="sc-metric-row"><span>Fuel Efficiency:</span><b class="sc-fuel-val" style="color:#fbbf24;">76%</b></div>
                 <div class="sc-safety-status moderate">MODERATE RISK (CAUTION)</div>
               </div>
             </div>
