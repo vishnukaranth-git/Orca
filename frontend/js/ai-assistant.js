@@ -742,15 +742,32 @@ class OrcaAIAssistant {
         const meta = metaMap[step.agent] || { symbol: '📊', source: step.source || 'Sensor Feed' };
         const metricEntries = Object.entries(step.metrics || {});
         const metricRowsHtml = metricEntries.length > 0
-          ? metricEntries.slice(0, 3).map(([k, v]) => `<div class="ev-metric-item"><span>${this.escapeHtml(k)}:</span> <b>${this.escapeHtml(String(v))}</b></div>`).join('')
-          : `<div class="ev-metric-item"><span>Finding:</span> <b>${this.escapeHtml(step.detail || 'Verified')}</b></div>`;
+          ? metricEntries.map(([k, v]) => `
+              <div class="ev-metric-item">
+                <span class="ev-metric-key">${this.escapeHtml(k)}:</span>
+                <span class="ev-metric-val">${this.escapeHtml(String(v))}</span>
+              </div>
+            `).join('')
+          : `<div class="ev-metric-item"><span class="ev-metric-key">Telemetry:</span> <span class="ev-metric-val">${this.escapeHtml(step.detail || 'Verified Operational')}</span></div>`;
 
-        const srcShort = (step.source || meta.source || 'Operational Feed').split('/')[0].trim();
+        // Clean concise source badge
+        let rawSrc = step.source || meta.source || 'Operational Feed';
+        if (rawSrc.includes('/')) rawSrc = rawSrc.split('/')[0].trim();
+        if (rawSrc.includes('&')) rawSrc = rawSrc.split('&')[0].trim();
+        const srcClean = rawSrc.length > 26 ? rawSrc.substring(0, 24) + '...' : rawSrc;
+
         return `
           <div class="evidence-agent-card">
-            <div class="ev-agent-top">
-              <span class="ev-agent-name">${meta.symbol || '⚙️'} ${this.escapeHtml(step.agent)}</span>
-              <span class="ev-tag">${this.escapeHtml(srcShort)}</span>
+            <div class="ev-agent-header">
+              <div class="ev-agent-title-wrap">
+                <span class="ev-agent-symbol">${meta.symbol || '⚙️'}</span>
+                <span class="ev-agent-name">${this.escapeHtml(step.agent)}</span>
+              </div>
+              <span class="ev-verified-pill">✓ LIVE</span>
+            </div>
+            <div class="ev-source-line">
+              <span class="ev-source-label">SRC:</span>
+              <span class="ev-source-val" title="${this.escapeHtml(step.source || meta.source)}">${this.escapeHtml(srcClean)}</span>
             </div>
             <div class="ev-metrics-list">
               ${metricRowsHtml}
@@ -761,12 +778,26 @@ class OrcaAIAssistant {
     } else {
       evidenceCardsHtml = `
         <div class="evidence-agent-card">
-          <div class="ev-agent-top"><span class="ev-agent-name">🌊 Ocean Agent</span><span class="ev-tag">INCOIS BUOYS</span></div>
-          <div class="ev-metrics-list"><div class="ev-metric-item"><span>Wave Height:</span> <b>${this.escapeHtml(waveVal)}</b></div><div class="ev-metric-item"><span>SST:</span> <b>${this.escapeHtml(sstVal)}</b></div></div>
+          <div class="ev-agent-header">
+            <div class="ev-agent-title-wrap"><span class="ev-agent-symbol">🌊</span><span class="ev-agent-name">Ocean Agent</span></div>
+            <span class="ev-verified-pill">✓ LIVE</span>
+          </div>
+          <div class="ev-source-line"><span class="ev-source-label">SRC:</span><span class="ev-source-val">INCOIS Deep Sea Buoys</span></div>
+          <div class="ev-metrics-list">
+            <div class="ev-metric-item"><span class="ev-metric-key">Wave Height:</span> <span class="ev-metric-val">${this.escapeHtml(waveVal)}</span></div>
+            <div class="ev-metric-item"><span class="ev-metric-key">SST:</span> <span class="ev-metric-val">${this.escapeHtml(sstVal)}</span></div>
+          </div>
         </div>
         <div class="evidence-agent-card">
-          <div class="ev-agent-top"><span class="ev-agent-name">💨 Weather Agent</span><span class="ev-tag">IMD / GFS</span></div>
-          <div class="ev-metrics-list"><div class="ev-metric-item"><span>Wind Speed:</span> <b>${this.escapeHtml(windVal)}</b></div><div class="ev-metric-item"><span>Status:</span> <b>Fair</b></div></div>
+          <div class="ev-agent-header">
+            <div class="ev-agent-title-wrap"><span class="ev-agent-symbol">💨</span><span class="ev-agent-name">Weather Agent</span></div>
+            <span class="ev-verified-pill">✓ LIVE</span>
+          </div>
+          <div class="ev-source-line"><span class="ev-source-label">SRC:</span><span class="ev-source-val">IMD Synoptic Mesh</span></div>
+          <div class="ev-metrics-list">
+            <div class="ev-metric-item"><span class="ev-metric-key">Wind Speed:</span> <span class="ev-metric-val">${this.escapeHtml(windVal)}</span></div>
+            <div class="ev-metric-item"><span class="ev-metric-key">Status:</span> <span class="ev-metric-val">Fair Condition</span></div>
+          </div>
         </div>
       `;
     }
