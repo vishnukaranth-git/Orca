@@ -33,7 +33,7 @@
     
     <!-- Top HUD Header -->
     <header class="hud-header">
-      <div class="brand-section" onclick="orcaApp.switchView('command')">
+      <div class="brand-section" onclick="orcaApp.switchView('ask-orca')">
         <div class="brand-logo-hud">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3 8c3-2 6-2 9 0s6 2 9 0"/><path d="M3 12c3-2 6-2 9 0s6 2 9 0"/><path d="M3 16c3-2 6-2 9 0s6 2 9 0"/></svg>
         </div>
@@ -68,11 +68,11 @@
     <aside class="orca-left-sidebar" id="orca-sidebar-nav">
       <div class="sidebar-section-header">MISSION NAVIGATION</div>
       <nav class="sidebar-nav-list">
-        <button class="nav-tab-btn highlight-tab" data-view="ask-orca" id="tab-ask-orca">
+        <button class="nav-tab-btn highlight-tab active" data-view="ask-orca" id="tab-ask-orca">
           <i data-lucide="sparkles"></i>
           <span>Ask ORCA</span>
         </button>
-        <button class="nav-tab-btn active" data-view="command" id="tab-command">
+        <button class="nav-tab-btn" data-view="command" id="tab-command">
           <i data-lucide="layout-dashboard"></i>
           <span>Command Center</span>
         </button>
@@ -250,7 +250,7 @@
       </div>
 
       <!-- VIEW 1: COMMAND CENTER (Map-First Experience) -->
-      <div class="view-panel active" id="view-command">
+      <div class="view-panel" id="view-command">
         <!-- Floating Marine Region Inspector Overlay (Docked on Right) -->
         <div class="marine-region-inspector" id="marine-region-inspector">
           <div class="inspector-header">
@@ -269,7 +269,7 @@
       </div>
 
       <!-- VIEW 2: ASK ORCA — PRIMARY AGENTIC AI EXPERIENCE -->
-      <div class="view-panel" id="view-ask-orca">
+      <div class="view-panel active" id="view-ask-orca">
         <div class="ask-orca-chat-layout">
           
           <!-- LEFT: CONVERSATION SESSIONS & CHAT HISTORY -->

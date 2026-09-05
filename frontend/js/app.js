@@ -6,7 +6,7 @@
 
 class OrcaApp {
   constructor() {
-    this.currentView = 'command';
+    this.currentView = 'ask-orca';
     this.mapController = null;
     this.agentNetwork = null;
     this.satelliteLab = null;
@@ -50,8 +50,8 @@ class OrcaApp {
     this.checkBackendHealth();
     this.fetchLiveTelemetry();
 
-    // Default view: Command Center Map
-    this.switchView('command');
+    // Default view: Ask ORCA (Primary Agentic AI Experience)
+    this.switchView('ask-orca');
 
     // Popover click-outside dismissal
     document.addEventListener('click', (e) => {
@@ -65,9 +65,9 @@ class OrcaApp {
       }
     });
 
-    // Inspect initial Arabian Sea basin on load
+    // Inspect initial Arabian Sea basin when user opens command center view
     setTimeout(() => {
-      if (this.mapController) {
+      if (this.currentView === 'command' && this.mapController) {
         this.mapController.inspectRegion('arabian_sea');
       }
     }, 400);
