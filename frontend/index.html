@@ -5,13 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ORCA | Ocean Reasoning & Collaborative Agents</title>
   <meta name="description" content="AI-powered marine intelligence, fisheries optimization, and disaster watch platform for the Indian Ocean and Asian waters.">
-  <meta name="color-scheme" content="light">
+  <meta name="color-scheme" content="dark light">
   
-  <!-- Valley Sans Preload & Google Mono Font -->
-  <link rel="preload" href="fonts/ValleySans-Variable.woff2" as="font" type="font/woff2" crossorigin>
+  <!-- Google Fonts: Orbitron, Space Grotesk, Rajdhani, Inter & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
@@ -208,7 +207,7 @@
 
         <!-- Layers Dropdown Popover (Controlled by Layers Button) -->
         <div class="map-layers-popover" id="map-layers-popover" style="display:none;">
-          <div style="font-family:var(--font-display);font-size:11px;font-weight:700;letter-spacing:0.08em;color:var(--accent-cyan);border-bottom:1px solid rgba(13,148,136,0.2);padding-bottom:4px;margin-bottom:2px;">GEOSPATIAL LAYERS</div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.08em;color:var(--accent-cyan);border-bottom:1px solid rgba(36,160,200,0.2);padding-bottom:4px;margin-bottom:2px;">GEOSPATIAL LAYERS</div>
           <label class="layer-toggle-row">
             <span>Satellite Labels &amp; Borders</span>
             <input type="checkbox" checked onchange="orcaApp.mapController.toggleLayer('labels', this.checked)">

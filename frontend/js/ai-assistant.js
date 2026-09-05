@@ -495,13 +495,13 @@ class OrcaAIAssistant {
               <span>✓</span>
             </div>
             <div class="agent-name-role">
-              <span class="modal-agent-name" style="color:var(--text-pure);">Understanding Intent</span>
+              <span class="modal-agent-name" style="color:#ffffff;">Understanding Intent</span>
               <span class="modal-agent-role-tag">NATURAL LANGUAGE NLP</span>
             </div>
           </div>
           <span class="modal-agent-state-pill completed">✓ ANALYZED</span>
         </div>
-        <div class="modal-agent-action-banner" style="color:var(--text-secondary);font-size:10.5px;">
+        <div class="modal-agent-action-banner" style="color:#94a3b8;font-size:10px;">
           Marine intent extracted · Spatial bounds and oceanographic domain resolved
         </div>
       </div>
@@ -609,7 +609,7 @@ class OrcaAIAssistant {
 
       const sourceName = step?.source || meta.source;
       if (sub) {
-        sub.innerHTML = `<span style="color:var(--accent-teal);font-weight:700;">✓ Ingested from:</span> <span style="color:var(--text-pure);font-weight:600;">${sourceName}</span>`;
+        sub.innerHTML = `<span style="color:#2dd4bf;font-weight:700;">✓ Ingested from:</span> <span style="color:#ffffff;font-weight:600;">${sourceName}</span>`;
       }
 
       // Populate rich collected metrics chips with value, unit, source
@@ -821,8 +821,8 @@ class OrcaAIAssistant {
           </div>
           <span class="risk-score-pill">SCORE: ${riskScore}/100</span>
         </div>
-        <div class="common-user-summary" style="margin-top:10px;padding:12px 14px;background:var(--bg-primary);border-radius:8px;border:1px solid var(--border-panel);">
-          <p style="font-size:14px;line-height:1.65;color:var(--text-pure);font-weight:500;margin:0;">${this.escapeHtml(directAnswer)}</p>
+        <div class="common-user-summary" style="margin-top:10px;padding:12px 14px;background:rgba(15,23,42,0.65);border-radius:8px;border:1px solid rgba(255,255,255,0.08);">
+          <p style="font-size:14px;line-height:1.65;color:#ffffff;font-weight:500;margin:0;">${this.escapeHtml(directAnswer)}</p>
         </div>
       </div>
 

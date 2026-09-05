@@ -157,17 +157,17 @@ class OrcaApp {
       : `<div style="color:#22d3b6;font-size:11px;margin-top:4px;">✓ Safe Channel Clear of Marine Sanctuaries & Military Sectors</div>`;
 
     card.innerHTML = `
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;border-bottom:1px solid var(--border-panel);padding-bottom:6px;">
-        <b style="font-family:var(--font-display);font-size:14px;color:var(--text-pure);">${route.route_type}</b>
-        <span class="telemetry-tag" style="color:var(--accent-teal);font-weight:700;">PASSAGE CLEARED</span>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;border-bottom:1px solid rgba(36,160,200,0.2);padding-bottom:6px;">
+        <b style="font-family:'Rajdhani',sans-serif;font-size:14px;color:#fff;">${route.route_type}</b>
+        <span class="telemetry-tag" style="color:#22d3b6;">PASSAGE CLEARED</span>
       </div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;font-size:11.5px;margin-bottom:8px;">
-        <div><span style="color:var(--text-muted);">Distance:</span> <b style="font-family:var(--font-body);color:var(--text-pure);">${route.distance_km} km</b></div>
-        <div><span style="color:var(--text-muted);">Nautical:</span> <b style="font-family:var(--font-body);color:var(--text-pure);">${route.distance_nm} NM</b></div>
-        <div><span style="color:var(--text-muted);">Est. Transit:</span> <b style="font-family:var(--font-body);color:var(--accent-teal);">${route.estimated_transit_hours} hrs</b></div>
+        <div><span style="color:var(--text-muted);">Distance:</span> <b style="font-family:var(--font-mono);color:#fff;">${route.distance_km} km</b></div>
+        <div><span style="color:var(--text-muted);">Nautical:</span> <b style="font-family:var(--font-mono);color:#fff;">${route.distance_nm} NM</b></div>
+        <div><span style="color:var(--text-muted);">Est. Transit:</span> <b style="font-family:var(--font-mono);color:#22d3b6;">${route.estimated_transit_hours} hrs</b></div>
       </div>
-      <div style="background:var(--bg-primary);border:1px solid var(--border-panel);padding:8px;border-radius:4px;">
-        <div style="font-size:10px;font-family:var(--font-body);font-weight:700;color:var(--text-muted);">SAFETY CHECK & GEOFENCING:</div>
+      <div style="background:rgba(3,14,24,0.7);padding:8px;border-radius:4px;">
+        <div style="font-size:10px;font-family:var(--font-mono);color:var(--text-muted);">SAFETY CHECK & GEOFENCING:</div>
         ${warningsHtml}
       </div>
     `;
@@ -433,8 +433,8 @@ class OrcaApp {
         datasets: [{
           label: 'Wave Height (m)',
           data: data.wave_heights_m || [1.2, 1.4, 1.3, 1.1, 1.5, 1.3, 1.2],
-          borderColor: '#0d9488',
-          backgroundColor: 'rgba(13, 148, 136, 0.12)',
+          borderColor: '#22d3b6',
+          backgroundColor: 'rgba(34, 211, 182, 0.15)',
           fill: true,
           tension: 0.3
         }]
@@ -443,8 +443,8 @@ class OrcaApp {
         responsive: true,
         maintainAspectRatio: false,
         scales: {
-          y: { grid: { color: 'rgba(15, 23, 42, 0.06)' }, ticks: { color: '#64748b', font: { family: "'Valley Sans', sans-serif" } } },
-          x: { grid: { display: false }, ticks: { color: '#64748b', font: { family: "'Valley Sans', sans-serif" } } }
+          y: { grid: { color: 'rgba(36, 160, 200, 0.1)' }, ticks: { color: '#84a9ba' } },
+          x: { grid: { display: false }, ticks: { color: '#84a9ba' } }
         },
         plugins: { legend: { display: false } }
       }
@@ -457,8 +457,8 @@ class OrcaApp {
         datasets: [{
           label: 'Sea Surface Temp (°C)',
           data: data.sst_celsius || [28.2, 28.4, 28.5, 28.3, 28.6, 28.5, 28.4],
-          borderColor: '#0284c7',
-          backgroundColor: 'rgba(2, 132, 199, 0.12)',
+          borderColor: '#f59e0b',
+          backgroundColor: 'rgba(245, 158, 11, 0.15)',
           fill: true,
           tension: 0.3
         }]
@@ -467,8 +467,8 @@ class OrcaApp {
         responsive: true,
         maintainAspectRatio: false,
         scales: {
-          y: { min: 27, max: 30, grid: { color: 'rgba(15, 23, 42, 0.06)' }, ticks: { color: '#64748b', font: { family: "'Valley Sans', sans-serif" } } },
-          x: { grid: { display: false }, ticks: { color: '#64748b', font: { family: "'Valley Sans', sans-serif" } } }
+          y: { min: 27, max: 30, grid: { color: 'rgba(36, 160, 200, 0.1)' }, ticks: { color: '#84a9ba' } },
+          x: { grid: { display: false }, ticks: { color: '#84a9ba' } }
         },
         plugins: { legend: { display: false } }
       }
