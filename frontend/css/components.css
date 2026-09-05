@@ -80,8 +80,50 @@
 }
 
 .sidebar-brand:hover .brand-logo-hud {
-  border-color: #2dd4bf;
-  box-shadow: 0 0 12px rgba(45, 212, 191, 0.35);
+  border-color: #00F5D4;
+  box-shadow: 0 0 12px rgba(0, 245, 212, 0.45);
+}
+
+.sidebar-telemetry-strip {
+  margin: -4px 0 12px 0;
+  padding: 6px 8px;
+  background: rgba(0, 245, 212, 0.04);
+  border: 1px solid rgba(0, 245, 212, 0.12);
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.telemetry-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--accent-biolum);
+  letter-spacing: 0.06em;
+}
+
+.telemetry-coords-line {
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  color: var(--text-cyan-grey);
+  letter-spacing: 0.05em;
+  opacity: 0.85;
+}
+
+.sidebar-telemetry-meta {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  color: var(--accent-isro-blue);
+  letter-spacing: 0.06em;
+  padding: 4px 6px;
+  background: rgba(58, 160, 255, 0.06);
+  border: 1px solid rgba(58, 160, 255, 0.14);
+  border-radius: 4px;
+  text-align: center;
 }
 
 .sidebar-footer {
@@ -2167,7 +2209,7 @@
   display: flex;
   height: 100vh;
   width: 100%;
-  background: linear-gradient(180deg, rgba(6, 11, 18, 0.65) 0%, rgba(3, 7, 12, 0.82) 100%), url('../ocean_satellite_bg.jpg') center/cover no-repeat;
+  background: radial-gradient(ellipse at 50% 30%, rgba(4, 20, 40, 0.45) 0%, rgba(1, 5, 12, 0.72) 100%);
   position: relative;
   overflow: hidden;
 }
@@ -2175,7 +2217,7 @@
 /* Left Sidebar for Intelligence Sessions */
 .ask-orca-history-col {
   width: 260px;
-  background: rgba(8, 13, 20, 0.92);
+  background: rgba(2, 10, 22, 0.84);
   border-right: 1px solid var(--panel-border);
   display: flex;
   flex-direction: column;
@@ -2351,23 +2393,48 @@
   margin-bottom: 24px;
 }
 
-/* Large Hero Input Box */
+/* Large Hero Input Box with Submarine HUD Reticles */
 .hero-chat-input-wrapper {
   width: 100%;
   position: relative;
   display: flex;
   align-items: center;
-  background: rgba(14, 20, 30, 0.88);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 10px;
+  background: rgba(2, 12, 26, 0.82);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 245, 212, 0.26);
+  border-radius: 8px;
   padding: 6px 8px 6px 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.65);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.75), inset 0 0 16px rgba(0, 245, 212, 0.04);
   transition: all 0.25s ease;
 }
 
+.hero-chat-input-wrapper::before,
+.hero-chat-input-wrapper::after {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  pointer-events: none;
+}
+
+.hero-chat-input-wrapper::before {
+  top: -1px;
+  left: -1px;
+  border-top: 2px solid var(--accent-biolum);
+  border-left: 2px solid var(--accent-biolum);
+}
+
+.hero-chat-input-wrapper::after {
+  bottom: -1px;
+  right: -1px;
+  border-bottom: 2px solid var(--accent-biolum);
+  border-right: 2px solid var(--accent-biolum);
+}
+
 .hero-chat-input-wrapper:focus-within {
-  border-color: rgba(45, 212, 191, 0.5);
-  box-shadow: 0 8px 36px rgba(0, 0, 0, 0.75);
+  border-color: var(--accent-biolum);
+  box-shadow: 0 8px 36px rgba(0, 0, 0, 0.85), 0 0 20px rgba(0, 245, 212, 0.25);
 }
 
 .hero-input-icon {
@@ -2513,19 +2580,45 @@
   flex-shrink: 0;
 }
 
-/* Structured ORCA Response Card in Thread */
+/* Structured ORCA Response Card in Thread with Submarine HUD Reticles */
 .orca-chat-response-card {
   align-self: flex-start;
   width: 100%;
-  background: rgba(2, 14, 24, 0.88);
-  border: 1px solid rgba(34, 211, 182, 0.25);
-  border-radius: 12px;
+  background: rgba(2, 12, 26, 0.84);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 245, 212, 0.22);
+  border-radius: 8px;
   padding: 18px 20px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.65), inset 0 0 20px rgba(0, 245, 212, 0.03);
   display: flex;
   flex-direction: column;
   gap: 14px;
   animation: fadeInResponse 0.35s ease-out;
+  position: relative;
+}
+
+.orca-chat-response-card::before,
+.orca-chat-response-card::after {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  pointer-events: none;
+}
+
+.orca-chat-response-card::before {
+  top: -1px;
+  left: -1px;
+  border-top: 2px solid var(--accent-biolum);
+  border-left: 2px solid var(--accent-biolum);
+}
+
+.orca-chat-response-card::after {
+  bottom: -1px;
+  right: -1px;
+  border-bottom: 2px solid var(--accent-biolum);
+  border-right: 2px solid var(--accent-biolum);
 }
 
 @keyframes fadeInResponse {
@@ -3063,16 +3156,40 @@
 .orca-execution-modal-dialog {
   width: 100%;
   max-width: 680px;
-  background: linear-gradient(180deg, rgba(14, 20, 30, 0.98) 0%, rgba(8, 12, 18, 0.99) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.9), 0 4px 20px rgba(0, 0, 0, 0.6);
+  background: linear-gradient(180deg, rgba(2, 12, 26, 0.98) 0%, rgba(1, 6, 14, 0.99) 100%);
+  border: 1px solid rgba(0, 245, 212, 0.28);
+  border-radius: 8px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.9), inset 0 0 20px rgba(0, 245, 212, 0.04);
   display: flex;
   flex-direction: column;
   padding: 20px 22px;
   gap: 14px;
   max-height: 88vh;
   overflow-y: auto;
+  position: relative;
+}
+
+.orca-execution-modal-dialog::before,
+.orca-execution-modal-dialog::after {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  pointer-events: none;
+}
+
+.orca-execution-modal-dialog::before {
+  top: -1px;
+  left: -1px;
+  border-top: 2px solid var(--accent-biolum);
+  border-left: 2px solid var(--accent-biolum);
+}
+
+.orca-execution-modal-dialog::after {
+  bottom: -1px;
+  right: -1px;
+  border-bottom: 2px solid var(--accent-biolum);
+  border-right: 2px solid var(--accent-biolum);
 }
 
 .modal-dialog-header {

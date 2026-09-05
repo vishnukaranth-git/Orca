@@ -157,9 +157,27 @@ class OrcaAIAssistant {
     document.querySelectorAll('.history-item').forEach(i => i.classList.remove('active'));
   }
 
+  triggerSonarPing() {
+    const overlay = document.getElementById('sonar-ping-overlay');
+    if (!overlay) return;
+    overlay.style.display = 'block';
+    const line = overlay.querySelector('.sonar-ping-line');
+    if (line) {
+      line.style.animation = 'none';
+      void line.offsetWidth; // force DOM reflow
+      line.style.animation = 'sonar-scanline 0.85s cubic-bezier(0.25, 1, 0.5, 1) forwards';
+    }
+    setTimeout(() => {
+      overlay.style.display = 'none';
+    }, 900);
+  }
+
   async submitQuery(queryText) {
     if (!queryText || queryText.trim().length === 0 || this.isProcessing) return;
     this.isProcessing = true;
+
+    // Trigger acoustic sonar sweep animation
+    this.triggerSonarPing();
 
     // Clear inputs
     const heroInput = document.getElementById('ask-orca-hero-input');

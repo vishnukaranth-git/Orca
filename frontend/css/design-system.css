@@ -1,64 +1,77 @@
 /* ==========================================================================
-   ORCA DESIGN SYSTEM — REALISTIC OCEAN + SATELLITE INTELLIGENCE
-   Palette: Black / Near-Black / Charcoal / Graphite neutrals + Crisp Pure White
-   Accents: Sea Green / Turquoise · Emerald · Amber · Orange · Hazard Red · Violet
-   Atmosphere: Earth Observation & Marine Intelligence
+   ORCA DESIGN SYSTEM — DEEP OCEAN / ISRO-GRADE MISSION CONTROL
+   Aesthetic: Deep-sea submarine viewport meets ISRO/NASA satellite telemetry.
+   Palette: Abyssal void (#01050C -> #041428 -> #062038) with bioluminescent
+            cyan (#00F5D4), teal (#00C2D1), ISRO telemetry blue (#3AA0FF),
+            amber (#FFB020), and coral (#FF3D7F).
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 :root {
-  /* Neutral Base: Black, Near-Black, Charcoal, Graphite, Dark Grey */
-  --bg-void: #030508;
-  --bg-primary: #06090d;
-  --bg-deep-void: #06090d;
-  --bg-charcoal: #0e141c;
-  --bg-graphite: #141d27;
-  --bg-dark-grey: #1c2633;
-  --bg-elevated: #18222f;
+  /* Abyssal Ocean Depths Base Palette */
+  --bg-abyss-0: #01050C;
+  --bg-abyss-1: #041428;
+  --bg-abyss-2: #062038;
+  --bg-void: #01050C;
+  --bg-primary: #041428;
+  --bg-deep-void: #01050C;
+  --bg-charcoal: #071322;
+  --bg-graphite: #0c1c30;
+  --bg-dark-grey: #12253d;
+  --bg-elevated: #0e223a;
 
-  /* Glass Panels with Dark Neutral Foundation */
-  --bg-marine-panel: rgba(10, 15, 22, 0.88);
-  --bg-marine-card: rgba(14, 20, 29, 0.78);
-  --bg-marine-card-hover: rgba(22, 31, 44, 0.85);
-  --bg-overlay: rgba(4, 7, 11, 0.85);
+  /* Glass Panels: Submarine Mission Control Viewport */
+  --bg-marine-panel: rgba(2, 10, 22, 0.78);
+  --bg-marine-card: rgba(4, 15, 30, 0.74);
+  --bg-marine-card-hover: rgba(8, 25, 48, 0.85);
+  --bg-overlay: rgba(1, 5, 12, 0.88);
 
-  /* Subtle, Restrained Precision Borders (No neon) */
-  --panel-border: rgba(255, 255, 255, 0.08);
-  --panel-border-subtle: rgba(255, 255, 255, 0.04);
-  --panel-border-bright: rgba(45, 212, 191, 0.35);
-  --border-panel: rgba(255, 255, 255, 0.08);
-  --border-subtle: rgba(255, 255, 255, 0.05);
-  --panel-glow: 0 8px 32px rgba(0, 0, 0, 0.65);
-  --panel-shadow: 0 4px 24px rgba(0, 0, 0, 0.55);
+  /* Precision HUD & Sonar Borders */
+  --panel-border: rgba(0, 245, 212, 0.16);
+  --panel-border-subtle: rgba(58, 160, 255, 0.10);
+  --panel-border-bright: rgba(0, 245, 212, 0.45);
+  --border-panel: rgba(0, 245, 212, 0.16);
+  --border-subtle: rgba(58, 160, 255, 0.08);
+  --panel-glow: 0 8px 32px rgba(0, 0, 0, 0.75), inset 0 0 20px rgba(0, 245, 212, 0.03);
+  --panel-shadow: 0 8px 32px rgba(0, 0, 0, 0.65);
 
-  /* Selective Accents */
+  /* Bioluminescent & ISRO Satellite Telemetry Accents */
+  --accent-biolum: #00F5D4;
+  --accent-teal: #00C2D1;
+  --accent-isro-blue: #3AA0FF;
+  --accent-signal-blue: #5CC8FF;
+  --status-amber: #FFB020;
+  --accent-amber: #FFB020;
+  --accent-coral: #FF3D7F;
+  --accent-red: #FF3D7F;
+  --accent-critical: #FF3D7F;
+  --accent-sea: #00F5D4;
+  --accent-turquoise: #00C2D1;
+  --accent-cyan: #00F5D4;
+  --accent-aqua: #00F5D4;
+  --accent-green: #10B981;
+  --accent-safe: #10B981;
+  --accent-gold: #FFB020;
+  --accent-orange: #FF8A3D;
+  --accent-violet: #8B5CF6;
+  --accent-satellite: #3AA0FF;
+  --accent-blue: #5CC8FF;
   --accent-white: #ffffff;
-  --accent-sea: #14b8a6;
-  --accent-turquoise: #2dd4bf;
-  --accent-cyan: #2dd4bf;
-  --accent-aqua: #2dd4bf;
-  --accent-green: #10b981;
-  --accent-safe: #10b981;
-  --accent-amber: #f59e0b;
-  --accent-gold: #f59e0b;
-  --accent-orange: #f97316;
-  --accent-red: #ef4444;
-  --accent-critical: #ef4444;
-  --accent-violet: #8b5cf6;
-  --accent-satellite: #8b5cf6;
-  --accent-blue: #38bdf8;
 
-  /* Typography: Crisp Pure White for Headings & Primary Contrast */
+  /* Typography: Soft White & Phosphor Cyan-Grey */
   --text-pure: #ffffff;
-  --text-main: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
-  --text-dim: #475569;
+  --text-soft-white: #E6F7FF;
+  --text-main: #E6F7FF;
+  --text-secondary: #7FA8B8;
+  --text-cyan-grey: #7FA8B8;
+  --text-muted: #537588;
+  --text-dim: #3a5566;
 
-  --font-display: 'Rajdhani', 'Inter', -apple-system, sans-serif;
-  --font-body: 'Inter', -apple-system, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  /* Font Families */
+  --font-display: 'Orbitron', 'Space Grotesk', 'Rajdhani', sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Courier New', monospace;
 
   --radius-sm: 4px;
   --radius-md: 6px;
@@ -75,8 +88,8 @@ html, body {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background-color: var(--bg-void);
-  color: var(--text-main);
+  background-color: var(--bg-abyss-0);
+  color: var(--text-soft-white);
   font-family: var(--font-body);
   font-size: 13px;
   line-height: 1.45;
@@ -109,6 +122,152 @@ html, body {
 .telemetry-tag {
   font-family: var(--font-mono);
   font-size: 10px;
-  letter-spacing: 0.05em;
-  color: var(--text-secondary);
+  letter-spacing: 0.06em;
+  color: var(--text-cyan-grey);
+}
+
+/* ==========================================================================
+   HUD CORNER RETICLE BRACKETS & SUBMARINE SENSOR VIEWPORT
+   ========================================================================== */
+.hud-reticle-card {
+  position: relative;
+  background: var(--bg-marine-panel);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--panel-border);
+  box-shadow: var(--panel-glow);
+}
+
+.hud-reticle-card::before,
+.hud-reticle-card::after {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.hud-reticle-card::before {
+  top: -1px;
+  left: -1px;
+  border-top: 2px solid var(--accent-biolum);
+  border-left: 2px solid var(--accent-biolum);
+}
+
+.hud-reticle-card::after {
+  bottom: -1px;
+  right: -1px;
+  border-bottom: 2px solid var(--accent-biolum);
+  border-right: 2px solid var(--accent-biolum);
+}
+
+/* Optional explicit 4-corner reticle elements */
+.reticle-corner {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  pointer-events: none;
+  z-index: 3;
+}
+.reticle-tl { top: -1px; left: -1px; border-top: 2px solid var(--accent-biolum); border-left: 2px solid var(--accent-biolum); }
+.reticle-tr { top: -1px; right: -1px; border-top: 2px solid var(--accent-biolum); border-right: 2px solid var(--accent-biolum); }
+.reticle-bl { bottom: -1px; left: -1px; border-bottom: 2px solid var(--accent-biolum); border-left: 2px solid var(--accent-biolum); }
+.reticle-br { bottom: -1px; right: -1px; border-bottom: 2px solid var(--accent-biolum); border-right: 2px solid var(--accent-biolum); }
+
+/* Mission Control Pulsing Status LED */
+.pulse-led-green {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--accent-biolum);
+  box-shadow: 0 0 8px var(--accent-biolum);
+  animation: pulse-led 2s infinite ease-in-out;
+}
+
+.pulse-led-amber {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--status-amber);
+  box-shadow: 0 0 8px var(--status-amber);
+  animation: pulse-led 2s infinite ease-in-out;
+}
+
+@keyframes pulse-led {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+    box-shadow: 0 0 8px var(--accent-biolum);
+  }
+  50% {
+    opacity: 0.45;
+    transform: scale(0.85);
+    box-shadow: 0 0 2px var(--accent-biolum);
+  }
+}
+
+/* Fullscreen Sonar Ping Overlay & Animations */
+.sonar-ping-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.sonar-ping-line {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(0, 245, 212, 0.65) 25%, 
+    rgba(92, 200, 255, 0.95) 50%, 
+    rgba(0, 245, 212, 0.65) 75%, 
+    transparent 100%);
+  box-shadow: 0 0 24px rgba(0, 245, 212, 0.8), 0 0 60px rgba(58, 160, 255, 0.4);
+  animation: sonar-scanline 0.85s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes sonar-scanline {
+  0% {
+    top: 0%;
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 0.9;
+  }
+  100% {
+    top: 100%;
+    opacity: 0;
+  }
+}
+
+/* Radar Sweep Keyframe */
+@keyframes radar-sweep-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Caustic Drift Animation */
+@keyframes caustic-drift {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(-10px, 8px) scale(1.04);
+  }
 }

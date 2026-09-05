@@ -1,53 +1,57 @@
 /**
- * ORCA Realistic Ocean & Satellite Intelligence Background FX
- * Visual Atmosphere: Deep Oceanic Abyssal Sounding + Satellite Earth Observation Sweep
- * Features:
- * - Subtle bathymetric depth contours & ocean current streamlines
- * - Translucent satellite orbital scan sweep & geospatial graticule
- * - Gentle marine particulate drift (upwelling & marine snow)
- * - Distant, restrained deep-ocean marine life silhouettes (pelagic whale & fish schools)
+ * ORCA Living Bioluminescent Deep Ocean Ecosystem & ISRO Sonar Radar Canvas
+ * Fusion of deep-sea abyssal biology and satellite/submarine mission telemetry.
+ * 
+ * Multi-layer rendering pipeline:
+ *  - Layer 0: Abyssal void depth gradient (#01050C -> #041428 -> #062038)
+ *  - Layer 1: Drifting ocean caustics & soft god-rays
+ *  - Layer 2: Distant pelagic megafauna silhouettes (Blue Whale, Whale Shark, Manta Rays)
+ *  - Layer 3: Midground marine life (Bioluminescent Jellyfish, Sea Turtles, Fish Schools, Shark)
+ *  - Layer 4: Seafloor bathymetry (Swaying kelp forest, coral silhouettes, Anglerfish with glowing esca)
+ *  - Layer 5: Bioluminescent plankton embers & rising micro-bubbles
+ *  - Layer 6: Subtle ISRO / Sonar acoustic radar range rings & rotating radial sweep
  */
 
 class UnderwaterBackgroundFX {
   constructor(canvasId) {
     this.canvas = document.getElementById(canvasId);
     if (!this.canvas) return;
-    this.ctx = this.canvas.getContext('2d');
+    this.ctx = this.canvas.getContext('2d', { alpha: false });
     this.width = window.innerWidth;
     this.height = window.innerHeight;
     
     this.time = 0;
-    this.scanY = 0;
-    this.scanSpeed = 0.45;
+    this.radarAngle = 0;
+    this.prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    // Particles (marine drift / upwelling)
-    this.particles = [];
-    this.particleCount = 38;
-
-    // Current Streamlines
-    this.streamlines = [];
-
-    // Subtle deep marine life silhouettes
-    this.whale = {
-      x: -250,
-      y: this.height * 0.72,
-      speedX: 0.28,
-      scale: 0.85,
-      phase: 0
-    };
-
-    this.fishSchools = [];
+    // Entities
+    this.plankton = [];
+    this.bubbles = [];
+    this.jellyfish = [];
+    this.schools = [];
+    this.kelpStrands = [];
+    this.turtles = [];
+    this.manta = null;
+    this.whale = null;
+    this.whaleShark = null;
+    this.shark = null;
+    this.anglerfish = null;
 
     this.init();
     this.bindEvents();
-    this.animate();
+
+    if (this.prefersReducedMotion) {
+      this.renderStaticFrame();
+    } else {
+      this.animate();
+    }
   }
 
   init() {
     this.resize();
     this.initParticles();
-    this.initStreamlines();
-    this.initFishSchools();
+    this.initFauna();
+    this.initSeafloor();
   }
 
   resize() {
@@ -55,197 +59,735 @@ class UnderwaterBackgroundFX {
     this.height = window.innerHeight;
     this.canvas.width = this.width;
     this.canvas.height = this.height;
-    if (this.whale.y > this.height) {
-      this.whale.y = this.height * 0.72;
-    }
   }
 
   bindEvents() {
-    window.addEventListener('resize', () => this.resize());
-  }
+    window.addEventListener('resize', () => {
+      this.resize();
+      this.initSeafloor();
+      if (this.prefersReducedMotion) this.renderStaticFrame();
+    });
 
-  initParticles() {
-    this.particles = [];
-    for (let i = 0; i < this.particleCount; i++) {
-      this.particles.push({
-        x: Math.random() * this.width,
-        y: Math.random() * this.height,
-        radius: Math.random() * 1.5 + 0.5,
-        speedX: Math.random() * 0.25 - 0.05,
-        speedY: Math.random() * -0.35 - 0.1, // gentle upward oceanic drift
-        opacity: Math.random() * 0.18 + 0.06,
-        pulseSpeed: Math.random() * 0.02 + 0.01,
-        phase: Math.random() * Math.PI * 2
+    if (window.matchMedia) {
+      window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', e => {
+        this.prefersReducedMotion = e.matches;
+        if (!this.prefersReducedMotion) this.animate();
+        else this.renderStaticFrame();
       });
     }
   }
 
-  initStreamlines() {
-    this.streamlines = [
-      { yRatio: 0.28, amp: 22, freq: 0.0018, speed: 0.008, alpha: 0.05, width: 1.2 },
-      { yRatio: 0.45, amp: 35, freq: 0.0012, speed: 0.006, alpha: 0.04, width: 1.0 },
-      { yRatio: 0.65, amp: 28, freq: 0.0015, speed: 0.007, alpha: 0.05, width: 1.4 },
-      { yRatio: 0.84, amp: 40, freq: 0.0009, speed: 0.005, alpha: 0.035, width: 1.0 }
-    ];
+  initParticles() {
+    // Bioluminescent Plankton Embers
+    this.plankton = [];
+    const pCount = Math.min(55, Math.floor(this.width / 26));
+    for (let i = 0; i < pCount; i++) {
+      this.plankton.push({
+        x: Math.random() * this.width,
+        y: Math.random() * this.height,
+        radius: Math.random() * 2.0 + 0.6,
+        vx: (Math.random() - 0.5) * 0.2,
+        vy: -0.15 - Math.random() * 0.25,
+        baseAlpha: Math.random() * 0.35 + 0.2,
+        pulseSpeed: Math.random() * 0.03 + 0.015,
+        phase: Math.random() * Math.PI * 2,
+        hue: Math.random() > 0.4 ? '0, 245, 212' : '58, 160, 255' // Teal or ISRO Blue
+      });
+    }
+
+    // Micro-bubbles
+    this.bubbles = [];
+    for (let i = 0; i < 22; i++) {
+      this.bubbles.push({
+        x: Math.random() * this.width,
+        y: Math.random() * this.height,
+        r: Math.random() * 2.2 + 0.8,
+        vy: -0.4 - Math.random() * 0.6,
+        vx: (Math.random() - 0.5) * 0.15,
+        alpha: Math.random() * 0.25 + 0.08
+      });
+    }
   }
 
-  initFishSchools() {
-    this.fishSchools = [
+  initFauna() {
+    // Distant Blue Whale
+    this.whale = {
+      x: -340,
+      y: this.height * 0.62,
+      vx: 0.32,
+      scale: 0.88,
+      tailPhase: 0
+    };
+
+    // Distant Whale Shark with spots
+    this.whaleShark = {
+      x: this.width + 300,
+      y: this.height * 0.38,
+      vx: -0.28,
+      scale: 0.72,
+      tailPhase: 1.5
+    };
+
+    // Manta Ray
+    this.manta = {
+      x: this.width * 0.45,
+      y: this.height * 0.24,
+      vx: 0.38,
+      vy: 0.06,
+      scale: 0.65,
+      wingPhase: 0
+    };
+
+    // Bioluminescent Jellyfish
+    this.jellyfish = [
+      { x: this.width * 0.18, y: this.height * 0.42, r: 24, vy: -0.22, pulse: 0, color: '0, 245, 212' },
+      { x: this.width * 0.78, y: this.height * 0.68, r: 32, vy: -0.28, pulse: 1.8, color: '0, 194, 209' },
+      { x: this.width * 0.88, y: this.height * 0.28, r: 18, vy: -0.18, pulse: 3.4, color: '58, 160, 255' }
+    ];
+
+    // Sea Turtles
+    this.turtles = [
       {
-        x: this.width * 0.3,
-        y: this.height * 0.55,
-        count: 14,
-        speedX: 0.32,
-        speedY: 0.05,
-        spreadX: 120,
-        spreadY: 40
+        x: this.width * 0.12,
+        y: this.height * 0.78,
+        vx: 0.42,
+        vy: -0.08,
+        scale: 0.55,
+        flipperPhase: 0
+      }
+    ];
+
+    // Cruising Shark
+    this.shark = {
+      x: -220,
+      y: this.height * 0.82,
+      vx: 0.45,
+      scale: 0.68,
+      phase: 0
+    };
+
+    // Anglerfish with glowing esca
+    this.anglerfish = {
+      x: this.width * 0.82,
+      y: this.height - 42,
+      scale: 0.48,
+      glowPhase: 0
+    };
+
+    // Schools of Fish
+    this.schools = [
+      {
+        x: this.width * 0.35,
+        y: this.height * 0.48,
+        vx: 0.55,
+        vy: 0.04,
+        count: 16,
+        spreadX: 110,
+        spreadY: 45
       },
       {
-        x: this.width * 0.75,
-        y: this.height * 0.38,
-        count: 10,
-        speedX: -0.22,
-        speedY: -0.04,
-        spreadX: 90,
-        spreadY: 30
+        x: this.width * 0.65,
+        y: this.height * 0.32,
+        vx: -0.42,
+        vy: -0.06,
+        count: 14,
+        spreadX: 95,
+        spreadY: 38
       }
     ];
   }
 
+  initSeafloor() {
+    // Kelp Strands along bottom
+    this.kelpStrands = [];
+    const numKelp = Math.floor(this.width / 42);
+    for (let i = 0; i < numKelp; i++) {
+      this.kelpStrands.push({
+        x: i * 42 + (Math.random() * 14 - 7),
+        height: Math.random() * 110 + 65,
+        width: Math.random() * 8 + 6,
+        phase: Math.random() * Math.PI * 2,
+        swaySpeed: Math.random() * 0.015 + 0.008
+      });
+    }
+  }
+
   animate() {
+    if (this.prefersReducedMotion) return;
     this.time += 0.02;
-    this.ctx.clearRect(0, 0, this.width, this.height);
+    this.radarAngle = (this.radarAngle + 0.008) % (Math.PI * 2);
 
-    // 1. Base Oceanic Deep Abyss Background Gradient
-    this.drawDeepOceanAbyss();
-
-    // 2. Subtle Ocean Current Streamlines (Bathymetric drift)
-    this.drawCurrentStreamlines();
-
-    // 3. Subtle Satellite Earth Observation Scan Sweep
-    this.drawSatelliteScanline();
-
-    // 4. Subtle Marine Particulate Drift (Bioluminescent snow / nutrients)
-    this.drawMarineParticles();
-
-    // 5. Restrained Distant Marine Life Silhouettes
-    this.drawDistantPelagicLife();
-
+    this.renderFrame();
     requestAnimationFrame(() => this.animate());
   }
 
-  drawDeepOceanAbyss() {
+  renderStaticFrame() {
+    this.time = 1.5;
+    this.radarAngle = 0.8;
+    this.renderFrame();
+  }
+
+  renderFrame() {
     const ctx = this.ctx;
     const w = this.width;
     const h = this.height;
 
-    // Deep realistic ocean gradient: near-black void to deep indigo-graphite abyss
-    const grad = ctx.createLinearGradient(0, 0, 0, h);
-    grad.addColorStop(0, '#04070b');
-    grad.addColorStop(0.35, '#070d15');
-    grad.addColorStop(0.70, '#09131e');
-    grad.addColorStop(1, '#050a10');
-
-    ctx.fillStyle = grad;
+    // 0. Base Abyssal Depth Gradient (#01050C -> #041428 -> #062038)
+    const bgGrad = ctx.createLinearGradient(0, 0, 0, h);
+    bgGrad.addColorStop(0, '#01050C');
+    bgGrad.addColorStop(0.35, '#041428');
+    bgGrad.addColorStop(0.72, '#062038');
+    bgGrad.addColorStop(1, '#020A16');
+    ctx.fillStyle = bgGrad;
     ctx.fillRect(0, 0, w, h);
 
-    // Subtle radial light vignette simulating satellite optical sensor focus
-    const radGrad = ctx.createRadialGradient(w * 0.5, h * 0.45, w * 0.1, w * 0.5, h * 0.45, w * 0.85);
-    radGrad.addColorStop(0, 'rgba(14, 28, 42, 0.15)');
-    radGrad.addColorStop(0.6, 'rgba(6, 14, 22, 0.08)');
-    radGrad.addColorStop(1, 'rgba(0, 0, 0, 0.35)');
-    ctx.fillStyle = radGrad;
-    ctx.fillRect(0, 0, w, h);
+    // 1. Drifting Caustic God-Rays
+    this.drawCaustics();
 
-    // Subtle Geospatial Graticule Grid (Very faint satellite reference ticks)
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.015)';
-    ctx.lineWidth = 1;
-    const gridSize = 140;
-    for (let x = gridSize; x < w; x += gridSize) {
-      ctx.beginPath();
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x, h);
-      ctx.stroke();
-    }
-    for (let y = gridSize; y < h; y += gridSize) {
-      ctx.beginPath();
-      ctx.moveTo(0, y);
-      ctx.lineTo(w, y);
-      ctx.stroke();
-    }
+    // 2. ISRO Acoustic Radar Range Grid & Sweep
+    this.drawSonarRadar();
+
+    // 3. Deep Background Megafauna (Whale, Whale Shark, Manta)
+    this.drawDistantMegafauna();
+
+    // 4. Midground Marine Life (Jellyfish, Turtles, Fish Schools, Pelagic Shark)
+    this.drawMidgroundFauna();
+
+    // 5. Seafloor Bathymetry (Swaying Kelp, Coral, Anglerfish)
+    this.drawSeafloor();
+
+    // 6. Foreground Bioluminescent Plankton & Bubbles
+    this.drawParticles();
   }
 
-  drawCurrentStreamlines() {
+  drawCaustics() {
     const ctx = this.ctx;
     const w = this.width;
+    const h = this.height;
 
-    this.streamlines.forEach(stream => {
-      const baseY = this.height * stream.yRatio;
-      ctx.save();
-      ctx.strokeStyle = `rgba(45, 212, 191, ${stream.alpha})`;
-      ctx.lineWidth = stream.width;
-      ctx.setLineDash([12, 18]);
-      ctx.lineDashOffset = -this.time * 25 * stream.speed;
+    ctx.save();
+    // Light shafts descending from water surface
+    const rayCount = 6;
+    for (let i = 0; i < rayCount; i++) {
+      const xOrigin = (w / (rayCount + 1)) * (i + 1) + Math.sin(this.time * 0.4 + i) * 35;
+      const rayWidth = 80 + Math.sin(this.time * 0.3 + i * 2) * 20;
 
+      const grad = ctx.createLinearGradient(xOrigin, 0, xOrigin + 120, h * 0.7);
+      grad.addColorStop(0, 'rgba(0, 245, 212, 0.045)');
+      grad.addColorStop(0.3, 'rgba(58, 160, 255, 0.03)');
+      grad.addColorStop(1, 'rgba(1, 5, 12, 0)');
+
+      ctx.fillStyle = grad;
       ctx.beginPath();
-      for (let x = 0; x <= w; x += 15) {
-        const y = baseY + Math.sin(x * stream.freq + this.time * stream.speed) * stream.amp
-                        + Math.cos(x * stream.freq * 0.5 + this.time * 0.01) * (stream.amp * 0.4);
-        if (x === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
+      ctx.moveTo(xOrigin - rayWidth * 0.2, 0);
+      ctx.lineTo(xOrigin + rayWidth * 0.4, 0);
+      ctx.lineTo(xOrigin + 160 + rayWidth, h * 0.7);
+      ctx.lineTo(xOrigin + 120 - rayWidth * 0.5, h * 0.7);
+      ctx.closePath();
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  drawSonarRadar() {
+    const ctx = this.ctx;
+    const cx = this.width * 0.88;
+    const cy = this.height * 0.22;
+    const maxRadius = Math.min(this.width * 0.18, 180);
+
+    ctx.save();
+    ctx.translate(cx, cy);
+
+    // Range rings (1000m, 2500m, 4000m)
+    const rings = [0.33, 0.66, 1.0];
+    const ringLabels = ['1,000M', '2,500M', '4,000M'];
+
+    ctx.strokeStyle = 'rgba(0, 245, 212, 0.08)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 6]);
+
+    rings.forEach((ratio, idx) => {
+      const r = maxRadius * ratio;
+      ctx.beginPath();
+      ctx.arc(0, 0, r, 0, Math.PI * 2);
       ctx.stroke();
+
+      // Range label
+      ctx.fillStyle = 'rgba(127, 168, 184, 0.22)';
+      ctx.font = '8px "JetBrains Mono", monospace';
+      ctx.fillText(ringLabels[idx], 4, -r + 10);
+    });
+
+    // Crosshairs
+    ctx.setLineDash([2, 4]);
+    ctx.strokeStyle = 'rgba(58, 160, 255, 0.08)';
+    ctx.beginPath();
+    ctx.moveTo(-maxRadius, 0);
+    ctx.lineTo(maxRadius, 0);
+    ctx.moveTo(0, -maxRadius);
+    ctx.lineTo(0, maxRadius);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Degree markers
+    ctx.fillStyle = 'rgba(127, 168, 184, 0.25)';
+    ctx.font = '8px "JetBrains Mono", monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('000°', 0, -maxRadius - 4);
+    ctx.fillText('090°', maxRadius + 14, 3);
+    ctx.fillText('180°', 0, maxRadius + 11);
+    ctx.fillText('270°', -maxRadius - 14, 3);
+
+    // Rotating Radar Sweep Cone
+    const sweepGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, maxRadius);
+    sweepGrad.addColorStop(0, 'rgba(0, 245, 212, 0.12)');
+    sweepGrad.addColorStop(0.7, 'rgba(0, 245, 212, 0.04)');
+    sweepGrad.addColorStop(1, 'rgba(0, 245, 212, 0)');
+
+    ctx.fillStyle = sweepGrad;
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.arc(0, 0, maxRadius, this.radarAngle - 0.35, this.radarAngle);
+    ctx.closePath();
+    ctx.fill();
+
+    // Leading sweep line
+    ctx.strokeStyle = 'rgba(0, 245, 212, 0.35)';
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(Math.cos(this.radarAngle) * maxRadius, Math.sin(this.radarAngle) * maxRadius);
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
+  drawDistantMegafauna() {
+    const ctx = this.ctx;
+    const w = this.width;
+    const h = this.height;
+
+    // 1. Blue Whale
+    const wh = this.whale;
+    wh.x += wh.vx;
+    wh.tailPhase += 0.02;
+    if (wh.x > w + 360) {
+      wh.x = -360;
+      wh.y = h * (0.55 + Math.random() * 0.2);
+    }
+
+    ctx.save();
+    ctx.translate(wh.x, wh.y);
+    ctx.scale(wh.scale, wh.scale);
+
+    // Atmosphere silhouette color: deep abyssal blue-grey
+    ctx.fillStyle = 'rgba(10, 30, 52, 0.22)';
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.bezierCurveTo(55, -14, 130, -18, 180, -8);
+    ctx.bezierCurveTo(240, 4, 300, 10, 330, 4);
+    
+    // Tail oscillation
+    const tailY = Math.sin(wh.tailPhase) * 6;
+    ctx.bezierCurveTo(345, 2 + tailY, 355, -2 + tailY, 362, -14 + tailY);
+    ctx.lineTo(372, -22 + tailY);
+    ctx.lineTo(366, -2 + tailY);
+    ctx.lineTo(372, 14 + tailY);
+    ctx.lineTo(360, 6 + tailY);
+
+    ctx.bezierCurveTo(340, 14, 280, 28, 220, 30);
+    // Pectoral flipper
+    ctx.bezierCurveTo(175, 40, 158, 56, 148, 62);
+    ctx.bezierCurveTo(154, 48, 166, 36, 176, 28);
+    // Belly groove
+    ctx.bezierCurveTo(130, 26, 60, 16, 0, 0);
+    ctx.closePath();
+    ctx.fill();
+
+    // Subtle bioluminescent rim glow
+    ctx.strokeStyle = 'rgba(0, 245, 212, 0.05)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    ctx.restore();
+
+    // 2. Whale Shark (Swimming right to left)
+    const ws = this.whaleShark;
+    ws.x += ws.vx;
+    ws.tailPhase += 0.025;
+    if (ws.x < -360) {
+      ws.x = w + 360;
+      ws.y = h * (0.3 + Math.random() * 0.25);
+    }
+
+    ctx.save();
+    ctx.translate(ws.x, ws.y);
+    ctx.scale(-ws.scale, ws.scale); // flip to swim left
+
+    ctx.fillStyle = 'rgba(8, 26, 48, 0.20)';
+    ctx.beginPath();
+    // Broad flat head
+    ctx.moveTo(0, 4);
+    ctx.bezierCurveTo(25, -16, 80, -22, 140, -16);
+    // Dorsal fin 1
+    ctx.lineTo(165, -34);
+    ctx.lineTo(175, -12);
+    ctx.bezierCurveTo(210, -6, 250, 0, 280, 2);
+    // Dorsal fin 2
+    ctx.lineTo(290, -10);
+    ctx.lineTo(296, 4);
+    // Tail peduncle
+    const wsTail = Math.sin(ws.tailPhase) * 7;
+    ctx.lineTo(320, -2 + wsTail);
+    // Big heterocercal caudal fin
+    ctx.lineTo(336, -26 + wsTail);
+    ctx.lineTo(328, 0 + wsTail);
+    ctx.lineTo(338, 18 + wsTail);
+    ctx.lineTo(320, 8 + wsTail);
+    // Ventral line
+    ctx.bezierCurveTo(270, 16, 210, 22, 160, 22);
+    // Pectoral fin
+    ctx.lineTo(135, 48);
+    ctx.lineTo(145, 20);
+    ctx.bezierCurveTo(90, 18, 40, 14, 0, 4);
+    ctx.closePath();
+    ctx.fill();
+
+    // Spots on dorsal back (bioluminescent marine snow reflection)
+    ctx.fillStyle = 'rgba(0, 245, 212, 0.12)';
+    for (let r = 0; r < 5; r++) {
+      for (let c = 0; c < 4; c++) {
+        const sx = 60 + r * 38 + (c % 2) * 8;
+        const sy = -8 + c * 7;
+        ctx.beginPath();
+        ctx.arc(sx, sy, 1.4, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+    ctx.restore();
+
+    // 3. Manta Ray Gliding
+    const m = this.manta;
+    m.x += m.vx;
+    m.y += Math.sin(this.time * 0.5) * 0.2;
+    m.wingPhase += 0.04;
+    if (m.x > w + 200) {
+      m.x = -200;
+      m.y = h * (0.18 + Math.random() * 0.2);
+    }
+
+    ctx.save();
+    ctx.translate(m.x, m.y);
+    ctx.scale(m.scale, m.scale);
+
+    const wingFlap = Math.sin(m.wingPhase) * 9;
+    ctx.fillStyle = 'rgba(6, 24, 44, 0.25)';
+    ctx.beginPath();
+    ctx.moveTo(0, 0); // Head center
+    // Left wing
+    ctx.bezierCurveTo(-25, -20 + wingFlap, -65, -35 + wingFlap * 1.5, -95, -28 + wingFlap * 1.8);
+    ctx.bezierCurveTo(-70, -10, -35, 10, -15, 20);
+    // Tail
+    ctx.lineTo(-4, 25);
+    ctx.lineTo(-2, 75); // Long whip tail
+    ctx.lineTo(2, 75);
+    ctx.lineTo(4, 25);
+    // Right wing
+    ctx.lineTo(15, 20);
+    ctx.bezierCurveTo(35, 10, 70, -10, 95, -28 - wingFlap * 1.8);
+    ctx.bezierCurveTo(65, -35 - wingFlap * 1.5, 25, -20 - wingFlap, 0, 0);
+    ctx.closePath();
+    ctx.fill();
+
+    // Cephalic horns
+    ctx.beginPath();
+    ctx.moveTo(-10, -4);
+    ctx.lineTo(-15, -14);
+    ctx.lineTo(-8, -10);
+    ctx.moveTo(10, -4);
+    ctx.lineTo(15, -14);
+    ctx.lineTo(8, -10);
+    ctx.strokeStyle = 'rgba(6, 24, 44, 0.25)';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
+  drawMidgroundFauna() {
+    const ctx = this.ctx;
+    const w = this.width;
+    const h = this.height;
+
+    // 1. Bioluminescent Jellyfish
+    this.jellyfish.forEach(j => {
+      j.y += j.vy;
+      j.pulse += 0.035;
+
+      if (j.y < -80) {
+        j.y = h + 60;
+        j.x = Math.random() * (w * 0.8) + (w * 0.1);
+      }
+
+      // Rhythmic bell pulsing
+      const contraction = Math.sin(j.pulse);
+      const scaleX = 1 + contraction * 0.12;
+      const scaleY = 1 - contraction * 0.18;
+
+      ctx.save();
+      ctx.translate(j.x, j.y);
+      ctx.scale(scaleX, scaleY);
+
+      // Outer glowing bell
+      const bellGrad = ctx.createRadialGradient(0, -j.r * 0.2, 2, 0, 0, j.r);
+      bellGrad.addColorStop(0, `rgba(${j.color}, 0.45)`);
+      bellGrad.addColorStop(0.65, `rgba(${j.color}, 0.18)`);
+      bellGrad.addColorStop(1, `rgba(${j.color}, 0)`);
+
+      ctx.fillStyle = bellGrad;
+      ctx.beginPath();
+      ctx.arc(0, 0, j.r, Math.PI, 0, false);
+      ctx.bezierCurveTo(j.r * 0.6, j.r * 0.4, -j.r * 0.6, j.r * 0.4, -j.r, 0);
+      ctx.closePath();
+      ctx.fill();
+
+      // Inner glowing organ / umbrella margin
+      ctx.strokeStyle = `rgba(${j.color}, 0.6)`;
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.arc(0, 0, j.r * 0.95, Math.PI * 1.05, Math.PI * 1.95, false);
+      ctx.stroke();
+
+      // Flowing bioluminescent tentacles
+      ctx.lineWidth = 1;
+      const tentacleCount = 5;
+      for (let t = 0; t < tentacleCount; t++) {
+        const tx = ((t / (tentacleCount - 1)) - 0.5) * (j.r * 1.2);
+        ctx.strokeStyle = `rgba(${j.color}, 0.28)`;
+        ctx.beginPath();
+        ctx.moveTo(tx, 4);
+
+        const wave1 = Math.sin(this.time * 2 + t) * 6;
+        const wave2 = Math.cos(this.time * 1.5 + t * 0.8) * 9;
+        ctx.bezierCurveTo(tx + wave1, j.r * 0.8, tx - wave2, j.r * 1.6, tx + wave1 * 0.5, j.r * 2.5);
+        ctx.stroke();
+      }
+
+      ctx.restore();
+    });
+
+    // 2. Sea Turtle
+    this.turtles.forEach(t => {
+      t.x += t.vx;
+      t.y += t.vy;
+      t.flipperPhase += 0.03;
+
+      if (t.x > w + 160) {
+        t.x = -160;
+        t.y = h * (0.65 + Math.random() * 0.25);
+      }
+
+      ctx.save();
+      ctx.translate(t.x, t.y);
+      ctx.scale(t.scale, t.scale);
+
+      const stroke = Math.sin(t.flipperPhase) * 14;
+      ctx.fillStyle = 'rgba(8, 28, 48, 0.24)';
+      ctx.beginPath();
+      // Carapace shell
+      ctx.ellipse(0, 0, 24, 18, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Head
+      ctx.beginPath();
+      ctx.ellipse(30, -2, 8, 5, 0.1, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Front Flippers
+      ctx.beginPath();
+      ctx.moveTo(14, -8);
+      ctx.bezierCurveTo(24, -26 + stroke, 12, -34 + stroke, -2, -30 + stroke);
+      ctx.lineTo(8, -8);
+      ctx.moveTo(14, 8);
+      ctx.bezierCurveTo(24, 26 - stroke, 12, 34 - stroke, -2, 30 - stroke);
+      ctx.lineTo(8, 8);
+      ctx.fill();
+
+      // Rear Flippers
+      ctx.beginPath();
+      ctx.ellipse(-18, -10, 6, 3, -0.4, 0, Math.PI * 2);
+      ctx.ellipse(-18, 10, 6, 3, 0.4, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+    });
+
+    // 3. Pelagic Cruising Shark
+    const sk = this.shark;
+    sk.x += sk.vx;
+    sk.phase += 0.035;
+    if (sk.x > w + 260) {
+      sk.x = -260;
+      sk.y = h * (0.75 + Math.random() * 0.15);
+    }
+
+    ctx.save();
+    ctx.translate(sk.x, sk.y);
+    ctx.scale(sk.scale, sk.scale);
+
+    const tailSwing = Math.sin(sk.phase) * 6;
+    ctx.fillStyle = 'rgba(7, 25, 46, 0.26)';
+    ctx.beginPath();
+    ctx.moveTo(0, 0); // Snout
+    ctx.bezierCurveTo(20, -10, 60, -12, 100, -8);
+    // Dorsal Fin
+    ctx.lineTo(118, -32);
+    ctx.lineTo(132, -4);
+    ctx.bezierCurveTo(160, 0, 190, 4, 215, 4);
+    // Tail
+    ctx.lineTo(238, -20 + tailSwing);
+    ctx.lineTo(230, 0 + tailSwing);
+    ctx.lineTo(240, 14 + tailSwing);
+    ctx.lineTo(218, 8 + tailSwing);
+    // Belly
+    ctx.bezierCurveTo(180, 14, 130, 16, 90, 14);
+    // Pectoral fin
+    ctx.lineTo(76, 32);
+    ctx.lineTo(82, 12);
+    ctx.bezierCurveTo(50, 10, 20, 6, 0, 0);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+
+    // 4. Schools of Fish
+    this.schools.forEach(school => {
+      school.x += school.vx;
+      school.y += school.vy;
+
+      if (school.vx > 0 && school.x > w + 180) {
+        school.x = -180;
+        school.y = h * (0.28 + Math.random() * 0.35);
+      } else if (school.vx < 0 && school.x < -180) {
+        school.x = w + 180;
+        school.y = h * (0.28 + Math.random() * 0.35);
+      }
+
+      ctx.save();
+      ctx.fillStyle = 'rgba(0, 245, 212, 0.18)';
+      for (let i = 0; i < school.count; i++) {
+        const fx = school.x + Math.sin(i * 1.3 + this.time) * (school.spreadX * 0.5) + (i * 9);
+        const fy = school.y + Math.cos(i * 1.1 + this.time * 0.8) * (school.spreadY * 0.5);
+
+        ctx.beginPath();
+        ctx.ellipse(fx, fy, 4.5, 1.6, school.vx > 0 ? 0.05 : Math.PI - 0.05, 0, Math.PI * 2);
+        ctx.fill();
+      }
       ctx.restore();
     });
   }
 
-  drawSatelliteScanline() {
+  drawSeafloor() {
     const ctx = this.ctx;
     const w = this.width;
     const h = this.height;
 
-    this.scanY += this.scanSpeed;
-    if (this.scanY > h + 40) {
-      this.scanY = -40;
+    // Coral / Bathymetric ridge silhouette
+    ctx.fillStyle = 'rgba(2, 8, 16, 0.65)';
+    ctx.beginPath();
+    ctx.moveTo(0, h);
+    ctx.lineTo(0, h - 35);
+    for (let x = 0; x <= w; x += 40) {
+      const cy = h - 28 + Math.sin(x * 0.008) * 14 + Math.cos(x * 0.02) * 8;
+      ctx.lineTo(x, cy);
     }
+    ctx.lineTo(w, h);
+    ctx.closePath();
+    ctx.fill();
 
-    const y = this.scanY;
+    // Swaying Kelp Forest
+    this.kelpStrands.forEach(kelp => {
+      ctx.save();
+      const sway = Math.sin(this.time * 1.5 + kelp.phase) * 18;
+      ctx.strokeStyle = 'rgba(0, 194, 209, 0.14)';
+      ctx.lineWidth = kelp.width;
+      ctx.lineCap = 'round';
 
-    // Faint satellite sensor sweep beam
-    const sweepGrad = ctx.createLinearGradient(0, y - 35, 0, y + 8);
-    sweepGrad.addColorStop(0, 'rgba(45, 212, 191, 0)');
-    sweepGrad.addColorStop(0.85, 'rgba(45, 212, 191, 0.035)');
-    sweepGrad.addColorStop(1, 'rgba(139, 92, 246, 0.05)');
+      ctx.beginPath();
+      ctx.moveTo(kelp.x, h);
+      ctx.bezierCurveTo(
+        kelp.x + sway * 0.3, h - kelp.height * 0.4,
+        kelp.x - sway * 0.5, h - kelp.height * 0.7,
+        kelp.x + sway, h - kelp.height
+      );
+      ctx.stroke();
 
-    ctx.fillStyle = sweepGrad;
-    ctx.fillRect(0, y - 35, w, 43);
+      // Kelp leaf blades
+      ctx.fillStyle = 'rgba(0, 245, 212, 0.12)';
+      for (let b = 0.2; b <= 0.8; b += 0.25) {
+        const bx = kelp.x + sway * b;
+        const by = h - kelp.height * b;
+        ctx.beginPath();
+        ctx.ellipse(bx + 6, by, 7, 2.5, 0.3, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+    });
 
-    // Ultra-thin scan pass line
-    ctx.strokeStyle = 'rgba(45, 212, 191, 0.18)';
+    // Deep-Sea Anglerfish with Glowing Esca Lure
+    const af = this.anglerfish;
+    af.glowPhase += 0.04;
+    ctx.save();
+    ctx.translate(af.x, h - 32);
+    ctx.scale(af.scale, af.scale);
+
+    // Body
+    ctx.fillStyle = 'rgba(4, 12, 22, 0.7)';
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 22, 16, -0.1, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Jaw and teeth
+    ctx.strokeStyle = 'rgba(127, 168, 184, 0.5)';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(0, y);
-    ctx.lineTo(w, y);
+    ctx.moveTo(-16, -2);
+    ctx.lineTo(-24, 6);
+    ctx.lineTo(-12, 10);
     ctx.stroke();
 
-    // Satellite Observation Telemetry Marker along scanline
-    ctx.save();
-    ctx.fillStyle = 'rgba(148, 163, 184, 0.22)';
-    ctx.font = '9px "JetBrains Mono", monospace';
-    ctx.fillText('SENTINEL-3 / EOS-06 RADIAL SWATH [PASS ' + Math.floor(this.time * 2 % 900 + 100) + ']', 24, y - 5);
+    // Illicium spine curving forward
+    ctx.strokeStyle = 'rgba(0, 245, 212, 0.4)';
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.moveTo(-4, -14);
+    ctx.bezierCurveTo(-8, -32, -32, -32, -34, -20);
+    ctx.stroke();
+
+    // Bioluminescent Esca bulb (glowing lure)
+    const escaAlpha = 0.6 + Math.sin(af.glowPhase) * 0.35;
+    const escaGrad = ctx.createRadialGradient(-34, -20, 1, -34, -20, 12);
+    escaGrad.addColorStop(0, `rgba(0, 245, 212, ${escaAlpha})`);
+    escaGrad.addColorStop(0.5, `rgba(58, 160, 255, ${escaAlpha * 0.5})`);
+    escaGrad.addColorStop(1, 'rgba(0, 245, 212, 0)');
+
+    ctx.fillStyle = escaGrad;
+    ctx.beginPath();
+    ctx.arc(-34, -20, 12, 0, Math.PI * 2);
+    ctx.fill();
+
     ctx.restore();
   }
 
-  drawMarineParticles() {
+  drawParticles() {
     const ctx = this.ctx;
     const w = this.width;
     const h = this.height;
 
-    this.particles.forEach(p => {
-      p.x += p.speedX;
-      p.y += p.speedY;
+    // Bioluminescent Plankton Embers
+    this.plankton.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy;
 
-      // Wrap around screen edges
       if (p.y < -10) {
         p.y = h + 10;
         p.x = Math.random() * w;
@@ -253,88 +795,37 @@ class UnderwaterBackgroundFX {
       if (p.x > w + 10) p.x = -10;
       if (p.x < -10) p.x = w + 10;
 
-      const currentAlpha = p.opacity * (0.7 + 0.3 * Math.sin(this.time * 2 + p.phase));
+      const alpha = p.baseAlpha * (0.65 + 0.35 * Math.sin(this.time * 2 + p.phase));
 
       ctx.save();
-      ctx.fillStyle = `rgba(165, 243, 252, ${currentAlpha})`;
+      // Soft radial glow around ember
+      const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius * 3);
+      grad.addColorStop(0, `rgba(${p.hue}, ${alpha})`);
+      grad.addColorStop(1, `rgba(${p.hue}, 0)`);
+
+      ctx.fillStyle = grad;
       ctx.beginPath();
-      ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+      ctx.arc(p.x, p.y, p.radius * 3, 0, Math.PI * 2);
       ctx.fill();
       ctx.restore();
     });
-  }
 
-  drawDistantPelagicLife() {
-    const ctx = this.ctx;
-    const w = this.width;
-    const h = this.height;
+    // Micro-bubbles
+    this.bubbles.forEach(b => {
+      b.y += b.vy;
+      b.x += b.vx + Math.sin(this.time + b.y * 0.05) * 0.15;
 
-    // 1. Distant Blue Whale / Pelagic Silhouette (Drifting smoothly in deep ocean background)
-    const wh = this.whale;
-    wh.x += wh.speedX;
-    if (wh.x > w + 300) {
-      wh.x = -320;
-      wh.y = h * (0.65 + Math.random() * 0.18);
-    }
-
-    ctx.save();
-    ctx.translate(wh.x, wh.y);
-    ctx.scale(wh.scale, wh.scale);
-
-    // Deep ocean silhouette styling (Restrained, subtle graphite-blue at ~0.09 opacity)
-    ctx.fillStyle = 'rgba(22, 38, 56, 0.14)';
-    ctx.beginPath();
-    
-    // Smooth, realistic whale body contours
-    ctx.moveTo(0, 0);
-    // Head rostrum curve
-    ctx.bezierCurveTo(45, -12, 110, -14, 150, -6);
-    // Dorsal line to tail
-    ctx.bezierCurveTo(200, 4, 250, 10, 275, 4);
-    // Tail peduncle
-    ctx.bezierCurveTo(285, 2, 292, -2, 298, -12);
-    // Upper fluke
-    ctx.lineTo(306, -18);
-    ctx.lineTo(302, -2);
-    // Lower fluke
-    ctx.lineTo(306, 12);
-    ctx.lineTo(296, 6);
-    // Ventral groove back to belly
-    ctx.bezierCurveTo(280, 12, 230, 24, 180, 26);
-    // Pectoral fin
-    ctx.bezierCurveTo(145, 34, 130, 48, 122, 54);
-    ctx.bezierCurveTo(126, 42, 136, 30, 145, 24);
-    // Throat grooves to chin
-    ctx.bezierCurveTo(110, 22, 50, 14, 0, 0);
-    ctx.closePath();
-    ctx.fill();
-
-    ctx.restore();
-
-    // 2. Subtle Distant Pelagic Fish Schools
-    this.fishSchools.forEach(school => {
-      school.x += school.speedX;
-      school.y += school.speedY;
-
-      if (school.speedX > 0 && school.x > w + 150) {
-        school.x = -150;
-        school.y = h * (0.3 + Math.random() * 0.4);
-      } else if (school.speedX < 0 && school.x < -150) {
-        school.x = w + 150;
-        school.y = h * (0.3 + Math.random() * 0.4);
+      if (b.y < -10) {
+        b.y = h + 10;
+        b.x = Math.random() * w;
       }
 
       ctx.save();
-      ctx.fillStyle = 'rgba(56, 189, 248, 0.08)';
-      for (let i = 0; i < school.count; i++) {
-        const fx = school.x + Math.sin(i * 1.5 + this.time) * (school.spreadX * 0.5) + (i * 8);
-        const fy = school.y + Math.cos(i * 1.2 + this.time * 0.8) * (school.spreadY * 0.5);
-        
-        ctx.beginPath();
-        // Tiny fish silhouette dart
-        ctx.ellipse(fx, fy, 4.5, 1.8, school.speedX > 0 ? 0.05 : Math.PI - 0.05, 0, Math.PI * 2);
-        ctx.fill();
-      }
+      ctx.strokeStyle = `rgba(165, 243, 252, ${b.alpha})`;
+      ctx.lineWidth = 0.8;
+      ctx.beginPath();
+      ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+      ctx.stroke();
       ctx.restore();
     });
   }
