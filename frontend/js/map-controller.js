@@ -1859,32 +1859,45 @@ class OrcaMapController {
   }
 
   fitRouteBounds() {
-    if (!this.currentRouteWaypoints || this.currentRouteWaypoints.length < 2) return;
+    if (!this.map || !this.currentRouteWaypoints || this.currentRouteWaypoints.length < 2) return;
     const latlngs = this.currentRouteWaypoints.map(wp => [wp.lat, wp.lng]);
     const bounds = L.latLngBounds(latlngs);
+    if (!bounds.isValid()) return;
 
-    // Calculate left offset to ensure the entire corridor is visible to the right of the side dock
+    this.map.invalidateSize();
+
+    const mapSize = this.map.getSize();
+    const mapW = (mapSize && mapSize.x > 0) ? mapSize.x : (window.innerWidth - 220);
+    const mapH = (mapSize && mapSize.y > 0) ? mapSize.y : window.innerHeight;
+
+    // Check width of the dock panel in the current view
     const sideDock = document.querySelector('#view-routes .side-dock-panel');
-    let leftOffset = 560;
+    let dockW = 520;
     if (sideDock && sideDock.offsetWidth > 0) {
-      leftOffset = sideDock.offsetLeft + sideDock.offsetWidth + 40;
+      dockW = sideDock.offsetWidth;
     }
 
-    // Guard against very small screen widths
-    const winWidth = window.innerWidth || 1200;
-    if (leftOffset > winWidth * 0.65) {
-      leftOffset = Math.floor(winWidth * 0.4);
-    }
+    // Limit leftPad so that at least 55% of the map width is open and available for bounds fitting!
+    // This strictly prevents Leaflet from receiving negative/NaN sizing on any screen resolution.
+    const safeLeftPad = Math.max(30, Math.min(dockW + 25, Math.floor(mapW * 0.42)));
+    const safeRightPad = Math.max(25, Math.min(60, Math.floor(mapW * 0.08)));
+    const safeTopPad = Math.max(30, Math.min(60, Math.floor(mapH * 0.1)));
+    const safeBottomPad = Math.max(30, Math.min(60, Math.floor(mapH * 0.1)));
 
-    // Frame the corridor in the unobstructed map area with a strict maxZoom of 9.3
-    // so it shows the coastal maritime route instead of over-zooming into local streets
-    this.map.fitBounds(bounds, {
-      paddingTopLeft: [leftOffset, 70],
-      paddingBottomRight: [70, 70],
-      maxZoom: 9.3,
-      animate: true,
-      duration: 1.0
-    });
+    try {
+      this.map.fitBounds(bounds, {
+        paddingTopLeft: [safeLeftPad, safeTopPad],
+        paddingBottomRight: [safeRightPad, safeBottomPad],
+        maxZoom: 9.3
+      });
+    } catch (err) {
+      console.warn("fitBounds with custom padding failed, using safe fallback:", err);
+      try {
+        this.map.fitBounds(bounds, { padding: [40, 40], maxZoom: 9.3 });
+      } catch (err2) {
+        this.map.setView(bounds.getCenter(), 7);
+      }
+    }
   }
 
   plotRoute(waypoints) {
@@ -1895,26 +1908,30 @@ class OrcaMapController {
     const latlngs = waypoints.map(wp => [wp.lat, wp.lng]);
 
     // 1. Draw Fairway Corridor Buffer Polygon (Semi-transparent bathymetric safety envelope)
-    const corridorPolygon = this.generateCorridorBuffer(latlngs, 0.038);
-    if (corridorPolygon && corridorPolygon.length > 2) {
-      L.polygon(corridorPolygon, {
-        color: '#22d3b6',
-        weight: 1.5,
-        dashArray: '5, 5',
-        fillColor: '#00f2fe',
-        fillOpacity: 0.12,
-        interactive: true
-      }).addTo(this.layers.routes).bindPopup(`
-        <div style="font-family:var(--font-body);padding:4px;font-size:12px;">
-          <div style="font-family:var(--font-display);font-weight:700;color:#22d3b6;font-size:13px;margin-bottom:4px;">
-            SAFE NAVIGATIONAL CORRIDOR
+    try {
+      const corridorPolygon = this.generateCorridorBuffer(latlngs, 0.038);
+      if (corridorPolygon && corridorPolygon.length > 2) {
+        L.polygon(corridorPolygon, {
+          color: '#22d3b6',
+          weight: 1.5,
+          dashArray: '5, 5',
+          fillColor: '#00f2fe',
+          fillOpacity: 0.12,
+          interactive: true
+        }).addTo(this.layers.routes).bindPopup(`
+          <div style="font-family:var(--font-body);padding:4px;font-size:12px;">
+            <div style="font-family:var(--font-display);font-weight:700;color:#22d3b6;font-size:13px;margin-bottom:4px;">
+              SAFE NAVIGATIONAL CORRIDOR
+            </div>
+            <div>Passage Status: <b style="color:#22d3b6;">CLEARED & VERIFIED</b></div>
+            <div style="color:#94a3b8;font-size:11px;margin-top:4px;">
+              Bathymetric soundings indicate clearance > 15m depth, avoiding nearshore shoals and geofenced military sanctuaries.
+            </div>
           </div>
-          <div>Passage Status: <b style="color:#22d3b6;">CLEARED & VERIFIED</b></div>
-          <div style="color:#94a3b8;font-size:11px;margin-top:4px;">
-            Bathymetric soundings indicate clearance > 15m depth, avoiding nearshore shoals and geofenced military sanctuaries.
-          </div>
-        </div>
-      `, { className: 'orca-context-popup', autoPan: false });
+        `, { className: 'orca-context-popup', autoPan: false });
+      }
+    } catch (e) {
+      console.warn("Could not draw corridor buffer polygon:", e);
     }
 
     // 2. Outer Glow Polyline

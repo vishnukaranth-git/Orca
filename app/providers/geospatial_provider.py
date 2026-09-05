@@ -153,40 +153,77 @@ class GeospatialProvider:
         return intersections
 
     def calculate_safe_route(self, origin: Coordinates, destination: Coordinates) -> dict:
-        dist_km = self.haversine_distance_km(origin, destination)
-        
-        mid_lat = (origin.latitude + destination.latitude) / 2.0
-        mid_lon = (origin.longitude + destination.longitude) / 2.0
-        
-        # Calculate seaward waypoint offset
-        seaward_lon = mid_lon - 0.15 if mid_lon < 78.0 else mid_lon + 0.15
-        
-        waypoints = [
-            {"name": "Departure Port Fairway", "lat": origin.latitude, "lng": origin.longitude, "type": "origin"},
-            {"name": "Coastal Navigation Waypoint 1", "lat": round((origin.latitude + mid_lat) / 2.0, 4), "lng": round(seaward_lon, 4), "type": "waypoint"},
-            {"name": "Deep Shelf Channel Waypoint 2", "lat": round((destination.latitude + mid_lat) / 2.0, 4), "lng": round(seaward_lon, 4), "type": "waypoint"},
-            {"name": "Target Sector Arrival", "lat": destination.latitude, "lng": destination.longitude, "type": "destination"}
-        ]
-        
+        # Check if transit crosses from West Coast (Arabian Sea) to East Coast (Bay of Bengal) or vice-versa
+        is_west_to_east = (origin.longitude < 77.5 and destination.longitude > 79.0 and origin.latitude > 8.5)
+        is_east_to_west = (origin.longitude > 79.0 and destination.longitude < 77.5 and destination.latitude > 8.5)
+
+        if is_west_to_east:
+            # Maritime passage rounding Cape Comorin / Wadge Bank into Gulf of Mannar
+            waypoints = [
+                {"name": "Departure Port Fairway", "lat": origin.latitude, "lng": origin.longitude, "type": "origin"},
+                {"name": "South Malabar Seaward Fairway", "lat": round(max(8.40, min(origin.latitude - 1.0, 9.50)), 4), "lng": 75.8500, "type": "waypoint"},
+                {"name": "Cape Comorin / Wadge Bank Passage", "lat": 7.4500, "lng": 77.5500, "type": "waypoint"},
+                {"name": "Gulf of Mannar Deep Channel", "lat": 8.7000, "lng": 79.2500, "type": "waypoint"},
+                {"name": "Coromandel Approach Fairway", "lat": round(min(destination.latitude - 0.5, 12.20), 4), "lng": 80.3500, "type": "waypoint"},
+                {"name": "Target Sector Arrival", "lat": destination.latitude, "lng": destination.longitude, "type": "destination"}
+            ]
+        elif is_east_to_west:
+            # Maritime passage in reverse around Cape Comorin / Wadge Bank
+            waypoints = [
+                {"name": "Departure Port Fairway", "lat": origin.latitude, "lng": origin.longitude, "type": "origin"},
+                {"name": "Coromandel Deep Channel", "lat": round(min(origin.latitude - 0.5, 12.20), 4), "lng": 80.3500, "type": "waypoint"},
+                {"name": "Gulf of Mannar Deep Channel", "lat": 8.7000, "lng": 79.2500, "type": "waypoint"},
+                {"name": "Cape Comorin / Wadge Bank Passage", "lat": 7.4500, "lng": 77.5500, "type": "waypoint"},
+                {"name": "South Malabar Seaward Fairway", "lat": round(max(8.40, min(destination.latitude - 1.0, 9.50)), 4), "lng": 75.8500, "type": "waypoint"},
+                {"name": "Target Sector Arrival", "lat": destination.latitude, "lng": destination.longitude, "type": "destination"}
+            ]
+        elif destination.longitude > 91.0 or origin.longitude > 91.0:
+            # Andaman Sea open-ocean passage across Bay of Bengal
+            mid_lat = (origin.latitude + destination.latitude) / 2.0
+            mid_lon = (origin.longitude + destination.longitude) / 2.0
+            waypoints = [
+                {"name": "Departure Port Fairway", "lat": origin.latitude, "lng": origin.longitude, "type": "origin"},
+                {"name": "Bay of Bengal Ocean Transit 1", "lat": round((origin.latitude + mid_lat) / 2.0, 4), "lng": round((origin.longitude + mid_lon) / 2.0, 4), "type": "waypoint"},
+                {"name": "Andaman Sea Deep Approach 2", "lat": round((destination.latitude + mid_lat) / 2.0, 4), "lng": round((destination.longitude + mid_lon) / 2.0, 4), "type": "waypoint"},
+                {"name": "Target Sector Arrival", "lat": destination.latitude, "lng": destination.longitude, "type": "destination"}
+            ]
+        else:
+            # Coastal routing within the same ocean basin (Arabian Sea or Bay of Bengal)
+            is_arabian_sea = (origin.longitude < 77.5 and destination.longitude < 78.5)
+            offset_lon = -0.15 if is_arabian_sea else 0.15
+            mid_lat = (origin.latitude + destination.latitude) / 2.0
+            mid_lon = (origin.longitude + destination.longitude) / 2.0 + offset_lon
+
+            waypoints = [
+                {"name": "Departure Port Fairway", "lat": origin.latitude, "lng": origin.longitude, "type": "origin"},
+                {"name": "Coastal Navigation Waypoint 1", "lat": round((origin.latitude + mid_lat) / 2.0, 4), "lng": round(mid_lon, 4), "type": "waypoint"},
+                {"name": "Deep Shelf Channel Waypoint 2", "lat": round((destination.latitude + mid_lat) / 2.0, 4), "lng": round(mid_lon, 4), "type": "waypoint"},
+                {"name": "Target Sector Arrival", "lat": destination.latitude, "lng": destination.longitude, "type": "destination"}
+            ]
+
+        # Calculate cumulative nautical corridor distance across all waypoints
+        total_dist_km = 0.0
+        for i in range(len(waypoints) - 1):
+            p1 = Coordinates(latitude=waypoints[i]["lat"], longitude=waypoints[i]["lng"])
+            p2 = Coordinates(latitude=waypoints[i+1]["lat"], longitude=waypoints[i+1]["lng"])
+            total_dist_km += self.haversine_distance_km(p1, p2)
+        total_dist_km = round(total_dist_km, 2)
+
         warnings = []
         for wp in waypoints:
             hits = self.check_geofence(Coordinates(latitude=wp["lat"], longitude=wp["lng"]))
             if hits:
                 for hit in hits:
-                    warnings.append(f"Caution: Planned waypoint is near {hit['zone_name']}. Safe clearance required.")
+                    warnings.append(f"Caution: Waypoint is near {hit['zone_name']}. Safe clearance required.")
 
-        mid_hits = self.check_geofence(Coordinates(latitude=mid_lat, longitude=mid_lon))
-        if mid_hits:
-            warnings.append(f"Transit corridor skirts {mid_hits[0]['zone_name']}. Standard autopilot course offset applied.")
-
-        nautical_miles = round(dist_km * 0.539957, 1)
+        nautical_miles = round(total_dist_km * 0.539957, 1)
         cruise_speed_knots = 12.0
         est_transit_hours = round(nautical_miles / cruise_speed_knots, 1)
-        
+
         return {
             "route_id": f"RT-{int(time.time())}",
             "route_type": "Navigational Safe Coastal Corridor",
-            "distance_km": dist_km,
+            "distance_km": total_dist_km,
             "distance_nm": nautical_miles,
             "estimated_transit_hours": est_transit_hours,
             "waypoints": waypoints,
