@@ -214,7 +214,12 @@ class OrcaApp {
       this.loadDisasterData();
     } else if (viewId === 'satellite') {
       setTimeout(() => {
-        if (this.satelliteLab) this.satelliteLab.renderCanvasLayers();
+        if (this.satelliteLab) {
+          if (typeof this.satelliteLab.initMaps === 'function' && !this.satelliteLab.mapAfter) {
+            this.satelliteLab.initMaps();
+          }
+          this.satelliteLab.invalidateMaps();
+        }
       }, 100);
     } else if (viewId === 'simulator') {
       setTimeout(() => {

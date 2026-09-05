@@ -2587,29 +2587,41 @@
 /* --------------------------------------------------------------------------
    SATELLITE LAB OVERLAY
    -------------------------------------------------------------------------- */
-.satellite-lab-overlay-card {
+.sat-full-browser-container {
   position: absolute;
-  top: 16px;
-  left: 18px;
-  right: 18px;
-  bottom: 20px;
-  background: rgba(2, 11, 20, 0.94);
-  backdrop-filter: blur(14px);
-  border: 1px solid var(--border-panel);
-  border-radius: 8px;
-  padding: 16px;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: radial-gradient(circle at 50% 15%, rgba(6, 30, 48, 0.94) 0%, rgba(2, 11, 20, 0.98) 70%, #01060b 100%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
+  overflow: hidden;
+  z-index: 10;
+  pointer-events: auto;
+}
+
+.satellite-lab-overlay-card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 50% 15%, rgba(6, 30, 48, 0.94) 0%, rgba(2, 11, 20, 0.98) 70%, #01060b 100%);
+  backdrop-filter: blur(14px);
+  display: flex;
+  flex-direction: column;
 }
 
 .sat-lab-header {
+  padding: 16px 28px 12px 28px;
+  background: rgba(2, 11, 20, 0.88);
+  border-bottom: 1px solid var(--border-panel);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid rgba(36, 160, 200, 0.2);
-  padding-bottom: 10px;
   gap: 16px;
   flex-wrap: wrap;
 }
@@ -2749,11 +2761,31 @@
 .satellite-split-viewer-container {
   flex: 1;
   position: relative;
-  border-radius: 6px;
+  margin: 12px 28px;
+  border-radius: 8px;
   overflow: hidden;
-  border: 1px solid rgba(36, 160, 200, 0.25);
+  border: 1px solid rgba(36, 160, 200, 0.3);
   background: #010810;
   cursor: crosshair;
+}
+
+.sat-map-view {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.sat-map-after {
+  z-index: 1;
+}
+
+.sat-map-before {
+  z-index: 2;
+  clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%);
 }
 
 .sat-layer {
@@ -2908,10 +2940,9 @@
 }
 
 .sat-meta-bar {
-  background: rgba(4, 22, 36, 0.7);
-  border: 1px solid rgba(36, 160, 200, 0.2);
-  border-radius: 6px;
-  padding: 8px 14px;
+  background: rgba(1, 8, 16, 0.92);
+  border-top: 1px solid rgba(36, 160, 200, 0.2);
+  padding: 12px 28px;
   display: flex;
   align-items: center;
   justify-content: space-between;

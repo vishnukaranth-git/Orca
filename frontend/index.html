@@ -578,7 +578,7 @@
 
       <!-- VIEW 5: SATELLITE LAB (Multispectral Slider & Coastal Change) -->
       <div class="view-panel" id="view-satellite">
-        <div class="satellite-lab-overlay-card">
+        <div class="sat-full-browser-container">
           <!-- Top Mission Header -->
           <div class="sat-lab-header">
             <div class="sat-title-group">
@@ -616,15 +616,11 @@
             </div>
           </div>
 
-          <!-- Interactive Before/After Split Viewer -->
+          <!-- Interactive Before/After Split Viewer with Real GIS Satellite Feeds -->
           <div class="satellite-split-viewer-container" id="satellite-split-viewer">
             <!-- Layers -->
-            <div class="sat-layer sat-layer-after" id="sat-layer-after">
-              <canvas id="sat-canvas-after"></canvas>
-            </div>
-            <div class="sat-layer sat-layer-before" id="sat-layer-before">
-              <canvas id="sat-canvas-before"></canvas>
-            </div>
+            <div class="sat-map-view sat-map-after" id="sat-map-after"></div>
+            <div class="sat-map-view sat-map-before" id="sat-map-before"></div>
 
             <!-- Sliding Divider -->
             <div class="sat-split-divider" id="sat-split-divider">
