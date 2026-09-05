@@ -1,43 +1,68 @@
 /* ==========================================================================
-   ORCA DESIGN SYSTEM - SPLIT-LEVEL OCEAN & MARINE INTELLIGENCE
-   Exact match to the reference marine command UI
+   ORCA DESIGN SYSTEM — REALISTIC OCEAN + SATELLITE INTELLIGENCE
+   Palette: Black / Near-Black / Charcoal / Graphite neutrals + Crisp Pure White
+   Accents: Sea Green / Turquoise · Emerald · Amber · Orange · Hazard Red · Violet
+   Atmosphere: Earth Observation & Marine Intelligence
    ========================================================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 :root {
-  /* Ocean Colors */
-  --bg-deep-void: #020b14;
-  --bg-marine-panel: rgba(6, 26, 42, 0.78);
-  --bg-marine-card: rgba(8, 32, 50, 0.65);
-  --bg-marine-card-hover: rgba(12, 44, 68, 0.85);
-  
-  /* Precision Glass Borders */
-  --panel-border: rgba(36, 160, 200, 0.22);
-  --panel-border-bright: rgba(34, 211, 182, 0.45);
-  --panel-glow: 0 8px 32px rgba(0, 0, 0, 0.45);
+  /* Neutral Base: Black, Near-Black, Charcoal, Graphite, Dark Grey */
+  --bg-void: #030508;
+  --bg-primary: #06090d;
+  --bg-deep-void: #06090d;
+  --bg-charcoal: #0e141c;
+  --bg-graphite: #141d27;
+  --bg-dark-grey: #1c2633;
+  --bg-elevated: #18222f;
 
-  /* Accents */
-  --accent-cyan: #1cbcd8;
-  --accent-aqua: #22d3b6;
-  --accent-green: #2dd4bf;
-  --accent-blue: #0284c7;
+  /* Glass Panels with Dark Neutral Foundation */
+  --bg-marine-panel: rgba(10, 15, 22, 0.88);
+  --bg-marine-card: rgba(14, 20, 29, 0.78);
+  --bg-marine-card-hover: rgba(22, 31, 44, 0.85);
+  --bg-overlay: rgba(4, 7, 11, 0.85);
+
+  /* Subtle, Restrained Precision Borders (No neon) */
+  --panel-border: rgba(255, 255, 255, 0.08);
+  --panel-border-subtle: rgba(255, 255, 255, 0.04);
+  --panel-border-bright: rgba(45, 212, 191, 0.35);
+  --border-panel: rgba(255, 255, 255, 0.08);
+  --border-subtle: rgba(255, 255, 255, 0.05);
+  --panel-glow: 0 8px 32px rgba(0, 0, 0, 0.65);
+  --panel-shadow: 0 4px 24px rgba(0, 0, 0, 0.55);
+
+  /* Selective Accents */
+  --accent-white: #ffffff;
+  --accent-sea: #14b8a6;
+  --accent-turquoise: #2dd4bf;
+  --accent-cyan: #2dd4bf;
+  --accent-aqua: #2dd4bf;
+  --accent-green: #10b981;
+  --accent-safe: #10b981;
   --accent-amber: #f59e0b;
+  --accent-gold: #f59e0b;
+  --accent-orange: #f97316;
   --accent-red: #ef4444;
+  --accent-critical: #ef4444;
+  --accent-violet: #8b5cf6;
+  --accent-satellite: #8b5cf6;
+  --accent-blue: #38bdf8;
 
-  /* Typography */
+  /* Typography: Crisp Pure White for Headings & Primary Contrast */
   --text-pure: #ffffff;
-  --text-main: #d1e8f2;
-  --text-muted: #84a9ba;
-  --text-dim: #507788;
-  
+  --text-main: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --text-dim: #475569;
+
   --font-display: 'Rajdhani', 'Inter', -apple-system, sans-serif;
   --font-body: 'Inter', -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 
   --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
 }
 
 *, *::before, *::after {
@@ -50,15 +75,16 @@ html, body {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background-color: var(--bg-deep-void);
+  background-color: var(--bg-void);
   color: var(--text-main);
   font-family: var(--font-body);
   font-size: 13px;
-  line-height: 1.4;
+  line-height: 1.45;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Background Canvas */
+/* Background Atmosphere Canvas */
 #underwater-canvas {
   position: fixed;
   top: 0;
@@ -84,5 +110,5 @@ html, body {
   font-family: var(--font-mono);
   font-size: 10px;
   letter-spacing: 0.05em;
-  color: var(--text-muted);
+  color: var(--text-secondary);
 }

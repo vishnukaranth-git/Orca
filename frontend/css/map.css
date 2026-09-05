@@ -3,13 +3,20 @@
    GIS-Grade Earth Observation Satellite Basemap & Multi-Source Intelligence HUD
    ========================================================================== */
 
-/* Disable cartoon background canvas to guarantee authentic satellite Earth map */
+/* Realistic Ocean & Satellite Atmosphere Background */
 #underwater-canvas {
-  display: none !important;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 1;
 }
 
 .leaflet-container {
-  background-color: #01070e !important;
+  background-color: #04070b !important;
   font-family: var(--font-body) !important;
   outline: none;
 }
@@ -841,29 +848,61 @@
   justify-content: center;
   text-align: center;
   cursor: pointer;
+  position: relative;
 }
 
 .pfz-polygon-label .pin-icon {
-  width: 22px;
-  height: 22px;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));
+  width: 18px;
+  height: 18px;
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.8));
+  transition: transform 0.2s ease;
+}
+
+.pfz-polygon-label:hover .pin-icon {
+  transform: scale(1.2);
 }
 
 .pfz-polygon-label .name {
   font-family: var(--font-display);
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 700;
   color: #ffffff;
-  letter-spacing: 0.06em;
-  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.9);
-  line-height: 1.1;
+  letter-spacing: 0.05em;
+  line-height: 1.2;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  background: rgba(8, 12, 18, 0.92);
+  padding: 2px 6px;
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.7);
+  white-space: nowrap;
+  pointer-events: none;
+  margin-top: 3px;
 }
 
 .pfz-polygon-label .potential {
-  font-size: 11px;
-  color: #d1e8f2;
-  font-family: var(--font-body);
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+  font-size: 9.5px;
+  color: #2dd4bf;
+  font-family: var(--font-mono);
+  opacity: 0;
+  transform: translateY(4px);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  background: rgba(8, 12, 18, 0.92);
+  padding: 1px 5px;
+  border-radius: 2px;
+  border: 1px solid rgba(45, 212, 191, 0.25);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.7);
+  white-space: nowrap;
+  pointer-events: none;
+  margin-top: 2px;
+}
+
+.pfz-polygon-label:hover .name,
+.pfz-polygon-label:hover .potential {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .vessel-pin {
