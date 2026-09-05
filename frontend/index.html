@@ -602,10 +602,10 @@
 
               <!-- Band Selector Buttons -->
               <div class="sat-band-buttons">
-                <button class="sat-band-btn active" data-band="sst"><i data-lucide="flame" style="width:12px;height:12px;"></i> SST Anomaly</button>
-                <button class="sat-band-btn" data-band="chl"><i data-lucide="waves" style="width:12px;height:12px;"></i> Chlorophyll-a</button>
-                <button class="sat-band-btn" data-band="flood"><i data-lucide="shield-alert" style="width:12px;height:12px;"></i> SAR Flood Radar</button>
-                <button class="sat-band-btn" data-band="optical"><i data-lucide="eye" style="width:12px;height:12px;"></i> True Color Optical</button>
+                <button class="sat-band-btn active" data-band="sst" onclick="orcaApp.satelliteLab && orcaApp.satelliteLab.setBand('sst')"><i data-lucide="flame" style="width:12px;height:12px;"></i> SST Anomaly</button>
+                <button class="sat-band-btn" data-band="chl" onclick="orcaApp.satelliteLab && orcaApp.satelliteLab.setBand('chl')"><i data-lucide="waves" style="width:12px;height:12px;"></i> Chlorophyll-a</button>
+                <button class="sat-band-btn" data-band="flood" onclick="orcaApp.satelliteLab && orcaApp.satelliteLab.setBand('flood')"><i data-lucide="shield-alert" style="width:12px;height:12px;"></i> SAR Flood Radar</button>
+                <button class="sat-band-btn" data-band="optical" onclick="orcaApp.satelliteLab && orcaApp.satelliteLab.setBand('optical')"><i data-lucide="eye" style="width:12px;height:12px;"></i> True Color Optical</button>
               </div>
 
               <!-- Action button to plot anomaly on live tactical map -->

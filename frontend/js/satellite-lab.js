@@ -281,10 +281,10 @@ class OrcaSatelliteLab {
         L.polygon(s.bloomPolygon, {
           color: '#38bdf8',
           fillColor: '#0ea5e9',
-          fillOpacity: 0.18,
-          weight: 1.5,
+          fillOpacity: 0.22,
+          weight: 2,
           dashArray: '3, 6'
-        }).addTo(this.mapAfter).bindTooltip(`Sentinel-2 Optical: ${s.opticalText}`, { permanent: false, direction: 'top' });
+        }).addTo(this.mapAfter).bindTooltip(`Sentinel-2 Optical (10m): ${s.opticalText}`, { permanent: true, direction: 'top', className: 'sat-gis-tooltip' });
       }
 
     } else if (this.currentBand === 'sst') {
@@ -294,18 +294,18 @@ class OrcaSatelliteLab {
         { maxZoom: 18, opacity: 0.55 }
       ).addTo(this.mapAfter);
 
-      // NASA GIBS GHRSST Sea Surface Temperature layer
+      // NASA GIBS GHRSST Sea Surface Temperature layer (Level 7 native zoom scaled up cleanly)
       L.tileLayer(
         'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/GHRSST_L4_MUR_Sea_Surface_Temperature/default/2024-03-01/GoogleMapsCompatible_Level7/{z}/{y}/{x}.png',
-        { maxZoom: 12, opacity: 0.72 }
+        { maxNativeZoom: 7, maxZoom: 18, opacity: 0.72 }
       ).addTo(this.mapAfter);
 
       // Thermal Shear Front Polyline & Gradient Front
       if (s.thermalFront) {
         L.polyline(s.thermalFront, {
           color: '#ef4444',
-          weight: 3.5,
-          opacity: 0.9,
+          weight: 4,
+          opacity: 0.95,
           dashArray: '6, 6'
         }).addTo(this.mapAfter).bindTooltip(`THERMAL SHEAR FRONT (${s.sstAnomalyText})`, { permanent: true, direction: 'right', className: 'sat-gis-tooltip' });
 
@@ -316,8 +316,8 @@ class OrcaSatelliteLab {
         L.polygon(bufferPoly, {
           color: '#f59e0b',
           fillColor: '#f97316',
-          fillOpacity: 0.28,
-          weight: 1
+          fillOpacity: 0.32,
+          weight: 1.5
         }).addTo(this.mapAfter);
       }
 
@@ -328,10 +328,10 @@ class OrcaSatelliteLab {
         { maxZoom: 16, opacity: 0.6 }
       ).addTo(this.mapAfter);
 
-      // NASA GIBS MODIS Aqua Chlorophyll-a (Ocean Color)
+      // NASA GIBS MODIS Aqua Chlorophyll-a (Ocean Color - Level 7 native zoom scaled up cleanly)
       L.tileLayer(
         'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Aqua_L3_Chlorophyll_A_8Day/default/2024-03-01/GoogleMapsCompatible_Level7/{z}/{y}/{x}.png',
-        { maxZoom: 12, opacity: 0.75 }
+        { maxNativeZoom: 7, maxZoom: 18, opacity: 0.75 }
       ).addTo(this.mapAfter);
 
       // Active Upwelling & Phytoplankton Plume
@@ -339,8 +339,8 @@ class OrcaSatelliteLab {
         L.polygon(s.bloomPolygon, {
           color: '#10b981',
           fillColor: '#059669',
-          fillOpacity: 0.35,
-          weight: 2
+          fillOpacity: 0.45,
+          weight: 2.5
         }).addTo(this.mapAfter).bindTooltip(`OCM-3 / OLCI: ${s.chlPeakText}`, { permanent: true, direction: 'top', className: 'sat-gis-tooltip' });
       }
 
@@ -357,9 +357,9 @@ class OrcaSatelliteLab {
           L.polygon(poly, {
             color: '#22d3b6',
             fillColor: '#06b6d4',
-            fillOpacity: 0.45,
-            weight: 2.5
-          }).addTo(this.mapAfter).bindTooltip(`SAR Water Inundation: Sector ${idx + 1}`, { permanent: false });
+            fillOpacity: 0.55,
+            weight: 3
+          }).addTo(this.mapAfter).bindTooltip(`SAR Flood Surge Inundation: Sector ${idx + 1}`, { permanent: true, direction: 'top', className: 'sat-gis-tooltip' });
         });
       }
     }
@@ -382,6 +382,18 @@ class OrcaSatelliteLab {
   bindEvents() {
     const divider = document.getElementById('sat-split-divider');
     const container = document.getElementById('satellite-split-viewer');
+
+    // Bind band selection buttons
+    const bandBtns = document.querySelectorAll('.sat-band-btn');
+    bandBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const band = btn.dataset.band;
+        if (band) {
+          this.setBand(band);
+        }
+      });
+    });
 
     if (!divider || !container) return;
 
@@ -487,9 +499,22 @@ class OrcaSatelliteLab {
       btn.classList.toggle('active', btn.dataset.band === bandName);
     });
 
+    // Update floating HUD Post Tag
+    const postLabel = document.getElementById('sat-hud-post-label');
+    if (postLabel) {
+      if (bandName === 'sst') postLabel.textContent = 'LIVE ORBITAL PASS: SST THERMAL FRONT (10:45 UTC)';
+      else if (bandName === 'chl') postLabel.textContent = 'LIVE ORBITAL PASS: CHLOROPHYLL-a (10:45 UTC)';
+      else if (bandName === 'flood') postLabel.textContent = 'LIVE ORBITAL PASS: SENTINEL-1 C-SAR (10:45 UTC)';
+      else if (bandName === 'optical') postLabel.textContent = 'LIVE ORBITAL PASS: TRUE COLOR OPTICAL (10:45 UTC)';
+    }
+
     this.updateTelemetryText();
     this.updateLegend();
     this.setupAfterMapLayers();
+
+    if (window.lucide) {
+      lucide.createIcons();
+    }
   }
 
   updateTelemetryText() {
