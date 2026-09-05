@@ -124,11 +124,13 @@ class OrcaApp {
 
   bindRouteControls() {
     const btn = document.getElementById('btn-calculate-route');
-    if (!btn) return;
+    const originSelect = document.getElementById('route-origin-select');
+    const destSelect = document.getElementById('route-dest-select');
 
-    btn.addEventListener('click', async () => {
-      const origVal = document.getElementById('route-origin-select').value.split(',');
-      const destVal = document.getElementById('route-dest-select').value.split(',');
+    const executeRouteCalculation = async () => {
+      if (!btn || !originSelect || !destSelect) return;
+      const origVal = originSelect.value.split(',');
+      const destVal = destSelect.value.split(',');
 
       const origLat = parseFloat(origVal[0]), origLon = parseFloat(origVal[1]);
       const destLat = parseFloat(destVal[0]), destLon = parseFloat(destVal[1]);
@@ -148,6 +150,7 @@ class OrcaApp {
         if (resp.ok) {
           const json = await resp.json();
           const route = json.data;
+          this.lastCalculatedRoute = route;
           this.displayRouteResults(route);
           if (this.mapController) {
             this.mapController.plotRoute(route.waypoints);
@@ -159,7 +162,16 @@ class OrcaApp {
         btn.innerHTML = '<i data-lucide="navigation"></i><span>CALCULATE SAFE CORRIDOR</span>';
         if (window.lucide) lucide.createIcons();
       }
-    });
+    };
+
+    if (btn) {
+      btn.addEventListener('click', executeRouteCalculation);
+    }
+
+    if (originSelect && destSelect) {
+      originSelect.addEventListener('change', executeRouteCalculation);
+      destSelect.addEventListener('change', executeRouteCalculation);
+    }
   }
 
   displayRouteResults(route) {
@@ -180,12 +192,25 @@ class OrcaApp {
         <div><span style="color:var(--text-muted);">Nautical:</span> <b style="font-family:var(--font-mono);color:#fff;">${route.distance_nm} NM</b></div>
         <div><span style="color:var(--text-muted);">Est. Transit:</span> <b style="font-family:var(--font-mono);color:#22d3b6;">${route.estimated_transit_hours} hrs</b></div>
       </div>
-      <div style="background:rgba(3,14,24,0.7);padding:8px;border-radius:4px;">
+      <div style="background:rgba(3,14,24,0.7);padding:8px;border-radius:4px;margin-bottom:8px;">
         <div style="font-size:10px;font-family:var(--font-mono);color:var(--text-muted);">SAFETY CHECK & GEOFENCING:</div>
         ${warningsHtml}
       </div>
+      <button id="btn-recenter-route" class="orca-recenter-btn" style="width:100%;display:flex;align-items:center;justify-content:center;gap:6px;background:rgba(34,211,182,0.12);border:1px solid rgba(34,211,182,0.45);color:#22d3b6;padding:7px 10px;border-radius:4px;cursor:pointer;font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:0.04em;transition:all 0.18s ease;">
+        <i data-lucide="crosshair" style="width:13px;height:13px;"></i>
+        <span>RE-FRAME CORRIDOR OVERVIEW</span>
+      </button>
     `;
     card.style.display = 'block';
+
+    if (window.lucide) lucide.createIcons();
+
+    const recenterBtn = document.getElementById('btn-recenter-route');
+    if (recenterBtn && this.mapController) {
+      recenterBtn.addEventListener('click', () => {
+        this.mapController.fitRouteBounds();
+      });
+    }
   }
 
   switchView(viewId) {
@@ -227,6 +252,18 @@ class OrcaApp {
       }, 100);
     } else if (viewId === 'historical') {
       this.loadHistoricalTrends();
+    } else if (viewId === 'routes') {
+      setTimeout(() => {
+        if (this.mapController) {
+          this.mapController.map.invalidateSize();
+          if (this.mapController.currentRouteWaypoints) {
+            this.mapController.fitRouteBounds();
+          } else {
+            const btn = document.getElementById('btn-calculate-route');
+            if (btn) btn.click();
+          }
+        }
+      }, 150);
     }
 
     if (window.lucide) {

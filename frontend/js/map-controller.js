@@ -1827,40 +1827,191 @@ class OrcaMapController {
     `);
   }
 
+  generateCorridorBuffer(points, bufferDeg = 0.035) {
+    if (!points || points.length < 2) return [];
+    const leftSide = [];
+    const rightSide = [];
+
+    for (let i = 0; i < points.length - 1; i++) {
+      const p1 = points[i];
+      const p2 = points[i + 1];
+      const dLat = p2[0] - p1[0];
+      const midLat = (p1[0] + p2[0]) / 2.0;
+      const cosLat = Math.max(0.2, Math.cos(midLat * Math.PI / 180));
+      const dLng = (p2[1] - p1[1]) * cosLat;
+      const len = Math.sqrt(dLat * dLat + dLng * dLng) || 0.0001;
+
+      // Perpendicular normal unit vector
+      const uLat = -dLng / len;
+      const uLng = dLat / len;
+
+      const offLat = uLat * bufferDeg;
+      const offLng = (uLng * bufferDeg) / cosLat;
+
+      leftSide.push([p1[0] + offLat, p1[1] + offLng]);
+      leftSide.push([p2[0] + offLat, p2[1] + offLng]);
+
+      rightSide.push([p1[0] - offLat, p1[1] - offLng]);
+      rightSide.push([p2[0] - offLat, p2[1] - offLng]);
+    }
+
+    return leftSide.concat(rightSide.reverse());
+  }
+
+  fitRouteBounds() {
+    if (!this.currentRouteWaypoints || this.currentRouteWaypoints.length < 2) return;
+    const latlngs = this.currentRouteWaypoints.map(wp => [wp.lat, wp.lng]);
+    const bounds = L.latLngBounds(latlngs);
+
+    // Calculate left offset to ensure the entire corridor is visible to the right of the side dock
+    const sideDock = document.querySelector('#view-routes .side-dock-panel');
+    let leftOffset = 560;
+    if (sideDock && sideDock.offsetWidth > 0) {
+      leftOffset = sideDock.offsetLeft + sideDock.offsetWidth + 40;
+    }
+
+    // Guard against very small screen widths
+    const winWidth = window.innerWidth || 1200;
+    if (leftOffset > winWidth * 0.65) {
+      leftOffset = Math.floor(winWidth * 0.4);
+    }
+
+    // Frame the corridor in the unobstructed map area with a strict maxZoom of 9.3
+    // so it shows the coastal maritime route instead of over-zooming into local streets
+    this.map.fitBounds(bounds, {
+      paddingTopLeft: [leftOffset, 70],
+      paddingBottomRight: [70, 70],
+      maxZoom: 9.3,
+      animate: true,
+      duration: 1.0
+    });
+  }
+
   plotRoute(waypoints) {
     this.layers.routes.clearLayers();
     if (!waypoints || waypoints.length < 2) return;
 
+    this.currentRouteWaypoints = waypoints;
     const latlngs = waypoints.map(wp => [wp.lat, wp.lng]);
 
-    // Draw route polyline with glowing cyan effect
+    // 1. Draw Fairway Corridor Buffer Polygon (Semi-transparent bathymetric safety envelope)
+    const corridorPolygon = this.generateCorridorBuffer(latlngs, 0.038);
+    if (corridorPolygon && corridorPolygon.length > 2) {
+      L.polygon(corridorPolygon, {
+        color: '#22d3b6',
+        weight: 1.5,
+        dashArray: '5, 5',
+        fillColor: '#00f2fe',
+        fillOpacity: 0.12,
+        interactive: true
+      }).addTo(this.layers.routes).bindPopup(`
+        <div style="font-family:var(--font-body);padding:4px;font-size:12px;">
+          <div style="font-family:var(--font-display);font-weight:700;color:#22d3b6;font-size:13px;margin-bottom:4px;">
+            SAFE NAVIGATIONAL CORRIDOR
+          </div>
+          <div>Passage Status: <b style="color:#22d3b6;">CLEARED & VERIFIED</b></div>
+          <div style="color:#94a3b8;font-size:11px;margin-top:4px;">
+            Bathymetric soundings indicate clearance > 15m depth, avoiding nearshore shoals and geofenced military sanctuaries.
+          </div>
+        </div>
+      `, { className: 'orca-context-popup', autoPan: false });
+    }
+
+    // 2. Outer Glow Polyline
+    L.polyline(latlngs, {
+      color: '#00f2fe',
+      weight: 6,
+      opacity: 0.35,
+      interactive: false
+    }).addTo(this.layers.routes);
+
+    // 3. Central Navigational Track Polyline
     L.polyline(latlngs, {
       color: '#22d3b6',
       weight: 3.5,
       dashArray: '8, 6',
-      opacity: 0.9
+      opacity: 0.95,
+      interactive: false
     }).addTo(this.layers.routes);
 
-    // Waypoint markers
+    // 4. Waypoint Markers & Beacons
     waypoints.forEach((wp, idx) => {
-      const isEndpoint = idx === 0 || idx === waypoints.length - 1;
-      const markerColor = idx === 0 ? '#38bdf8' : idx === waypoints.length - 1 ? '#22d3b6' : '#f59e0b';
-      const circle = L.circleMarker([wp.lat, wp.lng], {
-        radius: isEndpoint ? 6 : 4,
-        color: markerColor,
-        fillColor: markerColor,
-        fillOpacity: 0.9,
-        weight: 2
-      }).addTo(this.layers.routes).bindPopup(`
-        <div style="font-family:'Inter',sans-serif;color:#020b14;padding:4px;">
+      const isOrigin = idx === 0;
+      const isDestination = idx === waypoints.length - 1;
+
+      let markerHtml = '';
+      let iconSize = [32, 32];
+      let iconAnchor = [16, 16];
+
+      if (isOrigin) {
+        markerHtml = `
+          <div class="orca-route-marker origin-marker" title="${wp.name}">
+            <div class="marker-pulse-ring origin-pulse"></div>
+            <div class="marker-core origin-core">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5">
+                <circle cx="12" cy="5" r="3"/>
+                <line x1="12" y1="8" x2="12" y2="21"/>
+                <path d="M5 12H2a10 10 0 0 0 20 0h-3"/>
+              </svg>
+            </div>
+            <div class="marker-pill origin-pill">PORT: ${wp.name.split('(')[0].trim()}</div>
+          </div>
+        `;
+        iconSize = [150, 36];
+        iconAnchor = [18, 18];
+      } else if (isDestination) {
+        markerHtml = `
+          <div class="orca-route-marker dest-marker" title="${wp.name}">
+            <div class="marker-pulse-ring dest-pulse"></div>
+            <div class="marker-core dest-core">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5">
+                <circle cx="12" cy="12" r="9"/>
+                <circle cx="12" cy="12" r="4"/>
+                <line x1="12" y1="2" x2="12" y2="6"/>
+                <line x1="12" y1="18" x2="12" y2="22"/>
+                <line x1="2" y1="12" x2="6" y2="12"/>
+                <line x1="18" y1="12" x2="22" y2="12"/>
+              </svg>
+            </div>
+            <div class="marker-pill dest-pill">ZONE: ${wp.name.split('(')[0].trim()}</div>
+          </div>
+        `;
+        iconSize = [150, 36];
+        iconAnchor = [18, 18];
+      } else {
+        markerHtml = `
+          <div class="orca-route-marker waypoint-marker" title="${wp.name}">
+            <div class="marker-core waypoint-core">${idx}</div>
+          </div>
+        `;
+        iconSize = [24, 24];
+        iconAnchor = [12, 12];
+      }
+
+      const icon = L.divIcon({
+        className: 'route-nav-div-icon',
+        html: markerHtml,
+        iconSize: iconSize,
+        iconAnchor: iconAnchor
+      });
+
+      const marker = L.marker([wp.lat, wp.lng], { icon: icon }).addTo(this.layers.routes);
+      marker.bindPopup(`
+        <div style="font-family:var(--font-body);padding:4px;font-size:12px;">
+          <div style="font-family:var(--font-display);font-weight:700;color:${isOrigin ? '#38bdf8' : isDestination ? '#22d3b6' : '#f59e0b'};font-size:13px;margin-bottom:4px;">
+            ${isOrigin ? 'DEPARTURE HARBOR' : isDestination ? 'TARGET FISHING ARRIVAL SECTOR' : `FAIRWAY WAYPOINT ${idx}`}
+          </div>
           <b>${wp.name}</b><br>
-          ${wp.lat.toFixed(4)}°N, ${wp.lng.toFixed(4)}°E
+          <div style="font-family:var(--font-mono);font-size:11px;color:#94a3b8;margin-top:2px;">${wp.lat.toFixed(4)}°N, ${wp.lng.toFixed(4)}°E</div>
         </div>
-      `);
-      if (idx === 0) circle.openPopup();
+      `, {
+        className: 'orca-context-popup',
+        autoPan: false
+      });
     });
 
-    this.map.fitBounds(L.latLngBounds(latlngs), { padding: [60, 60] });
+    // 5. Fit bounds framed to the right of the side-dock panel, without over-zooming
+    this.fitRouteBounds();
   }
 
   flyTo(lat, lng, zoom = 8) {
