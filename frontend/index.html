@@ -31,41 +31,19 @@
   <!-- 2. Main App Container -->
   <div id="orca-app">
     
-    <!-- Top HUD Header -->
-    <header class="hud-header">
-      <div class="brand-section" onclick="orcaApp.switchView('ask-orca')">
+    <!-- Vertical Left Sidebar Navigation Rail -->
+    <aside class="orca-left-sidebar" id="orca-sidebar-nav">
+      <!-- Sidebar Brand Header -->
+      <div class="sidebar-brand" onclick="orcaApp.switchView('ask-orca')">
         <div class="brand-logo-hud">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3 8c3-2 6-2 9 0s6 2 9 0"/><path d="M3 12c3-2 6-2 9 0s6 2 9 0"/><path d="M3 16c3-2 6-2 9 0s6 2 9 0"/></svg>
         </div>
         <div class="brand-title-group">
           <h1>ORCA</h1>
-          <p>OCEAN REASONING & COLLABORATIVE AGENTS</p>
+          <p>OCEAN INTELLIGENCE</p>
         </div>
       </div>
 
-      <!-- Right Telemetry Strip -->
-      <div class="hud-telemetry-bar">
-        <div class="telemetry-item" id="hud-backend-badge">
-          <span class="live-dot" style="background:#22d3b6;box-shadow:0 0 6px #22d3b6;"></span>
-          <span class="value" style="font-size:10px;">INDIAN OCEAN BASIN</span>
-        </div>
-        <div class="telemetry-item">
-          <i data-lucide="map-pin"></i>
-          <span class="value" id="hud-coords-val">12.0000°N<br>79.0000°E</span>
-        </div>
-        <div class="telemetry-item">
-          <i data-lucide="clock"></i>
-          <span class="value" id="hud-time-val">12:00 UTC</span>
-        </div>
-        <!-- Language Switcher Button -->
-        <button class="lang-toggle-btn" id="lang-toggle" title="Switch Language (English / Kannada)">
-          <span>EN</span> | <span style="opacity:0.6;">ಕನ್ನಡ</span>
-        </button>
-      </div>
-    </header>
-
-    <!-- Vertical Left Sidebar Navigation Rail -->
-    <aside class="orca-left-sidebar" id="orca-sidebar-nav">
       <div class="sidebar-section-header">MISSION NAVIGATION</div>
       <nav class="sidebar-nav-list">
         <button class="nav-tab-btn highlight-tab active" data-view="ask-orca" id="tab-ask-orca">
@@ -102,12 +80,17 @@
         </button>
       </nav>
 
-      <div class="sidebar-bottom-badge">
-        <div class="sidebar-status-dot"></div>
-        <div class="sidebar-status-text">
-          <span class="status-title">ORCA AGENTS</span>
-          <span class="status-sub">7 Core Agents Active</span>
+      <div class="sidebar-footer">
+        <div class="sidebar-bottom-badge">
+          <div class="sidebar-status-dot"></div>
+          <div class="sidebar-status-text">
+            <span class="status-title">ORCA AGENTS</span>
+            <span class="status-sub">7 Core Active · IO Basin</span>
+          </div>
         </div>
+        <button class="lang-toggle-btn sidebar-lang-btn" id="lang-toggle" title="Switch Language (English / Kannada)">
+          <span>EN</span> | <span style="opacity:0.6;">ಕನ್ನಡ</span>
+        </button>
       </div>
     </aside>
 

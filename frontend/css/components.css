@@ -8,29 +8,7 @@
    HUD Header & Navigation Bar
    -------------------------------------------------------------------------- */
 .hud-header {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 58px;
-  background: linear-gradient(180deg, rgba(8, 12, 18, 0.96) 0%, rgba(5, 8, 13, 0.92) 100%);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--panel-border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 18px;
-  z-index: 1000;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.65);
-}
-
-.brand-section {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  cursor: pointer;
-  user-select: none;
+  display: none !important;
 }
 
 .brand-logo-hud {
@@ -44,6 +22,7 @@
   justify-content: center;
   color: #2dd4bf;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+  flex-shrink: 0;
 }
 
 .brand-logo-hud svg {
@@ -53,7 +32,7 @@
 
 .brand-title-group h1 {
   font-family: var(--font-display);
-  font-size: 21px;
+  font-size: 19px;
   font-weight: 700;
   letter-spacing: 0.12em;
   color: #ffffff;
@@ -62,8 +41,8 @@
 
 .brand-title-group p {
   font-family: var(--font-mono);
-  font-size: 8.5px;
-  letter-spacing: 0.14em;
+  font-size: 8px;
+  letter-spacing: 0.12em;
   color: #94a3b8;
   margin-top: 3px;
 }
@@ -73,7 +52,7 @@
    -------------------------------------------------------------------------- */
 .orca-left-sidebar {
   position: absolute;
-  top: 58px;
+  top: 0;
   bottom: 0;
   left: 0;
   width: 200px;
@@ -87,6 +66,37 @@
   padding: 14px 10px;
   z-index: 950;
   box-shadow: 4px 0 24px rgba(0, 0, 0, 0.6);
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 6px 14px 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.sidebar-brand:hover .brand-logo-hud {
+  border-color: #2dd4bf;
+  box-shadow: 0 0 12px rgba(45, 212, 191, 0.35);
+}
+
+.sidebar-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.sidebar-lang-btn {
+  width: 100%;
+  justify-content: center;
+  padding: 6px 10px;
+  font-size: 11px;
 }
 
 .sidebar-section-header {
@@ -274,7 +284,7 @@
    -------------------------------------------------------------------------- */
 .main-view-container {
   position: absolute;
-  top: 58px;
+  top: 0;
   bottom: 0;
   left: 200px;
   right: 0;
@@ -2155,7 +2165,7 @@
 
 .ask-orca-chat-layout {
   display: flex;
-  height: calc(100vh - 58px);
+  height: 100vh;
   width: 100%;
   background: linear-gradient(180deg, rgba(6, 11, 18, 0.65) 0%, rgba(3, 7, 12, 0.82) 100%), url('../ocean_satellite_bg.jpg') center/cover no-repeat;
   position: relative;
