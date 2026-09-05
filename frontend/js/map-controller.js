@@ -849,6 +849,28 @@ class OrcaMapController {
     this.inspectRegion(regionKey);
   }
 
+  flyTo(lat, lng, zoom = 9) {
+    if (!this.map) return;
+    this.map.flyTo([lat, lng], zoom, { duration: 1.4 });
+  }
+
+  focusPFZ(lat, lng) {
+    if (!this.map) return;
+    this.map.flyTo([lat, lng], 9.5, { duration: 1.4 });
+    setTimeout(() => {
+      if (this.layers && this.layers.pfz) {
+        this.layers.pfz.eachLayer(layer => {
+          if (typeof layer.getLatLng === 'function') {
+            const pos = layer.getLatLng();
+            if (Math.abs(pos.lat - lat) < 0.25 && Math.abs(pos.lng - lng) < 0.25) {
+              layer.openPopup();
+            }
+          }
+        });
+      }
+    }, 700);
+  }
+
   renderOceanRegions() {
     this.layers.oceanRegions.clearLayers();
     this.regionPolygonLayers = {};

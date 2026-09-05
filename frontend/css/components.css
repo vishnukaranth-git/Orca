@@ -1696,6 +1696,305 @@
   color: var(--accent-aqua);
 }
 
+/* --------------------------------------------------------------------------
+   VIEW 3: FISHING ZONES — FULL BROWSER DASHBOARD VIEW
+   -------------------------------------------------------------------------- */
+.pfz-full-browser-container {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: radial-gradient(circle at 50% 15%, rgba(6, 30, 48, 0.94) 0%, rgba(2, 11, 20, 0.98) 70%, #01060b 100%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 10;
+  pointer-events: auto;
+}
+
+.pfz-browser-header {
+  padding: 20px 28px 16px 28px;
+  background: rgba(2, 11, 20, 0.85);
+  border-bottom: 1px solid var(--border-panel);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.pfz-browser-title-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pfz-browser-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--accent-aqua);
+  background: rgba(34, 211, 182, 0.1);
+  border: 1px solid rgba(34, 211, 182, 0.3);
+  padding: 3px 8px;
+  border-radius: 4px;
+  width: fit-content;
+}
+
+.pfz-browser-title-wrap h2 {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #ffffff;
+  margin: 0;
+}
+
+.pfz-browser-title-wrap .subtitle {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.pfz-browser-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.pfz-view-map-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(34, 211, 182, 0.12);
+  border: 1px solid var(--accent-aqua);
+  color: var(--accent-aqua);
+  font-family: var(--font-display);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 12px rgba(34, 211, 182, 0.15);
+}
+
+.pfz-view-map-cta-btn:hover {
+  background: var(--accent-aqua);
+  color: #010b14;
+  box-shadow: 0 0 20px rgba(34, 211, 182, 0.4);
+}
+
+.pfz-telemetry-banner {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  padding: 10px 28px;
+  background: rgba(1, 8, 16, 0.7);
+  border-bottom: 1px solid rgba(36, 160, 200, 0.15);
+}
+
+.pfz-banner-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pfz-banner-item .lbl {
+  font-family: var(--font-display);
+  font-size: 9.5px;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.pfz-banner-item .val {
+  font-family: var(--font-display);
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.pfz-banner-item .val.highlight {
+  color: var(--accent-aqua);
+}
+
+.pfz-browser-grid-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 28px 36px 28px;
+}
+
+.pfz-full-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 16px;
+}
+
+.pfz-full-card {
+  background: rgba(3, 18, 30, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(36, 160, 200, 0.22);
+  border-radius: 8px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: all 0.22s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+}
+
+.pfz-full-card:hover {
+  background: rgba(5, 26, 44, 0.95);
+  border-color: rgba(34, 211, 182, 0.55);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), 0 0 16px rgba(34, 211, 182, 0.2);
+}
+
+.pfz-card-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.pfz-card-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pfz-card-zone-name {
+  font-family: var(--font-display);
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.03em;
+}
+
+.pfz-card-region-tag {
+  font-size: 11px;
+  color: var(--accent-cyan);
+  font-family: var(--font-mono);
+}
+
+.pfz-full-orca-badge {
+  font-family: var(--font-display);
+  font-size: 12.5px;
+  font-weight: 800;
+  color: var(--accent-aqua);
+  background: rgba(34, 211, 182, 0.15);
+  border: 1px solid var(--accent-aqua);
+  padding: 3px 8px;
+  border-radius: 4px;
+  box-shadow: 0 0 10px rgba(34, 211, 182, 0.2);
+  white-space: nowrap;
+}
+
+.pfz-card-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  background: rgba(2, 11, 20, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 6px;
+  padding: 8px 10px;
+}
+
+.pfz-metric-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.pfz-metric-cell .lbl {
+  font-size: 9.5px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-family: var(--font-display);
+  letter-spacing: 0.05em;
+}
+
+.pfz-metric-cell .val {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.pfz-metric-cell .val.green {
+  color: #22d3b6;
+}
+
+.pfz-species-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: var(--text-main);
+  background: rgba(34, 211, 182, 0.06);
+  border: 1px solid rgba(34, 211, 182, 0.15);
+  padding: 5px 9px;
+  border-radius: 4px;
+}
+
+.pfz-species-row i {
+  color: var(--accent-aqua);
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+}
+
+.pfz-rationale-box {
+  font-size: 10.5px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  background: rgba(0, 0, 0, 0.25);
+  padding: 6px 9px;
+  border-radius: 4px;
+  border-left: 2px solid var(--accent-cyan);
+}
+
+.pfz-select-plot-btn {
+  margin-top: 2px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: linear-gradient(90deg, rgba(34, 211, 182, 0.2) 0%, rgba(56, 189, 248, 0.2) 100%);
+  border: 1px solid var(--accent-aqua);
+  color: #ffffff;
+  font-family: var(--font-display);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pfz-select-plot-btn:hover {
+  background: var(--accent-aqua);
+  color: #010b14;
+  box-shadow: 0 0 16px rgba(34, 211, 182, 0.45);
+}
+
+/* Fallback side dock card if ever rendered elsewhere */
 .pfz-zones-table-wrapper {
   flex: 1;
   overflow-y: auto;

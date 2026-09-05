@@ -292,25 +292,53 @@ class OrcaApp {
     }
 
     container.innerHTML = list.map(z => `
-      <div class="pfz-zone-card" onclick="orcaApp.inspectPFZ(${z.latitude}, ${z.longitude})">
-        <div class="pfz-card-top">
-          <div class="title">${z.zone_name}</div>
-          <div class="pfz-orca-score-badge">ORCA ${z.orca_score}</div>
+      <div class="pfz-full-card" onclick="orcaApp.inspectPFZ(${z.latitude}, ${z.longitude})">
+        <div class="pfz-card-header-row">
+          <div class="pfz-card-title-group">
+            <div class="pfz-card-zone-name">${z.zone_name}</div>
+            <div class="pfz-card-region-tag">COORDINATES: ${z.latitude.toFixed(2)}°N, ${z.longitude.toFixed(2)}°E</div>
+          </div>
+          <div class="pfz-full-orca-badge">ORCA ${z.orca_score}</div>
         </div>
-        <div class="pfz-grid-stats">
-          <div><span>Potential:</span> <b>${z.potential_score}/100</b></div>
-          <div><span>Safety:</span> <b>${z.safety_score}/100</b></div>
-          <div><span>Distance:</span> <b>${z.distance_km} km</b></div>
-          <div><span>Depth:</span> <b>-${z.depth_m}m</b></div>
+
+        <div class="pfz-card-metrics-grid">
+          <div class="pfz-metric-cell">
+            <span class="lbl">Potential</span>
+            <span class="val green">${z.potential_score}/100</span>
+          </div>
+          <div class="pfz-metric-cell">
+            <span class="lbl">Safety</span>
+            <span class="val">${z.safety_score}/100</span>
+          </div>
+          <div class="pfz-metric-cell">
+            <span class="lbl">Distance</span>
+            <span class="val">${z.distance_km} km</span>
+          </div>
+          <div class="pfz-metric-cell">
+            <span class="lbl">Depth</span>
+            <span class="val">-${z.depth_m}m</span>
+          </div>
         </div>
-        <div style="font-size:10.5px;color:var(--accent-aqua);margin:2px 0;">
-          Target Species: ${z.target_species}
+
+        <div class="pfz-species-row">
+          <i data-lucide="fish"></i>
+          <span><b>Target Species:</b> ${z.target_species}</span>
         </div>
-        <div class="pfz-explanation">
+
+        <div class="pfz-rationale-box">
           ${z.scoring_explanation}
         </div>
+
+        <button class="pfz-select-plot-btn" onclick="event.stopPropagation(); orcaApp.inspectPFZ(${z.latitude}, ${z.longitude})">
+          <i data-lucide="crosshair" style="width:13px;height:13px;"></i>
+          <span>OK, PLOT THIS ON MAP &rarr;</span>
+        </button>
       </div>
     `).join('');
+
+    if (window.lucide) {
+      lucide.createIcons();
+    }
   }
 
   async loadDisasterData() {
@@ -472,7 +500,11 @@ class OrcaApp {
   inspectPFZ(lat, lng) {
     this.switchView('command');
     if (this.mapController) {
-      this.mapController.flyTo(lat, lng, 8);
+      if (typeof this.mapController.focusPFZ === 'function') {
+        this.mapController.focusPFZ(lat, lng);
+      } else if (this.mapController.map) {
+        this.mapController.map.flyTo([lat, lng], 9, { duration: 1.4 });
+      }
     }
   }
 

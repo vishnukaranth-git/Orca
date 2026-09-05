@@ -465,24 +465,55 @@
       </div>
 
 
-      <!-- VIEW 3: FISHING ZONES (Pan-Indian PFZ Intelligence & Ranking) -->
+      <!-- VIEW 3: FISHING ZONES (Full Browser Experience -> Redirect to Map on Selection) -->
       <div class="view-panel" id="view-pfz">
-        <div class="side-dock-panel left-side-dock">
-          <div class="panel-header-bar">
-            <div>
-              <h2>POTENTIAL FISHING ZONES (INDIAN WATERS & EEZ)</h2>
-              <p class="subtitle">Multi-factor Explainable PFZ Intelligence (INCOIS Methodology)</p>
+        <div class="pfz-full-browser-container">
+          <!-- Top Mission Control Header -->
+          <div class="pfz-browser-header">
+            <div class="pfz-browser-title-wrap">
+              <span class="pfz-browser-badge"><i data-lucide="fish" style="width:12px;height:12px;"></i> SATELLITE DERIVED · INCOIS METHODOLOGY</span>
+              <h2>POTENTIAL FISHING ZONES (INDIAN WATERS &amp; EEZ)</h2>
+              <p class="subtitle">Multi-Factor Explainable PFZ Intelligence · Chlorophyll-a &amp; SST Thermal Fronts</p>
             </div>
-            <div class="dock-actions">
-              <button class="filter-btn active" data-sort="orca">Best Overall</button>
-              <button class="filter-btn" data-sort="nearest">Nearest</button>
-              <button class="filter-btn" data-sort="safest">Safest</button>
-              <button class="filter-btn" data-sort="potential">Highest Catch</button>
+            <div class="pfz-browser-header-actions">
+              <div class="dock-actions">
+                <button class="filter-btn active" data-sort="orca">Best Overall</button>
+                <button class="filter-btn" data-sort="nearest">Nearest</button>
+                <button class="filter-btn" data-sort="safest">Safest</button>
+                <button class="filter-btn" data-sort="potential">Highest Catch</button>
+              </div>
+              <button class="pfz-view-map-cta-btn" onclick="orcaApp.switchView('command')" title="Open Interactive Satellite Map">
+                <i data-lucide="map" style="width:14px;height:14px;"></i>
+                <span>VIEW ON MAP</span>
+              </button>
             </div>
           </div>
 
-          <div class="pfz-zones-table-wrapper" id="pfz-zones-container">
-            <!-- Dynamically populated PFZ Zone cards across Indian EEZ -->
+          <!-- Live Telemetry KPI Bar -->
+          <div class="pfz-telemetry-banner">
+            <div class="pfz-banner-item">
+              <span class="lbl">OPERATIONAL ZONES</span>
+              <span class="val highlight">8 ACTIVE SECTORS</span>
+            </div>
+            <div class="pfz-banner-item">
+              <span class="lbl">EO SENSORS</span>
+              <span class="val">EOS-06 OCM-3 &amp; SENTINEL-3</span>
+            </div>
+            <div class="pfz-banner-item">
+              <span class="lbl">THERMAL GRADIENT</span>
+              <span class="val">Δ 0.8°C — 1.2°C SST OPTIMAL FRONT</span>
+            </div>
+            <div class="pfz-banner-item">
+              <span class="lbl">SAFETY MARITIME CLEARANCE</span>
+              <span class="val highlight">REAL-TIME INCOIS SYNC</span>
+            </div>
+          </div>
+
+          <!-- Full Grid of Ranked PFZ Intelligence Cards -->
+          <div class="pfz-browser-grid-scroll">
+            <div class="pfz-full-grid" id="pfz-zones-container">
+              <!-- Dynamically populated PFZ Zone cards across Indian EEZ -->
+            </div>
           </div>
         </div>
       </div>
