@@ -48,24 +48,24 @@
 }
 
 /* --------------------------------------------------------------------------
-   Vertical Left Sidebar Navigation Rail
+   Vertical Left Sidebar Navigation Rail — Transparent Glass HUD Overlay
    -------------------------------------------------------------------------- */
 .orca-left-sidebar {
   position: absolute;
   top: 0;
   bottom: 0;
   left: 0;
-  width: 200px;
-  background: linear-gradient(180deg, rgba(8, 12, 18, 0.97) 0%, rgba(4, 7, 11, 0.98) 100%);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  border-right: 1px solid var(--panel-border);
+  width: 215px;
+  background: rgba(1, 6, 14, 0.42);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-right: 1px solid rgba(0, 245, 212, 0.16);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   padding: 14px 10px;
   z-index: 950;
-  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.6);
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.45);
 }
 
 .sidebar-brand {
@@ -73,7 +73,7 @@
   align-items: center;
   gap: 10px;
   padding: 4px 6px 14px 6px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(0, 245, 212, 0.12);
   margin-bottom: 12px;
   cursor: pointer;
   user-select: none;
@@ -81,14 +81,16 @@
 
 .sidebar-brand:hover .brand-logo-hud {
   border-color: #00F5D4;
-  box-shadow: 0 0 12px rgba(0, 245, 212, 0.45);
+  box-shadow: 0 0 14px rgba(0, 245, 212, 0.5);
 }
 
 .sidebar-telemetry-strip {
   margin: -4px 0 12px 0;
   padding: 6px 8px;
-  background: rgba(0, 245, 212, 0.04);
-  border: 1px solid rgba(0, 245, 212, 0.12);
+  background: rgba(0, 245, 212, 0.05);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(0, 245, 212, 0.16);
   border-radius: 4px;
   display: flex;
   flex-direction: column;
@@ -120,8 +122,10 @@
   color: var(--accent-isro-blue);
   letter-spacing: 0.06em;
   padding: 4px 6px;
-  background: rgba(58, 160, 255, 0.06);
-  border: 1px solid rgba(58, 160, 255, 0.14);
+  background: rgba(58, 160, 255, 0.08);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(58, 160, 255, 0.18);
   border-radius: 4px;
   text-align: center;
 }
@@ -131,7 +135,7 @@
   flex-direction: column;
   gap: 8px;
   padding-top: 10px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 1px solid rgba(0, 245, 212, 0.1);
 }
 
 .sidebar-lang-btn {
@@ -139,6 +143,20 @@
   justify-content: center;
   padding: 6px 10px;
   font-size: 11px;
+  background: rgba(3, 16, 32, 0.35);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sidebar-lang-btn:hover {
+  background: rgba(0, 245, 212, 0.14);
+  border-color: rgba(0, 245, 212, 0.4);
+  color: #ffffff;
 }
 
 .sidebar-section-header {
@@ -160,14 +178,16 @@
 
 .nav-tab-btn {
   width: 100%;
-  background: rgba(14, 20, 29, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(4, 16, 32, 0.25);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   color: #cbd5e1;
   font-family: var(--font-display);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.04em;
-  padding: 8px 12px;
+  padding: 8px 10px;
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
@@ -181,7 +201,7 @@
   width: 15px;
   height: 15px;
   flex-shrink: 0;
-  color: #94a3b8;
+  color: #7FA8B8;
   transition: transform 0.2s ease, color 0.2s ease;
 }
 
@@ -194,54 +214,58 @@
 
 .nav-tab-btn:hover {
   color: #ffffff;
-  background: rgba(22, 32, 46, 0.85);
-  border-color: rgba(255, 255, 255, 0.15);
+  background: rgba(0, 245, 212, 0.14);
+  border-color: rgba(0, 245, 212, 0.4);
+  box-shadow: 0 0 16px rgba(0, 245, 212, 0.15);
   transform: translateX(2px);
 }
 
 .nav-tab-btn:hover i {
-  color: #2dd4bf;
+  color: #00F5D4;
 }
 
 .nav-tab-btn.active {
   color: #ffffff;
-  background: rgba(24, 35, 50, 0.95);
-  border-color: rgba(45, 212, 191, 0.4);
+  background: linear-gradient(90deg, rgba(0, 245, 212, 0.22) 0%, rgba(58, 160, 255, 0.12) 100%);
+  border: 1px solid rgba(0, 245, 212, 0.55);
+  box-shadow: 0 0 20px rgba(0, 245, 212, 0.25), inset 0 0 12px rgba(0, 245, 212, 0.08);
+  text-shadow: 0 0 8px rgba(0, 245, 212, 0.3);
 }
 
 .nav-tab-btn.active i {
-  color: #2dd4bf;
+  color: #00F5D4;
 }
 
 .nav-tab-btn.highlight-tab {
-  border-color: rgba(139, 92, 246, 0.3);
-  background: rgba(18, 20, 34, 0.6);
+  border-color: rgba(0, 245, 212, 0.3);
+  background: rgba(0, 245, 212, 0.08);
 }
 
 .nav-tab-btn.highlight-tab i {
-  color: #a78bfa;
+  color: #00F5D4;
 }
 
 .nav-tab-btn.highlight-tab:hover,
 .nav-tab-btn.highlight-tab.active {
-  border-color: rgba(139, 92, 246, 0.55);
-  background: rgba(26, 28, 48, 0.85);
+  border-color: rgba(0, 245, 212, 0.65);
+  background: linear-gradient(90deg, rgba(0, 245, 212, 0.25) 0%, rgba(58, 160, 255, 0.14) 100%);
   color: #ffffff;
+  box-shadow: 0 0 22px rgba(0, 245, 212, 0.3), inset 0 0 12px rgba(0, 245, 212, 0.1);
 }
 
 .nav-tab-btn.highlight-tab.active i {
-  color: #c4b5fd;
+  color: #00F5D4;
 }
-
-
 
 .sidebar-bottom-badge {
   display: flex;
   align-items: center;
   gap: 9px;
   padding: 8px 10px;
-  background: rgba(4, 22, 36, 0.65);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(3, 16, 32, 0.35);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(0, 245, 212, 0.15);
   border-radius: 6px;
   margin-top: 10px;
 }
@@ -328,7 +352,7 @@
   position: absolute;
   top: 0;
   bottom: 0;
-  left: 200px;
+  left: 215px;
   right: 0;
   overflow: hidden;
 }
@@ -2209,22 +2233,23 @@
   display: flex;
   height: 100vh;
   width: 100%;
-  background: radial-gradient(ellipse at 50% 30%, rgba(4, 20, 40, 0.45) 0%, rgba(1, 5, 12, 0.72) 100%);
+  background: transparent;
   position: relative;
   overflow: hidden;
 }
 
-/* Left Sidebar for Intelligence Sessions */
+/* Left Sidebar for Intelligence Sessions — Transparent Glass Overlay */
 .ask-orca-history-col {
-  width: 260px;
-  background: rgba(2, 10, 22, 0.84);
-  border-right: 1px solid var(--panel-border);
+  width: 250px;
+  background: rgba(1, 6, 14, 0.35);
+  border-right: 1px solid rgba(0, 245, 212, 0.12);
   display: flex;
   flex-direction: column;
   padding: 14px 12px;
   z-index: 10;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
 }
 
 .history-col-top {
@@ -2234,8 +2259,10 @@
 .new-chat-btn {
   width: 100%;
   padding: 10px 14px;
-  background: rgba(18, 25, 36, 0.9);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 245, 212, 0.08);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(0, 245, 212, 0.3);
   border-radius: 8px;
   color: #ffffff;
   font-family: var(--font-display);
@@ -2247,13 +2274,14 @@
   gap: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
 .new-chat-btn:hover {
-  background: rgba(26, 36, 52, 0.95);
-  border-color: rgba(45, 212, 191, 0.45);
+  background: rgba(0, 245, 212, 0.18);
+  border-color: rgba(0, 245, 212, 0.55);
   color: #ffffff;
+  box-shadow: 0 0 16px rgba(0, 245, 212, 0.25);
 }
 
 .ask-orca-history-col .col-header {
@@ -2261,7 +2289,7 @@
   font-size: 9.5px;
   font-weight: 700;
   letter-spacing: 0.12em;
-  color: #64748b;
+  color: var(--text-cyan-grey);
   margin-bottom: 8px;
   display: flex;
   align-items: center;
@@ -2278,8 +2306,10 @@
 }
 
 .history-item {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(4, 16, 32, 0.25);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 6px;
   padding: 8px 10px;
   cursor: pointer;
@@ -2287,8 +2317,9 @@
 }
 
 .history-item:hover, .history-item.active {
-  background: rgba(34, 211, 182, 0.08);
-  border-color: rgba(34, 211, 182, 0.3);
+  background: rgba(0, 245, 212, 0.12);
+  border-color: rgba(0, 245, 212, 0.4);
+  box-shadow: 0 0 12px rgba(0, 245, 212, 0.15);
 }
 
 .history-item-top {
