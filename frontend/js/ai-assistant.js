@@ -157,6 +157,80 @@ class OrcaAIAssistant {
     document.querySelectorAll('.history-item').forEach(i => i.classList.remove('active'));
   }
 
+  escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  appendUserMessage(queryText) {
+    const msgList = document.getElementById('chat-messages-list');
+    if (!msgList) return;
+
+    const userBubble = document.createElement('div');
+    userBubble.className = 'user-chat-bubble';
+    userBubble.innerHTML = `
+      <i data-lucide="user" class="user-icon"></i>
+      <div class="user-bubble-content">
+        <div class="user-bubble-text">${this.escapeHtml(queryText)}</div>
+      </div>
+    `;
+    msgList.appendChild(userBubble);
+    if (window.lucide) lucide.createIcons({ root: userBubble });
+  }
+
+  scrollToLatestMessage() {
+    const chatStream = document.getElementById('ask-orca-chat-stream');
+    const msgList = document.getElementById('chat-messages-list');
+    if (msgList) {
+      msgList.scrollTop = msgList.scrollHeight;
+    }
+    if (chatStream) {
+      chatStream.scrollTop = chatStream.scrollHeight;
+    }
+  }
+
+  loadSessionHistory() {
+    const list = document.getElementById('ask-orca-history-list');
+    if (!list) return;
+    list.innerHTML = '';
+  }
+
+  addHistorySidebarItem(queryText, data) {
+    const list = document.getElementById('ask-orca-history-list');
+    if (!list) return;
+
+    const item = document.createElement('div');
+    item.className = 'history-item active';
+
+    // Remove active from other items
+    list.querySelectorAll('.history-item').forEach(i => i.classList.remove('active'));
+
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const riskLvl = (data.risk?.level || 'MODERATE').toUpperCase();
+
+    item.innerHTML = `
+      <div class="history-item-top">
+        <span class="query-text">${this.escapeHtml(queryText)}</span>
+      </div>
+      <div class="history-item-meta">
+        <span>${timeStr}</span> &middot; <span style="color:#00F5D4;">${riskLvl}</span>
+      </div>
+    `;
+
+    item.addEventListener('click', () => {
+      list.querySelectorAll('.history-item').forEach(i => i.classList.remove('active'));
+      item.classList.add('active');
+    });
+
+    list.prepend(item);
+  }
+
   triggerSonarPing() {
     const overlay = document.getElementById('sonar-ping-overlay');
     if (!overlay) return;

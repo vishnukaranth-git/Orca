@@ -187,11 +187,19 @@ class OrcaApp {
       panel.classList.toggle('active', panel.id === `view-${viewId}`);
     });
 
-    // Invalidate map size
-    if (this.mapController && this.mapController.map) {
-      setTimeout(() => {
-        this.mapController.map.invalidateSize();
-      }, 100);
+    // Toggle Leaflet Map: hide when in Ask ORCA so living ocean background displays, show on map-first views
+    const mapWrapper = document.querySelector('.center-marine-map-wrapper');
+    if (mapWrapper) {
+      if (viewId === 'ask-orca') {
+        mapWrapper.style.display = 'none';
+      } else {
+        mapWrapper.style.display = 'block';
+        if (this.mapController && this.mapController.map) {
+          setTimeout(() => {
+            this.mapController.map.invalidateSize();
+          }, 80);
+        }
+      }
     }
 
     if (viewId === 'pfz') {
