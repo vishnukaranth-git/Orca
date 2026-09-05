@@ -350,19 +350,53 @@ class OrcaApp {
       if (resp.ok) {
         const json = await resp.json();
         const hazards = json.data.hazards || [];
-        container.innerHTML = hazards.map(h => `
-          <div class="disaster-card ${h.severity.toLowerCase()}">
-            <div class="disaster-card-header">
-              <div class="title">${h.title}</div>
-              <span class="telemetry-tag" style="color:${h.severity === 'CRITICAL' ? '#ef4444' : h.severity === 'WARNING' ? '#f59e0b' : '#38bdf8'}">${h.severity}</span>
+        
+        container.innerHTML = hazards.map(h => {
+          let lat = 12.78, lng = 75.12;
+          const t = (h.title + " " + (h.description || "")).toLowerCase();
+          if (t.includes("japan")) { lat = 34.5; lng = 137.5; }
+          else if (t.includes("vietnam")) { lat = 16.0; lng = 108.5; }
+          else if (t.includes("cyclone") || t.includes("twentythree") || t.includes("nwpacific") || t.includes("philippine")) { lat = 17.5; lng = 124.0; }
+          else if (t.includes("bengal") || t.includes("odisha") || t.includes("andhra")) { lat = 18.5; lng = 87.0; }
+          else if (t.includes("arabian") || t.includes("gujarat") || t.includes("karnataka")) { lat = 14.5; lng = 73.5; }
+          else if (t.includes("lakshadweep")) { lat = 10.5; lng = 72.5; }
+          else if (t.includes("andaman")) { lat = 11.5; lng = 93.0; }
+
+          const safeTitle = (h.title || 'Marine Hazard').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+          const sevClass = (h.severity || 'watch').toLowerCase();
+
+          return `
+            <div class="disaster-full-card ${sevClass}" onclick="orcaApp.inspectHazard(${lat}, ${lng}, '${safeTitle}')">
+              <div class="disaster-card-top-row">
+                <div class="disaster-card-title">${h.title}</div>
+                <div class="disaster-severity-badge ${sevClass}">${h.severity || 'WATCH'}</div>
+              </div>
+
+              <div class="disaster-meta-tag">
+                <i data-lucide="radio" style="width:12px;height:12px;"></i>
+                <span>${h.source || 'OFFICIAL BULLETIN'} · ${h.issued_time || 'LIVE INGESTION'}</span>
+              </div>
+
+              <div class="disaster-desc-text">
+                ${h.description}
+              </div>
+
+              <div class="disaster-action-box">
+                <b>RECOMMENDED MARITIME ACTION:</b>
+                <span>${h.recommended_action || 'Avoid affected maritime sectors; monitor local port control on VHF Ch 16.'}</span>
+              </div>
+
+              <button class="disaster-select-plot-btn" onclick="event.stopPropagation(); orcaApp.inspectHazard(${lat}, ${lng}, '${safeTitle}')">
+                <i data-lucide="crosshair" style="width:13px;height:13px;"></i>
+                <span>OK, PLOT THIS ON MAP &rarr;</span>
+              </button>
             </div>
-            <div class="disaster-source-tag">${h.source} · Issued ${h.issued_time}</div>
-            <div class="disaster-desc">${h.description}</div>
-            <div class="disaster-action">
-              <b>Recommended Action:</b> ${h.recommended_action}
-            </div>
-          </div>
-        `).join('');
+          `;
+        }).join('');
+
+        if (window.lucide) {
+          lucide.createIcons();
+        }
       }
     } catch (e) {
       console.warn("Disaster feed error.", e);
@@ -504,6 +538,17 @@ class OrcaApp {
         this.mapController.focusPFZ(lat, lng);
       } else if (this.mapController.map) {
         this.mapController.map.flyTo([lat, lng], 9, { duration: 1.4 });
+      }
+    }
+  }
+
+  inspectHazard(lat, lng, title = '') {
+    this.switchView('command');
+    if (this.mapController) {
+      if (typeof this.mapController.focusHazard === 'function') {
+        this.mapController.focusHazard(lat, lng, title);
+      } else if (this.mapController.map) {
+        this.mapController.map.flyTo([lat, lng], 7, { duration: 1.4 });
       }
     }
   }

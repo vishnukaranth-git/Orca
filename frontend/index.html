@@ -518,24 +518,56 @@
         </div>
       </div>
 
-      <!-- VIEW 4: DISASTER WATCH (Indian Ocean Hazards & Tsunami Watch) -->
+      <!-- VIEW 4: DISASTER WATCH (Full Browser Dashboard -> Redirect to Map on Selection) -->
       <div class="view-panel" id="view-disasters">
-        <div class="side-dock-panel left-side-dock">
-          <div class="panel-header-bar">
-            <div>
-              <h2>DISASTER WATCH & HAZARD MONITOR</h2>
-              <p class="subtitle">Official Feeds: GDACS, USGS, & INCOIS Coastal Advisories</p>
+        <div class="disaster-full-browser-container">
+          <!-- Top Mission Control Header -->
+          <div class="disaster-browser-header">
+            <div class="disaster-browser-title-wrap">
+              <span class="disaster-browser-badge"><i data-lucide="shield-alert" style="width:12px;height:12px;"></i> GDACS · USGS · INCOIS OFFICIAL BULLETINS</span>
+              <h2>DISASTER WATCH &amp; MARITIME HAZARD MONITOR</h2>
+              <p class="subtitle">Live Global &amp; Regional Marine Intelligence · Cyclones, Storm Surges &amp; Seismic Advisories</p>
             </div>
-            <span class="official-seal-tag">OFFICIAL BULLETINS ONLY</span>
+            <div class="disaster-browser-header-actions">
+              <span class="official-seal-tag">OFFICIAL BULLETINS ONLY</span>
+              <button class="disaster-view-map-cta-btn" onclick="orcaApp.switchView('command')" title="Open Interactive Satellite Map">
+                <i data-lucide="map" style="width:14px;height:14px;"></i>
+                <span>VIEW ON MAP</span>
+              </button>
+            </div>
           </div>
 
-          <div class="disaster-feed-list" id="disaster-feed-container">
-            <!-- Dynamically populated active disaster cards -->
+          <!-- Live Telemetry KPI Bar -->
+          <div class="disaster-telemetry-banner">
+            <div class="disaster-banner-item">
+              <span class="lbl">GLOBAL MONITORING FEEDS</span>
+              <span class="val highlight">GDACS (UN/EC) &amp; USGS SEISMIC</span>
+            </div>
+            <div class="disaster-banner-item">
+              <span class="lbl">INDIAN OCEAN BASIN THREAT</span>
+              <span class="val highlight" style="color:#22d3b6;">NO TSUNAMI WATCH ACTIVE</span>
+            </div>
+            <div class="disaster-banner-item">
+              <span class="lbl">COASTAL WARNING SECTORS</span>
+              <span class="val">SWELL SURGE &amp; SQUALLY WEATHER</span>
+            </div>
+            <div class="disaster-banner-item">
+              <span class="lbl">DATA HONESTY PROTOCOL</span>
+              <span class="val">DIRECT AUTHORITATIVE INGESTION ONLY</span>
+            </div>
           </div>
 
-          <div class="disaster-notice-box">
-            <i data-lucide="info" style="color:var(--accent-aqua);flex-shrink:0;"></i>
-            <span>ORCA does not independently simulate or predict tsunamis. All seismic and tsunami notifications are directly ingested from authoritative international and national tsunami warning centers (IOTWMS / INCOIS).</span>
+          <!-- Full Grid of Ranked Disaster Hazard Cards -->
+          <div class="disaster-browser-grid-scroll">
+            <div class="disaster-full-grid" id="disaster-feed-container">
+              <!-- Dynamically populated active disaster cards -->
+            </div>
+          </div>
+
+          <!-- Full Width Authoritative Notice Footer -->
+          <div class="disaster-full-notice-bar">
+            <i data-lucide="shield-check" style="color:var(--accent-aqua);width:16px;height:16px;flex-shrink:0;"></i>
+            <span>ORCA does not independently simulate or synthesize fake tsunamis or disasters. All seismic and tsunami notifications are directly ingested from authoritative international and national tsunami warning centers (IOTWMS / INCOIS / USGS / GDACS).</span>
           </div>
         </div>
       </div>

@@ -871,6 +871,40 @@ class OrcaMapController {
     }, 700);
   }
 
+  focusHazard(lat, lng, title = '') {
+    if (!this.map) return;
+    this.map.flyTo([lat, lng], 7.5, { duration: 1.4 });
+    setTimeout(() => {
+      let found = false;
+      if (this.layers && this.layers.hazards) {
+        this.layers.hazards.eachLayer(layer => {
+          if (typeof layer.getLatLng === 'function') {
+            const pos = layer.getLatLng();
+            if (Math.abs(pos.lat - lat) < 1.0 && Math.abs(pos.lng - lng) < 1.0) {
+              layer.openPopup();
+              found = true;
+            }
+          }
+        });
+      }
+      if (!found) {
+        L.popup({ offset: [0, -10], className: 'orca-context-popup' })
+          .setLatLng([lat, lng])
+          .setContent(`
+            <div style="font-family:'Inter',sans-serif;color:#020b14;padding:4px;min-width:190px;">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+                <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#f59e0b;box-shadow:0 0 6px #f59e0b;"></span>
+                <b style="color:#d97706;font-family:'Rajdhani',sans-serif;font-size:13px;letter-spacing:0.05em;">ACTIVE MARITIME HAZARD</b>
+              </div>
+              <div style="font-weight:700;font-size:12px;color:#0f172a;line-height:1.3;">${title || 'Regional Alert Sector'}</div>
+              <div style="font-size:10px;color:#64748b;margin-top:2px;">Location: ${lat.toFixed(2)}°N, ${lng.toFixed(2)}°E</div>
+            </div>
+          `)
+          .openOn(this.map);
+      }
+    }, 700);
+  }
+
   renderOceanRegions() {
     this.layers.oceanRegions.clearLayers();
     this.regionPolygonLayers = {};
