@@ -171,11 +171,11 @@ class OrcaSimulator {
         maintainAspectRatio: false,
         scales: {
           r: {
-            angleLines: { color: 'rgba(36, 160, 200, 0.2)' },
-            grid: { color: 'rgba(36, 160, 200, 0.15)' },
+            angleLines: { color: 'rgba(15, 23, 42, 0.08)' },
+            grid: { color: 'rgba(15, 23, 42, 0.08)' },
             pointLabels: {
-              color: '#d1e8f2',
-              font: { family: "'Rajdhani', sans-serif", size: 11, weight: '600' }
+              color: '#475569',
+              font: { family: "'Valley Sans', sans-serif", size: 11.5, weight: '600' }
             },
             ticks: { display: false, max: 100, min: 0 }
           }
@@ -183,8 +183,8 @@ class OrcaSimulator {
         plugins: {
           legend: {
             labels: {
-              color: '#d1e8f2',
-              font: { family: "'Rajdhani', sans-serif", size: 12 }
+              color: '#1e293b',
+              font: { family: "'Valley Sans', sans-serif", size: 12, weight: '600' }
             }
           }
         }

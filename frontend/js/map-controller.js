@@ -893,8 +893,8 @@ class OrcaMapController {
           .setContent(`
             <div style="font-family:'Inter',sans-serif;color:#020b14;padding:4px;min-width:190px;">
               <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
-                <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#f59e0b;box-shadow:0 0 6px #f59e0b;"></span>
-                <b style="color:#d97706;font-family:'Rajdhani',sans-serif;font-size:13px;letter-spacing:0.05em;">ACTIVE MARITIME HAZARD</b>
+                <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#d97706;"></span>
+                <b style="color:#d97706;font-family:var(--font-display);font-size:12.5px;letter-spacing:0.04em;">ACTIVE MARITIME HAZARD</b>
               </div>
               <div style="font-weight:700;font-size:12px;color:#0f172a;line-height:1.3;">${title || 'Regional Alert Sector'}</div>
               <div style="font-size:10px;color:#64748b;margin-top:2px;">Location: ${lat.toFixed(2)}°N, ${lng.toFixed(2)}°E</div>
@@ -925,9 +925,9 @@ class OrcaMapController {
       // Subtle GIS Tooltip on hover
       polyLayer.bindTooltip(`
         <div class="orca-gis-tooltip">
-          <b style="font-family:'Rajdhani',sans-serif;font-size:13px;letter-spacing:0.08em;color:#fff;">${r.name.toUpperCase()}</b>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:9.5px;color:${r.color};margin-top:1px;">${r.sub}</div>
-          <div style="font-size:9px;color:#94a3b8;margin-top:2px;">Click to inspect regional intelligence</div>
+          <b style="font-family:var(--font-display);font-size:13px;letter-spacing:0.04em;color:var(--text-pure);">${r.name.toUpperCase()}</b>
+          <div style="font-family:var(--font-mono);font-size:9.5px;color:${r.color};margin-top:1px;">${r.sub}</div>
+          <div style="font-size:9px;color:var(--text-muted);margin-top:2px;">Click to inspect regional intelligence</div>
         </div>
       `, {
         sticky: true,
@@ -1038,9 +1038,9 @@ class OrcaMapController {
     if (bodyEl) {
       bodyEl.innerHTML = `
         <div style="padding:40px 20px;text-align:center;">
-          <div class="live-dot" style="background:#22d3b6;width:12px;height:12px;box-shadow:0 0 12px #22d3b6;margin:0 auto 12px;"></div>
-          <div style="font-family:'Rajdhani',sans-serif;font-size:14px;color:#fff;font-weight:700;letter-spacing:0.06em;">CONNECTING GEOSPATIAL INTELLIGENCE</div>
-          <div style="font-family:var(--font-mono);font-size:10px;color:var(--accent-cyan);margin-top:4px;">Querying INCOIS OSF · IMD · MOSDAC / ISRO · Copernicus</div>
+          <div class="live-dot" style="background:var(--accent-teal);width:10px;height:10px;margin:0 auto 12px;"></div>
+          <div style="font-family:var(--font-display);font-size:14px;color:var(--text-pure);font-weight:700;letter-spacing:0.04em;">CONNECTING GEOSPATIAL INTELLIGENCE</div>
+          <div style="font-family:var(--font-body);font-size:10.5px;color:var(--text-secondary);margin-top:4px;">Querying INCOIS OSF · IMD · MOSDAC / ISRO · Copernicus</div>
         </div>
       `;
     }
@@ -1718,8 +1718,8 @@ class OrcaMapController {
         weight: 2,
         dashArray: '6, 6'
       }).addTo(this.layers.restricted).bindPopup(`
-        <div style="font-family:'Inter',sans-serif;color:#020b14;padding:4px;">
-          <b style="color:#b91c1c;font-family:'Rajdhani',sans-serif;font-size:14px;">RESTRICTED: ${rz.name}</b><br>
+        <div style="font-family:var(--font-body);color:#0f172a;padding:4px;">
+          <b style="color:#b91c1c;font-family:var(--font-display);font-size:13.5px;">RESTRICTED: ${rz.name}</b><br>
           ${rz.desc}
         </div>
       `);
@@ -1755,8 +1755,8 @@ class OrcaMapController {
         iconAnchor: [13, 13]
       });
       L.marker(h.pos, { icon: hazardIcon }).addTo(this.layers.hazards).bindPopup(`
-        <div style="font-family:'Inter',sans-serif;color:#020b14;padding:4px;">
-          <b style="color:#d97706;font-family:'Rajdhani',sans-serif;font-size:14px;">${h.title}</b><br>
+        <div style="font-family:var(--font-body);color:#0f172a;padding:4px;">
+          <b style="color:#d97706;font-family:var(--font-display);font-size:13.5px;">${h.title}</b><br>
           ${h.desc}
         </div>
       `);

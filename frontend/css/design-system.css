@@ -1,81 +1,161 @@
 /* ==========================================================================
-   ORCA DESIGN SYSTEM — DEEP OCEAN / ISRO-GRADE MISSION CONTROL
-   Aesthetic: Deep-sea submarine viewport meets ISRO/NASA satellite telemetry.
-   Palette: Abyssal void (#01050C -> #041428 -> #062038) with bioluminescent
-            cyan (#00F5D4), teal (#00C2D1), ISRO telemetry blue (#3AA0FF),
-            amber (#FFB020), and coral (#FF3D7F).
+   ORCA DESIGN SYSTEM — LIGHT MARINE INTELLIGENCE PLATFORM
+   Aesthetic: Modern scientific ocean intelligence + clean enterprise SaaS UI
+   Palette: Clean white (#ffffff) & soft blue-gray (#f8fafc, #f1f5f9)
+            with soft marine teal (#0d9488), ocean blue (#0284c7),
+            and restrained status indicators (green, amber, red).
+   Typography: Valley Sans (Helsinki Type Studio) primary font.
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+/* --------------------------------------------------------------------------
+   Valley Sans Font Loading
+   -------------------------------------------------------------------------- */
+@font-face {
+  font-family: 'Valley Sans';
+  src: url('../fonts/ValleySans-Variable.woff2') format('woff2-variations'),
+       url('../fonts/ValleySans-Variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Valley Sans';
+  src: url('../fonts/ValleySans-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Valley Sans';
+  src: url('../fonts/ValleySans-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Valley Sans';
+  src: url('../fonts/ValleySans-SemiBold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Valley Sans';
+  src: url('../fonts/ValleySans-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 
 :root {
-  /* Abyssal Ocean Depths Base Palette */
-  --bg-abyss-0: #01050C;
-  --bg-abyss-1: #041428;
-  --bg-abyss-2: #062038;
-  --bg-void: #01050C;
-  --bg-primary: #041428;
-  --bg-deep-void: #01050C;
-  --bg-charcoal: #071322;
-  --bg-graphite: #0c1c30;
-  --bg-dark-grey: #12253d;
-  --bg-elevated: #0e223a;
+  /* Predominantly Light Color System */
+  --bg-primary: #f8fafc;
+  --bg-void: #f1f5f9;
+  --bg-abyss-0: #f8fafc;
+  --bg-abyss-1: #ffffff;
+  --bg-abyss-2: #f1f5f9;
+  --bg-deep-void: #f8fafc;
+  --bg-charcoal: #ffffff;
+  --bg-graphite: #f8fafc;
+  --bg-dark-grey: #e2e8f0;
+  --bg-elevated: #ffffff;
 
-  /* Glass Panels: Submarine Mission Control Viewport */
-  --bg-marine-panel: rgba(2, 10, 22, 0.78);
-  --bg-marine-card: rgba(4, 15, 30, 0.74);
-  --bg-marine-card-hover: rgba(8, 25, 48, 0.85);
-  --bg-overlay: rgba(1, 5, 12, 0.88);
+  /* Panels & Cards */
+  --bg-marine-panel: #ffffff;
+  --bg-marine-card: #ffffff;
+  --bg-marine-card-hover: #f8fafc;
+  --bg-overlay: rgba(15, 23, 42, 0.4);
 
-  /* Precision HUD & Sonar Borders */
-  --panel-border: rgba(0, 245, 212, 0.16);
-  --panel-border-subtle: rgba(58, 160, 255, 0.10);
-  --panel-border-bright: rgba(0, 245, 212, 0.45);
-  --border-panel: rgba(0, 245, 212, 0.16);
-  --border-subtle: rgba(58, 160, 255, 0.08);
-  --panel-glow: 0 8px 32px rgba(0, 0, 0, 0.75), inset 0 0 20px rgba(0, 245, 212, 0.03);
-  --panel-shadow: 0 8px 32px rgba(0, 0, 0, 0.65);
+  /* Clean Borders */
+  --panel-border: #e2e8f0;
+  --panel-border-subtle: #f1f5f9;
+  --panel-border-bright: #cbd5e1;
+  --border-panel: #e2e8f0;
+  --border-subtle: #e2e8f0;
+  --border-medium: #cbd5e1;
+  --border-focus: #0d9488;
 
-  /* Bioluminescent & ISRO Satellite Telemetry Accents */
-  --accent-biolum: #00F5D4;
-  --accent-teal: #00C2D1;
-  --accent-isro-blue: #3AA0FF;
-  --accent-signal-blue: #5CC8FF;
-  --status-amber: #FFB020;
-  --accent-amber: #FFB020;
-  --accent-coral: #FF3D7F;
-  --accent-red: #FF3D7F;
-  --accent-critical: #FF3D7F;
-  --accent-sea: #00F5D4;
-  --accent-turquoise: #00C2D1;
-  --accent-cyan: #00F5D4;
-  --accent-aqua: #00F5D4;
-  --accent-green: #10B981;
-  --accent-safe: #10B981;
-  --accent-gold: #FFB020;
-  --accent-orange: #FF8A3D;
-  --accent-violet: #8B5CF6;
-  --accent-satellite: #3AA0FF;
-  --accent-blue: #5CC8FF;
+  /* Soft Shadows (Restrained, Enterprise-Grade) */
+  --panel-glow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 14px rgba(15, 23, 42, 0.05);
+  --panel-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(15, 23, 42, 0.03);
+  --modal-shadow: 0 16px 40px rgba(15, 23, 42, 0.12), 0 2px 6px rgba(15, 23, 42, 0.06);
+
+  /* Primary Accent: Soft Marine Teal & Aqua */
+  --accent-teal: #0d9488;
+  --accent-aqua: #0d9488;
+  --accent-biolum: #0d9488;
+  --accent-sea: #0d9488;
+  --accent-turquoise: #0f766e;
+  --accent-primary: #0d9488;
+  --accent-primary-hover: #0f766e;
+  --accent-primary-light: #f0fdfa;
+  --accent-primary-border: #ccfbf1;
+
+  /* Secondary Accent: Light Ocean Blue */
+  --accent-cyan: #0284c7;
+  --accent-isro-blue: #0284c7;
+  --accent-signal-blue: #0369a1;
+  --accent-satellite: #0284c7;
+  --accent-blue: #0284c7;
+  --accent-secondary: #0284c7;
+  --accent-secondary-light: #f0f9ff;
+
+  /* Restrained Status & Risk Palette */
+  --status-low: #16a34a;
+  --status-low-bg: #dcfce7;
+  --status-low-border: #bbf7d0;
+  --accent-green: #16a34a;
+  --accent-safe: #16a34a;
+
+  --status-amber: #d97706;
+  --status-moderate: #d97706;
+  --status-mod-bg: #fef3c7;
+  --status-mod-border: #fde68a;
+  --accent-amber: #d97706;
+  --accent-gold: #d97706;
+
+  --status-high: #ea580c;
+  --status-high-bg: #ffedd5;
+  --status-high-border: #fed7aa;
+  --accent-orange: #ea580c;
+
+  --status-critical: #dc2626;
+  --status-crit-bg: #fee2e2;
+  --status-crit-border: #fca5a5;
+  --accent-coral: #dc2626;
+  --accent-red: #dc2626;
+  --accent-critical: #dc2626;
+
+  --accent-violet: #7c3aed;
   --accent-white: #ffffff;
 
-  /* Typography: Soft White & Phosphor Cyan-Grey */
-  --text-pure: #ffffff;
-  --text-soft-white: #E6F7FF;
-  --text-main: #E6F7FF;
-  --text-secondary: #7FA8B8;
-  --text-cyan-grey: #7FA8B8;
-  --text-muted: #537588;
-  --text-dim: #3a5566;
+  /* Typography: Dark Charcoal & Slate */
+  --text-pure: #0f172a;
+  --text-soft-white: #1e293b;
+  --text-main: #1e293b;
+  --text-secondary: #475569;
+  --text-cyan-grey: #475569;
+  --text-muted: #64748b;
+  --text-dim: #94a3b8;
 
-  /* Font Families */
-  --font-display: 'Orbitron', 'Space Grotesk', 'Rajdhani', sans-serif;
-  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  /* Primary Typography: Valley Sans */
+  --font-display: 'Valley Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-body: 'Valley Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-sans: 'Valley Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', 'Courier New', monospace;
 
   --radius-sm: 4px;
   --radius-md: 6px;
-  --radius-lg: 10px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
 }
 
 *, *::before, *::after {
@@ -88,8 +168,8 @@ html, body {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background-color: var(--bg-abyss-0);
-  color: var(--text-soft-white);
+  background-color: var(--bg-primary);
+  color: var(--text-main);
   font-family: var(--font-body);
   font-size: 13px;
   line-height: 1.45;
@@ -97,15 +177,23 @@ html, body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Background Atmosphere Canvas */
+/* Global Valley Sans Typography Rules */
+h1, h2, h3, h4, h5, h6,
+p, span, a, label, button, input, select, textarea,
+table, th, td,
+.nav-tab-btn,
+.brand-title-group,
+.status-badge,
+.telemetry-pill,
+.map-ctrl-btn,
+.region-selector-pill,
+.filter-btn {
+  font-family: var(--font-body);
+}
+
+/* Background Atmosphere Canvas — Hide dark oceanic canvas in favor of clean light theme */
 #underwater-canvas {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 0;
-  pointer-events: none;
+  display: none !important;
 }
 
 /* Main App Container */
@@ -116,74 +204,35 @@ html, body {
   flex-direction: column;
   height: 100vh;
   width: 100vw;
+  background-color: var(--bg-primary);
 }
 
 /* Telemetry & Badges */
 .telemetry-tag {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.06em;
-  color: var(--text-cyan-grey);
+  font-family: var(--font-body);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--text-secondary);
 }
 
-/* ==========================================================================
-   HUD CORNER RETICLE BRACKETS & SUBMARINE SENSOR VIEWPORT
-   ========================================================================== */
+/* Reticle Card Base — Clean white card with subtle border */
 .hud-reticle-card {
   position: relative;
   background: var(--bg-marine-panel);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--panel-border);
-  box-shadow: var(--panel-glow);
+  box-shadow: var(--card-shadow);
+  border-radius: var(--radius-md);
 }
 
-.hud-reticle-card::before,
-.hud-reticle-card::after {
-  content: '';
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  pointer-events: none;
-  z-index: 3;
-}
-
-.hud-reticle-card::before {
-  top: -1px;
-  left: -1px;
-  border-top: 2px solid var(--accent-biolum);
-  border-left: 2px solid var(--accent-biolum);
-}
-
-.hud-reticle-card::after {
-  bottom: -1px;
-  right: -1px;
-  border-bottom: 2px solid var(--accent-biolum);
-  border-right: 2px solid var(--accent-biolum);
-}
-
-/* Optional explicit 4-corner reticle elements */
-.reticle-corner {
-  position: absolute;
-  width: 8px;
-  height: 8px;
-  pointer-events: none;
-  z-index: 3;
-}
-.reticle-tl { top: -1px; left: -1px; border-top: 2px solid var(--accent-biolum); border-left: 2px solid var(--accent-biolum); }
-.reticle-tr { top: -1px; right: -1px; border-top: 2px solid var(--accent-biolum); border-right: 2px solid var(--accent-biolum); }
-.reticle-bl { bottom: -1px; left: -1px; border-bottom: 2px solid var(--accent-biolum); border-left: 2px solid var(--accent-biolum); }
-.reticle-br { bottom: -1px; right: -1px; border-bottom: 2px solid var(--accent-biolum); border-right: 2px solid var(--accent-biolum); }
-
-/* Mission Control Pulsing Status LED */
+/* Clean LED status dots */
 .pulse-led-green {
   display: inline-block;
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background-color: var(--accent-biolum);
-  box-shadow: 0 0 8px var(--accent-biolum);
-  animation: pulse-led 2s infinite ease-in-out;
+  background-color: var(--status-low);
+  box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.2);
 }
 
 .pulse-led-amber {
@@ -192,24 +241,10 @@ html, body {
   height: 7px;
   border-radius: 50%;
   background-color: var(--status-amber);
-  box-shadow: 0 0 8px var(--status-amber);
-  animation: pulse-led 2s infinite ease-in-out;
+  box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.2);
 }
 
-@keyframes pulse-led {
-  0%, 100% {
-    opacity: 1;
-    transform: scale(1);
-    box-shadow: 0 0 8px var(--accent-biolum);
-  }
-  50% {
-    opacity: 0.45;
-    transform: scale(0.85);
-    box-shadow: 0 0 2px var(--accent-biolum);
-  }
-}
-
-/* Fullscreen Sonar Ping Overlay & Animations */
+/* Subtle Sonar Ping Animation (Restrained) */
 .sonar-ping-overlay {
   position: fixed;
   top: 0;
@@ -224,15 +259,14 @@ html, body {
   position: absolute;
   left: 0;
   width: 100%;
-  height: 3px;
+  height: 2px;
   background: linear-gradient(90deg, 
     transparent 0%, 
-    rgba(0, 245, 212, 0.65) 25%, 
-    rgba(92, 200, 255, 0.95) 50%, 
-    rgba(0, 245, 212, 0.65) 75%, 
+    rgba(13, 148, 136, 0.5) 25%, 
+    rgba(2, 132, 199, 0.7) 50%, 
+    rgba(13, 148, 136, 0.5) 75%, 
     transparent 100%);
-  box-shadow: 0 0 24px rgba(0, 245, 212, 0.8), 0 0 60px rgba(58, 160, 255, 0.4);
-  animation: sonar-scanline 0.85s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  animation: sonar-scanline 0.7s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
 @keyframes sonar-scanline {
@@ -241,33 +275,13 @@ html, body {
     opacity: 0;
   }
   15% {
-    opacity: 1;
+    opacity: 0.8;
   }
   85% {
-    opacity: 0.9;
+    opacity: 0.6;
   }
   100% {
     top: 100%;
     opacity: 0;
-  }
-}
-
-/* Radar Sweep Keyframe */
-@keyframes radar-sweep-rotate {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* Caustic Drift Animation */
-@keyframes caustic-drift {
-  0%, 100% {
-    transform: translate(0, 0) scale(1);
-  }
-  50% {
-    transform: translate(-10px, 8px) scale(1.04);
   }
 }
