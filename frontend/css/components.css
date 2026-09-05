@@ -1902,6 +1902,55 @@
   border-radius: 4px;
   box-shadow: 0 0 10px rgba(34, 211, 182, 0.2);
   white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.pfz-full-orca-badge.highlighted {
+  box-shadow: 0 0 18px rgba(34, 211, 182, 0.5);
+  border-color: #22d3b6;
+  background: rgba(34, 211, 182, 0.25);
+}
+
+.pfz-card-rank-tag {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 3px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+}
+
+.pfz-card-rank-tag.best {
+  background: rgba(34, 211, 182, 0.18);
+  color: #22d3b6;
+  border: 1px solid rgba(34, 211, 182, 0.4);
+}
+
+.pfz-card-rank-tag.nearest {
+  background: rgba(56, 189, 248, 0.18);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.4);
+}
+
+.pfz-card-rank-tag.safest {
+  background: rgba(16, 185, 129, 0.18);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+.pfz-card-rank-tag.potential {
+  background: rgba(245, 158, 11, 0.18);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+}
+
+.pfz-card-rank-tag.all {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-secondary);
+  border: 1px solid rgba(255, 255, 255, 0.16);
 }
 
 .pfz-card-metrics-grid {
@@ -1918,6 +1967,14 @@
   display: flex;
   flex-direction: column;
   gap: 1px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.pfz-metric-cell.active-metric {
+  background: rgba(34, 211, 182, 0.1);
+  border: 1px solid rgba(34, 211, 182, 0.3);
 }
 
 .pfz-metric-cell .lbl {
@@ -1937,6 +1994,12 @@
 
 .pfz-metric-cell .val.green {
   color: #22d3b6;
+}
+
+.pfz-metric-cell .val.highlight-active {
+  color: #22d3b6 !important;
+  text-shadow: 0 0 8px rgba(34, 211, 182, 0.5);
+  font-weight: 800;
 }
 
 .pfz-species-row {

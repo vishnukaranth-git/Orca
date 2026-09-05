@@ -17,7 +17,7 @@ class OrcaApp {
     this.backendStatus = 'connecting';
     this.pfzZones = [];
     this.disasters = [];
-    this.currentSort = 'orca';
+    this.currentSort = 'best';
     this.histWaveChart = null;
     this.histSstChart = null;
   }
@@ -49,6 +49,7 @@ class OrcaApp {
     this.startClock();
     this.checkBackendHealth();
     this.fetchLiveTelemetry();
+    this.loadPFZData();
 
     // Default view: Ask ORCA (Primary Agentic AI Experience)
     this.switchView('ask-orca');
@@ -98,14 +99,27 @@ class OrcaApp {
   }
 
   bindPFZSorting() {
-    document.querySelectorAll('.filter-btn').forEach(btn => {
+    const btns = document.querySelectorAll('#view-pfz .filter-btn, .dock-actions .filter-btn');
+    btns.forEach(btn => {
       btn.addEventListener('click', () => {
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         this.currentSort = btn.dataset.sort;
-        this.renderPFZTable();
+        if (!this.pfzZones || !this.pfzZones.length) {
+          this.loadPFZData();
+        } else {
+          this.renderPFZTable();
+        }
       });
     });
+
+    // When route origin changes in Route Planner, dynamically update distances if PFZ is rendered
+    const originSelect = document.getElementById('route-origin-select');
+    if (originSelect) {
+      originSelect.addEventListener('change', () => {
+        this.renderPFZTable();
+      });
+    }
   }
 
   bindRouteControls() {
@@ -260,16 +274,198 @@ class OrcaApp {
     }
   }
 
+  getActiveReferenceOrigin() {
+    const originSelect = document.getElementById('route-origin-select');
+    if (originSelect && originSelect.value) {
+      const parts = originSelect.value.split(',');
+      const lat = parseFloat(parts[0]);
+      const lng = parseFloat(parts[1]);
+      if (!isNaN(lat) && !isNaN(lng)) {
+        const text = originSelect.options[originSelect.selectedIndex]?.text?.split('(')[0]?.trim() || 'Custom Hub';
+        return { latitude: lat, longitude: lng, name: text };
+      }
+    }
+    return { latitude: 12.9141, longitude: 74.8560, name: 'New Mangalore Port' };
+  }
+
+  calculateDistanceKm(lat1, lon1, lat2, lon2) {
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return Math.round(R * c * 10) / 10;
+  }
+
+  getFallbackPFZZones() {
+    return [
+      {
+        zone_id: "ZONE-MALPE",
+        zone_name: "Zone Alpha (Offshore Malpe Shelf, Arabian Sea)",
+        region: "Arabian Sea (Karnataka)",
+        latitude: 13.12,
+        longitude: 74.72,
+        distance_km: 27.2,
+        depth_m: 42,
+        target_species: "Yellowfin Tuna, Indian Mackerel, Seer Fish",
+        chlorophyll_mg_m3: 2.6,
+        sst_gradient_c: 0.8,
+        potential_score: 100.0,
+        potential_level: "HIGH",
+        safety_score: 60.9,
+        safety_level: "MEDIUM",
+        orca_score: 73.2,
+        scoring_explanation: "Zone Alpha (Offshore Malpe Shelf, Arabian Sea) (Arabian Sea (Karnataka)): Potential 100.0/100 based on Chl-a 2.6 mg/m³ & SST gradient delta 0.8°C. Safety 60.9/100. Distance 27.2 km."
+      },
+      {
+        zone_id: "ZONE-VERAVAL",
+        zone_name: "Zone Beta (Saurashtra / Veraval Bank, Arabian Sea)",
+        region: "Arabian Sea (Gujarat)",
+        latitude: 20.75,
+        longitude: 70.15,
+        distance_km: 1004.8,
+        depth_m: 54,
+        target_species: "Silver Pomfret, Ribbonfish, Hilsa",
+        chlorophyll_mg_m3: 2.8,
+        sst_gradient_c: 0.9,
+        potential_score: 100.0,
+        potential_level: "HIGH",
+        safety_score: 60.9,
+        safety_level: "MEDIUM",
+        orca_score: 71.1,
+        scoring_explanation: "Zone Beta (Saurashtra / Veraval Bank, Arabian Sea) (Arabian Sea (Gujarat)): Potential 100.0/100 based on Chl-a 2.8 mg/m³ & SST gradient delta 0.9°C. Safety 60.9/100. Distance 1004.8 km."
+      },
+      {
+        zone_id: "ZONE-WADGE",
+        zone_name: "Zone Gamma (Wadge Bank / Kanyakumari Shelf)",
+        region: "Indian Ocean (Tamil Nadu / Kerala)",
+        latitude: 7.85,
+        longitude: 77.30,
+        distance_km: 623.3,
+        depth_m: 68,
+        target_species: "Skipjack Tuna, Grouper, Snapper, Squid",
+        chlorophyll_mg_m3: 2.3,
+        sst_gradient_c: 0.75,
+        potential_score: 89.9,
+        potential_level: "HIGH",
+        safety_score: 60.9,
+        safety_level: "MEDIUM",
+        orca_score: 66.2,
+        scoring_explanation: "Zone Gamma (Wadge Bank / Kanyakumari Shelf): Potential 89.9/100 based on Chl-a 2.3 mg/m³ & SST gradient delta 0.75°C. Safety 60.9/100. Distance 623.3 km."
+      },
+      {
+        zone_id: "ZONE-MANNAR",
+        zone_name: "Zone Delta (Gulf of Mannar Shelf)",
+        region: "Gulf of Mannar (Tamil Nadu)",
+        latitude: 8.95,
+        longitude: 78.75,
+        distance_km: 612.3,
+        depth_m: 38,
+        target_species: "Sardine, Anchovy, Trevally",
+        chlorophyll_mg_m3: 1.8,
+        sst_gradient_c: 0.62,
+        potential_score: 71.6,
+        potential_level: "MODERATE",
+        safety_score: 60.9,
+        safety_level: "MEDIUM",
+        orca_score: 57.4,
+        scoring_explanation: "Zone Delta (Gulf of Mannar Shelf): Potential 71.6/100 based on Chl-a 1.8 mg/m³ & SST gradient delta 0.62°C. Safety 60.9/100. Distance 612.3 km."
+      },
+      {
+        zone_id: "ZONE-CHENNAI",
+        zone_name: "Zone Epsilon (Coromandel Deep Slope, Bay of Bengal)",
+        region: "Bay of Bengal (Tamil Nadu)",
+        latitude: 13.25,
+        longitude: 80.60,
+        distance_km: 623.2,
+        depth_m: 85,
+        target_species: "Mahi Mahi, Bigeye Tuna, Swordfish",
+        chlorophyll_mg_m3: 2.1,
+        sst_gradient_c: 0.68,
+        potential_score: 81.7,
+        potential_level: "HIGH",
+        safety_score: 60.9,
+        safety_level: "MEDIUM",
+        orca_score: 62.3,
+        scoring_explanation: "Zone Epsilon (Coromandel Deep Slope, Bay of Bengal): Potential 81.7/100 based on Chl-a 2.1 mg/m³ & SST gradient delta 0.68°C. Safety 60.9/100. Distance 623.2 km."
+      },
+      {
+        zone_id: "ZONE-VIZAG",
+        zone_name: "Zone Zeta (Andhra Shelf / Visakhapatnam Channel)",
+        region: "Bay of Bengal (Andhra Pradesh)",
+        latitude: 17.55,
+        longitude: 83.55,
+        distance_km: 1065.4,
+        depth_m: 76,
+        target_species: "Yellowfin Tuna, Tiger Prawn, Ribbonfish",
+        chlorophyll_mg_m3: 2.5,
+        sst_gradient_c: 0.81,
+        potential_score: 98.1,
+        potential_level: "HIGH",
+        safety_score: 60.9,
+        safety_level: "MEDIUM",
+        orca_score: 70.2,
+        scoring_explanation: "Zone Zeta (Andhra Shelf / Visakhapatnam Channel): Potential 98.1/100 based on Chl-a 2.5 mg/m³ & SST gradient delta 0.81°C. Safety 60.9/100. Distance 1065.4 km."
+      },
+      {
+        zone_id: "ZONE-ANDAMAN",
+        zone_name: "Zone Eta (Port Blair Outer Ridge, Andaman Sea)",
+        region: "Andaman Sea",
+        latitude: 11.55,
+        longitude: 92.95,
+        distance_km: 1971.7,
+        depth_m: 92,
+        target_species: "Yellowfin Tuna, Billfish, Mahi Mahi",
+        chlorophyll_mg_m3: 2.2,
+        sst_gradient_c: 0.72,
+        potential_score: 86.1,
+        potential_level: "HIGH",
+        safety_score: 60.9,
+        safety_level: "MEDIUM",
+        orca_score: 64.4,
+        scoring_explanation: "Zone Eta (Port Blair Outer Ridge, Andaman Sea): Potential 86.1/100 based on Chl-a 2.2 mg/m³ & SST gradient delta 0.72°C. Safety 60.9/100. Distance 1971.7 km."
+      },
+      {
+        zone_id: "ZONE-LAKSHADWEEP",
+        zone_name: "Zone Theta (Kavaratti / Lakshadweep Sea)",
+        region: "Lakshadweep Sea",
+        latitude: 10.60,
+        longitude: 72.40,
+        distance_km: 371.1,
+        depth_m: 60,
+        target_species: "Skipjack Tuna, Rainbow Runner",
+        chlorophyll_mg_m3: 1.9,
+        sst_gradient_c: 0.65,
+        potential_score: 76.0,
+        potential_level: "MODERATE",
+        safety_score: 60.9,
+        safety_level: "MEDIUM",
+        orca_score: 59.6,
+        scoring_explanation: "Zone Theta (Kavaratti / Lakshadweep Sea): Potential 76.0/100 based on Chl-a 1.9 mg/m³ & SST gradient delta 0.65°C. Safety 60.9/100. Distance 371.1 km."
+      }
+    ];
+  }
+
   async loadPFZData() {
     const container = document.getElementById('pfz-zones-container');
     if (!container) return;
 
+    if (!this.pfzZones || !this.pfzZones.length) {
+      this.pfzZones = this.getFallbackPFZZones();
+      this.renderPFZTable();
+    }
+
     try {
-      const resp = await fetch(`${this.getApiBase()}/api/pfz/ranked`);
+      const origin = this.getActiveReferenceOrigin();
+      const resp = await fetch(`${this.getApiBase()}/api/pfz/ranked?latitude=${origin.latitude}&longitude=${origin.longitude}`);
       if (resp.ok) {
         const json = await resp.json();
-        this.pfzZones = json.data.ranked_zones || [];
-        this.renderPFZTable();
+        if (json.data && json.data.ranked_zones && json.data.ranked_zones.length) {
+          this.pfzZones = json.data.ranked_zones;
+          this.renderPFZTable();
+        }
       }
     } catch (e) {
       console.warn("PFZ ranked fetch fallback.", e);
@@ -278,63 +474,137 @@ class OrcaApp {
 
   renderPFZTable() {
     const container = document.getElementById('pfz-zones-container');
-    if (!container || !this.pfzZones.length) return;
+    if (!container) return;
 
-    let list = [...this.pfzZones];
-    if (this.currentSort === 'orca') {
-      list.sort((a, b) => b.orca_score - a.orca_score);
-    } else if (this.currentSort === 'nearest') {
-      list.sort((a, b) => a.distance_km - b.distance_km);
-    } else if (this.currentSort === 'safest') {
-      list.sort((a, b) => b.safety_score - a.safety_score);
-    } else if (this.currentSort === 'potential') {
-      list.sort((a, b) => b.potential_score - a.potential_score);
+    if (!this.pfzZones || !this.pfzZones.length) {
+      this.pfzZones = this.getFallbackPFZZones();
     }
 
-    container.innerHTML = list.map(z => `
-      <div class="pfz-full-card" onclick="orcaApp.inspectPFZ(${z.latitude}, ${z.longitude})">
-        <div class="pfz-card-header-row">
-          <div class="pfz-card-title-group">
-            <div class="pfz-card-zone-name">${z.zone_name}</div>
-            <div class="pfz-card-region-tag">COORDINATES: ${z.latitude.toFixed(2)}°N, ${z.longitude.toFixed(2)}°E</div>
-          </div>
-          <div class="pfz-full-orca-badge">ORCA ${z.orca_score}</div>
-        </div>
+    const origin = this.getActiveReferenceOrigin();
 
-        <div class="pfz-card-metrics-grid">
-          <div class="pfz-metric-cell">
-            <span class="lbl">Potential</span>
-            <span class="val green">${z.potential_score}/100</span>
-          </div>
-          <div class="pfz-metric-cell">
-            <span class="lbl">Safety</span>
-            <span class="val">${z.safety_score}/100</span>
-          </div>
-          <div class="pfz-metric-cell">
-            <span class="lbl">Distance</span>
-            <span class="val">${z.distance_km} km</span>
-          </div>
-          <div class="pfz-metric-cell">
-            <span class="lbl">Depth</span>
-            <span class="val">-${z.depth_m}m</span>
-          </div>
-        </div>
+    // Compute live distance from active reference origin for every zone
+    let list = this.pfzZones.map(z => {
+      const dist = this.calculateDistanceKm(origin.latitude, origin.longitude, z.latitude, z.longitude);
+      return {
+        ...z,
+        distance_km: dist
+      };
+    });
 
-        <div class="pfz-species-row">
-          <i data-lucide="fish"></i>
-          <span><b>Target Species:</b> ${z.target_species}</span>
-        </div>
+    // Update active filter and reference origin labels in telemetry banner
+    const filterLabel = document.getElementById('pfz-active-filter-label');
+    const originLabel = document.getElementById('pfz-reference-hub-label');
 
-        <div class="pfz-rationale-box">
-          ${z.scoring_explanation}
-        </div>
+    if (originLabel) {
+      originLabel.textContent = `${origin.name.toUpperCase()} (${origin.latitude.toFixed(2)}°N, ${origin.longitude.toFixed(2)}°E)`;
+    }
 
-        <button class="pfz-select-plot-btn" onclick="event.stopPropagation(); orcaApp.inspectPFZ(${z.latitude}, ${z.longitude})">
-          <i data-lucide="crosshair" style="width:13px;height:13px;"></i>
-          <span>OK, PLOT THIS ON MAP &rarr;</span>
-        </button>
-      </div>
-    `).join('');
+    const CANONICAL_ORDER = [
+      'ZONE-MALPE',
+      'ZONE-VERAVAL',
+      'ZONE-WADGE',
+      'ZONE-MANNAR',
+      'ZONE-CHENNAI',
+      'ZONE-VIZAG',
+      'ZONE-ANDAMAN',
+      'ZONE-LAKSHADWEEP'
+    ];
+
+    if (this.currentSort === 'all') {
+      if (filterLabel) filterLabel.textContent = 'ALL 8 ZONES (CANONICAL)';
+      list.sort((a, b) => {
+        const idxA = CANONICAL_ORDER.indexOf(a.zone_id);
+        const idxB = CANONICAL_ORDER.indexOf(b.zone_id);
+        if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+        return (a.zone_name || '').localeCompare(b.zone_name || '');
+      });
+    } else if (this.currentSort === 'nearest') {
+      if (filterLabel) filterLabel.textContent = 'NEAREST (COASTAL PROXIMITY)';
+      list.sort((a, b) => (parseFloat(a.distance_km) || 0) - (parseFloat(b.distance_km) || 0));
+    } else if (this.currentSort === 'safest') {
+      if (filterLabel) filterLabel.textContent = 'SAFEST (WEATHER & METOCEAN)';
+      list.sort((a, b) => (parseFloat(b.safety_score) || 0) - (parseFloat(a.safety_score) || 0));
+    } else if (this.currentSort === 'potential') {
+      if (filterLabel) filterLabel.textContent = 'HIGHEST CATCH (CHL-A & SST)';
+      list.sort((a, b) => (parseFloat(b.potential_score) || 0) - (parseFloat(a.potential_score) || 0));
+    } else { // 'best' or 'orca'
+      if (filterLabel) filterLabel.textContent = 'BEST OVERALL (ORCA SCORE)';
+      list.sort((a, b) => (parseFloat(b.orca_score) || 0) - (parseFloat(a.orca_score) || 0));
+    }
+
+    container.innerHTML = list.map((z, idx) => {
+      const rank = idx + 1;
+      let rankTag = '';
+      if (this.currentSort === 'best' || this.currentSort === 'orca') {
+        rankTag = `<span class="pfz-card-rank-tag best">#${rank} BEST OVERALL</span>`;
+      } else if (this.currentSort === 'nearest') {
+        rankTag = `<span class="pfz-card-rank-tag nearest">#${rank} NEAREST · ${z.distance_km} KM</span>`;
+      } else if (this.currentSort === 'safest') {
+        rankTag = `<span class="pfz-card-rank-tag safest">#${rank} SAFEST · SCORE ${z.safety_score}</span>`;
+      } else if (this.currentSort === 'potential') {
+        rankTag = `<span class="pfz-card-rank-tag potential">#${rank} HIGHEST CATCH · ${z.potential_score}</span>`;
+      } else {
+        rankTag = `<span class="pfz-card-rank-tag all">SECTOR ${rank} OF ${list.length}</span>`;
+      }
+
+      const isBest = this.currentSort === 'best' || this.currentSort === 'orca';
+      const isNearest = this.currentSort === 'nearest';
+      const isSafest = this.currentSort === 'safest';
+      const isPotential = this.currentSort === 'potential';
+
+      return `
+        <div class="pfz-full-card" onclick="orcaApp.inspectPFZ(${z.latitude}, ${z.longitude})">
+          <div class="pfz-card-header-row">
+            <div class="pfz-card-title-group">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
+                ${rankTag}
+                <span class="pfz-card-region-tag">${z.region || 'INDIAN EEZ'}</span>
+              </div>
+              <div class="pfz-card-zone-name">${z.zone_name}</div>
+              <div class="pfz-card-coords-tag" style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);">
+                COORDINATES: ${z.latitude.toFixed(2)}°N, ${z.longitude.toFixed(2)}°E
+              </div>
+            </div>
+            <div class="pfz-full-orca-badge ${isBest ? 'highlighted' : ''}">
+              ORCA ${z.orca_score}
+            </div>
+          </div>
+
+          <div class="pfz-card-metrics-grid">
+            <div class="pfz-metric-cell ${isPotential ? 'active-metric' : ''}">
+              <span class="lbl">Potential</span>
+              <span class="val ${isPotential ? 'highlight-active' : 'green'}">${z.potential_score}/100</span>
+            </div>
+            <div class="pfz-metric-cell ${isSafest ? 'active-metric' : ''}">
+              <span class="lbl">Safety</span>
+              <span class="val ${isSafest ? 'highlight-active' : ''}">${z.safety_score}/100</span>
+            </div>
+            <div class="pfz-metric-cell ${isNearest ? 'active-metric' : ''}">
+              <span class="lbl">Distance</span>
+              <span class="val ${isNearest ? 'highlight-active' : ''}">${z.distance_km} km</span>
+            </div>
+            <div class="pfz-metric-cell">
+              <span class="lbl">Depth</span>
+              <span class="val">-${z.depth_m}m</span>
+            </div>
+          </div>
+
+          <div class="pfz-species-row">
+            <i data-lucide="fish"></i>
+            <span><b>Target Species:</b> ${z.target_species}</span>
+          </div>
+
+          <div class="pfz-rationale-box">
+            ${z.scoring_explanation}
+          </div>
+
+          <button class="pfz-select-plot-btn" onclick="event.stopPropagation(); orcaApp.inspectPFZ(${z.latitude}, ${z.longitude})">
+            <i data-lucide="crosshair" style="width:13px;height:13px;"></i>
+            <span>OK, PLOT THIS ON MAP &rarr;</span>
+          </button>
+        </div>
+      `;
+    }).join('');
 
     if (window.lucide) {
       lucide.createIcons();
