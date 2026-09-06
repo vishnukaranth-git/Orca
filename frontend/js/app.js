@@ -83,6 +83,9 @@ class OrcaApp {
     this.simulator.init();
     this.aiAssistant.init();
     this.mapController.init();
+    if (window.orcaAuth) {
+      window.orcaAuth.init();
+    }
 
     this.bindNavigation();
     this.bindRouteControls();
