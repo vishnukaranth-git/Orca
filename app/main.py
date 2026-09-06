@@ -1,3 +1,4 @@
+import os
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
@@ -285,7 +286,12 @@ async def chat_save(request: Request, body: ChatSaveRequest):
     updated = auth_store.append_user_chat(body.user_id, body.query, body.data)
     return out(request, {"saved": True, "count": len(updated)})
 
-# Mount frontend
-frontend_dir = Path(__file__).resolve().parent.parent / "frontend"
-if frontend_dir.exists():
-    app.mount("/", StaticFiles(directory=str(frontend_dir), html=True), name="frontend")
+# Mount frontend for local development
+if not (os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME")):
+    frontend_dir = Path(__file__).resolve().parent.parent / "frontend"
+    if frontend_dir.exists():
+        app.mount("/", StaticFiles(directory=str(frontend_dir), html=True), name="frontend")
+else:
+    @app.get("/")
+    async def serverless_root():
+        return {"status": "ok", "service": "ORCA API", "docs": "/docs", "health": "/health"}
