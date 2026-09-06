@@ -515,7 +515,7 @@
                 <div class="hero-chat-input-wrapper">
                   <i data-lucide="sparkles" class="hero-input-icon"></i>
                   <input type="text" id="ask-orca-hero-input" placeholder="Ask ORCA in English, Kannada, Hindi, or Tamil..." autofocus />
-                  <button type="button" class="hero-send-btn" id="ask-orca-hero-send" title="Ask ORCA" onclick="window.orcaAIAssistant && window.orcaAIAssistant.submitQuery(document.getElementById('ask-orca-hero-input').value)">
+                  <button type="button" class="hero-send-btn" id="ask-orca-hero-send" title="Ask ORCA" onclick="window.submitOrcaQuery(document.getElementById('ask-orca-hero-input').value)">
                     <span data-i18n="btn_hero_ask">Ask ORCA</span>
                     <i data-lucide="arrow-up-right"></i>
                   </button>
@@ -525,15 +525,15 @@
                 <div class="hero-suggestions-container">
                   <div class="suggestions-label" data-i18n="hero_suggested_label">Suggested questions</div>
                   <div class="hero-suggestions-grid">
-                    <button type="button" class="hero-suggestion-btn" data-query="Is it safe to fish tomorrow near Mangalore?" onclick="window.orcaAIAssistant && window.orcaAIAssistant.submitQuery('Is it safe to fish tomorrow near Mangalore?')">
+                    <button type="button" class="hero-suggestion-btn" data-query="Is it safe to fish tomorrow near Mangalore?" onclick="window.submitOrcaQuery('Is it safe to fish tomorrow near Mangalore?')">
                       <i data-lucide="shield"></i>
                       <span>Is it safe to fish tomorrow near Mangalore?</span>
                     </button>
-                    <button type="button" class="hero-suggestion-btn" data-query="Where is the nearest PFZ today?" onclick="window.orcaAIAssistant && window.orcaAIAssistant.submitQuery('Where is the nearest PFZ today?')">
+                    <button type="button" class="hero-suggestion-btn" data-query="Where is the nearest PFZ today?" onclick="window.submitOrcaQuery('Where is the nearest PFZ today?')">
                       <i data-lucide="fish"></i>
                       <span>Where is the nearest PFZ today?</span>
                     </button>
-                    <button type="button" class="hero-suggestion-btn" data-query="Are there any cyclone or high-wave warnings near my location?" onclick="window.orcaAIAssistant && window.orcaAIAssistant.submitQuery('Are there any cyclone or high-wave warnings near my location?')">
+                    <button type="button" class="hero-suggestion-btn" data-query="Are there any cyclone or high-wave warnings near my location?" onclick="window.submitOrcaQuery('Are there any cyclone or high-wave warnings near my location?')">
                       <i data-lucide="alert-triangle"></i>
                       <span>Are there any cyclone or high-wave warnings near my location?</span>
                     </button>
@@ -552,7 +552,7 @@
               <div class="bottom-chat-input-bar" id="bottom-chat-input-bar">
                 <div class="bottom-input-inner">
                   <input type="text" id="ask-orca-bottom-input" placeholder="Ask ORCA in English or Kannada (e.g. What about afternoon?)..." />
-                  <button type="button" class="bottom-send-btn" id="ask-orca-bottom-send" title="Send Query" onclick="window.orcaAIAssistant && window.orcaAIAssistant.submitQuery(document.getElementById('ask-orca-bottom-input').value)">
+                  <button type="button" class="bottom-send-btn" id="ask-orca-bottom-send" title="Send Query" onclick="window.submitOrcaQuery(document.getElementById('ask-orca-bottom-input').value)">
                     <i data-lucide="arrow-up-right"></i>
                   </button>
                 </div>
