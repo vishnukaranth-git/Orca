@@ -15,13 +15,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
   
-  <!-- Leaflet CSS & JS -->
+  <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  
-  <!-- Lucide Icons & Chart.js -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   
   <!-- ORCA Custom Design System -->
   <link rel="stylesheet" href="css/design-system.css">
@@ -59,35 +54,35 @@
 
       <div class="sidebar-section-header" data-i18n="nav_section_title">MISSION NAVIGATION</div>
       <nav class="sidebar-nav-list">
-        <button class="nav-tab-btn highlight-tab active" data-view="ask-orca" id="tab-ask-orca" onclick="window.orcaApp && window.orcaApp.switchView('ask-orca')">
+        <button class="nav-tab-btn highlight-tab active" data-view="ask-orca" id="tab-ask-orca">
           <i data-lucide="sparkles"></i>
           <span data-i18n="tab_ask_orca">Ask ORCA</span>
         </button>
-        <button class="nav-tab-btn" data-view="command" id="tab-command" onclick="window.orcaApp && window.orcaApp.switchView('command')">
+        <button class="nav-tab-btn" data-view="command" id="tab-command">
           <i data-lucide="layout-dashboard"></i>
           <span data-i18n="tab_command">Command Center</span>
         </button>
-        <button class="nav-tab-btn" data-view="pfz" id="tab-pfz" onclick="window.orcaApp && window.orcaApp.switchView('pfz')">
+        <button class="nav-tab-btn" data-view="pfz" id="tab-pfz">
           <i data-lucide="fish"></i>
           <span data-i18n="tab_pfz">Fishing Zones</span>
         </button>
-        <button class="nav-tab-btn" data-view="disasters" id="tab-disasters" onclick="window.orcaApp && window.orcaApp.switchView('disasters')">
+        <button class="nav-tab-btn" data-view="disasters" id="tab-disasters">
           <i data-lucide="alert-triangle"></i>
           <span data-i18n="tab_disasters">Disaster Watch</span>
         </button>
-        <button class="nav-tab-btn" data-view="satellite" id="tab-satellite" onclick="window.orcaApp && window.orcaApp.switchView('satellite')">
+        <button class="nav-tab-btn" data-view="satellite" id="tab-satellite">
           <i data-lucide="satellite"></i>
           <span data-i18n="tab_satellite">Satellite Lab</span>
         </button>
-        <button class="nav-tab-btn" data-view="routes" id="tab-routes" onclick="window.orcaApp && window.orcaApp.switchView('routes')">
+        <button class="nav-tab-btn" data-view="routes" id="tab-routes">
           <i data-lucide="navigation"></i>
           <span data-i18n="tab_routes">Safe Routes</span>
         </button>
-        <button class="nav-tab-btn" data-view="historical" id="tab-historical" onclick="window.orcaApp && window.orcaApp.switchView('historical')">
+        <button class="nav-tab-btn" data-view="historical" id="tab-historical">
           <i data-lucide="line-chart"></i>
           <span data-i18n="tab_historical">Historical Trends</span>
         </button>
-        <button class="nav-tab-btn" data-view="simulator" id="tab-simulator" onclick="window.orcaApp && window.orcaApp.switchView('simulator')">
+        <button class="nav-tab-btn" data-view="simulator" id="tab-simulator">
           <i data-lucide="sliders"></i>
           <span data-i18n="tab_simulator">What-If</span>
         </button>
@@ -103,10 +98,10 @@
           </div>
         </div>
         <div class="sidebar-lang-selector" id="sidebar-lang-selector" title="Switch Language (English / ಕನ್ನಡ / हिन्दी / தமிழ்)">
-          <button class="lang-pill-btn active" data-lang="en" onclick="window.orcaI18n && window.orcaI18n.setLanguage('en')">EN</button>
-          <button class="lang-pill-btn" data-lang="kn" onclick="window.orcaI18n && window.orcaI18n.setLanguage('kn')">ಕನ್ನಡ</button>
-          <button class="lang-pill-btn" data-lang="hi" onclick="window.orcaI18n && window.orcaI18n.setLanguage('hi')">हिन्दी</button>
-          <button class="lang-pill-btn" data-lang="ta" onclick="window.orcaI18n && window.orcaI18n.setLanguage('ta')">தமிழ்</button>
+          <button class="lang-pill-btn active" data-lang="en">EN</button>
+          <button class="lang-pill-btn" data-lang="kn">ಕನ್ನಡ</button>
+          <button class="lang-pill-btn" data-lang="hi">हिन्दी</button>
+          <button class="lang-pill-btn" data-lang="ta">தமிழ்</button>
         </div>
       </div>
     </aside>
@@ -487,7 +482,7 @@
           <!-- LEFT: CONVERSATION SESSIONS & CHAT HISTORY -->
           <div class="ask-orca-history-col">
             <div class="history-col-top">
-              <button class="new-chat-btn" id="btn-new-chat" onclick="window.orcaAIAssistant && window.orcaAIAssistant.startNewChat()">
+              <button class="new-chat-btn" id="btn-new-chat">
                 <i data-lucide="plus"></i>
                 <span data-i18n="chat_new_query">New Intelligence Query</span>
               </button>
@@ -520,7 +515,7 @@
                 <div class="hero-chat-input-wrapper">
                   <i data-lucide="sparkles" class="hero-input-icon"></i>
                   <input type="text" id="ask-orca-hero-input" placeholder="Ask ORCA in English, Kannada, Hindi, or Tamil..." autofocus />
-                  <button type="button" class="hero-send-btn" id="ask-orca-hero-send" title="Ask ORCA" onclick="window.submitOrcaQuery(document.getElementById('ask-orca-hero-input').value)">
+                  <button class="hero-send-btn" id="ask-orca-hero-send" title="Ask ORCA">
                     <span data-i18n="btn_hero_ask">Ask ORCA</span>
                     <i data-lucide="arrow-up-right"></i>
                   </button>
@@ -530,15 +525,15 @@
                 <div class="hero-suggestions-container">
                   <div class="suggestions-label" data-i18n="hero_suggested_label">Suggested questions</div>
                   <div class="hero-suggestions-grid">
-                    <button type="button" class="hero-suggestion-btn" data-query="Is it safe to fish tomorrow near Mangalore?" onclick="window.submitOrcaQuery('Is it safe to fish tomorrow near Mangalore?')">
+                    <button class="hero-suggestion-btn" data-query="Is it safe to fish tomorrow near Mangalore?">
                       <i data-lucide="shield"></i>
                       <span>Is it safe to fish tomorrow near Mangalore?</span>
                     </button>
-                    <button type="button" class="hero-suggestion-btn" data-query="Where is the nearest PFZ today?" onclick="window.submitOrcaQuery('Where is the nearest PFZ today?')">
+                    <button class="hero-suggestion-btn" data-query="Where is the nearest PFZ today?">
                       <i data-lucide="fish"></i>
                       <span>Where is the nearest PFZ today?</span>
                     </button>
-                    <button type="button" class="hero-suggestion-btn" data-query="Are there any cyclone or high-wave warnings near my location?" onclick="window.submitOrcaQuery('Are there any cyclone or high-wave warnings near my location?')">
+                    <button class="hero-suggestion-btn" data-query="Are there any cyclone or high-wave warnings near my location?">
                       <i data-lucide="alert-triangle"></i>
                       <span>Are there any cyclone or high-wave warnings near my location?</span>
                     </button>
@@ -557,7 +552,7 @@
               <div class="bottom-chat-input-bar" id="bottom-chat-input-bar">
                 <div class="bottom-input-inner">
                   <input type="text" id="ask-orca-bottom-input" placeholder="Ask ORCA in English or Kannada (e.g. What about afternoon?)..." />
-                  <button type="button" class="bottom-send-btn" id="ask-orca-bottom-send" title="Send Query" onclick="window.submitOrcaQuery(document.getElementById('ask-orca-bottom-input').value)">
+                  <button class="bottom-send-btn" id="ask-orca-bottom-send" title="Send Query">
                     <i data-lucide="arrow-up-right"></i>
                   </button>
                 </div>
@@ -1173,7 +1168,7 @@
   </script>
 
   <!-- ORCA Mission Access & Clearance Portal Modal -->
-  <div class="orca-auth-modal-backdrop" id="orca-auth-modal-backdrop" style="display:none;" onclick="if(event.target===this && window.orcaAuth) window.orcaAuth.closeModal()">
+  <div class="orca-auth-modal-backdrop" id="orca-auth-modal-backdrop" style="display:none;">
     <div class="orca-auth-modal-window">
       <!-- Modal Header -->
       <div class="auth-modal-header">
@@ -1186,18 +1181,18 @@
             <div class="auth-modal-subtitle" data-i18n="modal_clearance_sub">Ocean Intelligence Platform &amp; Operator Gateway</div>
           </div>
         </div>
-        <button type="button" class="btn-close-auth-modal" id="btn-close-auth-modal" title="Close" onclick="window.orcaAuth && window.orcaAuth.closeModal()">
+        <button class="btn-close-auth-modal" id="btn-close-auth-modal" title="Close">
           <i data-lucide="x" style="width:16px;height:16px;"></i>
         </button>
       </div>
 
       <!-- Clearance Mode Selector Tabs (Create Account & Sign In) -->
       <div class="auth-modal-tabs">
-        <button type="button" class="auth-tab-btn active" id="auth-tab-signup" onclick="window.orcaAuth && window.orcaAuth.switchTab('signup')">
+        <button class="auth-tab-btn active" id="auth-tab-signup">
           <i data-lucide="user-plus" style="width:13px;height:13px;"></i>
           <span data-i18n="tab_commission_station">Create Account</span>
         </button>
-        <button type="button" class="auth-tab-btn" id="auth-tab-login" onclick="window.orcaAuth && window.orcaAuth.switchTab('login')">
+        <button class="auth-tab-btn" id="auth-tab-login">
           <i data-lucide="log-in" style="width:13px;height:13px;"></i>
           <span data-i18n="tab_officer_signin">Sign In</span>
         </button>

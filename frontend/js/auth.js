@@ -11,11 +11,6 @@ class OrcaAuth {
     this.selectedRole = 'fishery';
     this.apiBase = window.location.port === '3000' ? 'http://localhost:8000' : '';
     this.loadLocalSession();
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', () => this.init());
-    } else {
-      this.init();
-    }
   }
 
   init() {
@@ -23,43 +18,6 @@ class OrcaAuth {
     this.updateUserUI();
     if (this.currentUser) {
       this.syncUserChatHistory();
-    }
-  }
-
-  switchTab(tabName) {
-    const tabLogin = document.getElementById('auth-tab-login');
-    const tabSignup = document.getElementById('auth-tab-signup');
-    const formLogin = document.getElementById('auth-form-login');
-    const formSignup = document.getElementById('auth-form-signup');
-    const errorEl = document.getElementById('auth-modal-error');
-
-    if (errorEl) {
-      errorEl.style.display = 'none';
-      errorEl.textContent = '';
-    }
-
-    if (tabName === 'login') {
-      if (tabLogin) tabLogin.classList.add('active');
-      if (tabSignup) tabSignup.classList.remove('active');
-      if (formLogin) {
-        formLogin.style.display = 'flex';
-        formLogin.classList.add('active');
-      }
-      if (formSignup) {
-        formSignup.style.display = 'none';
-        formSignup.classList.remove('active');
-      }
-    } else {
-      if (tabSignup) tabSignup.classList.add('active');
-      if (tabLogin) tabLogin.classList.remove('active');
-      if (formSignup) {
-        formSignup.style.display = 'flex';
-        formSignup.classList.add('active');
-      }
-      if (formLogin) {
-        formLogin.style.display = 'none';
-        formLogin.classList.remove('active');
-      }
     }
   }
 
@@ -149,20 +107,11 @@ class OrcaAuth {
     const formSignup = document.getElementById('auth-form-signup');
     const errorEl = document.getElementById('auth-modal-error');
 
-    if (closeBtn) {
-      closeBtn.onclick = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        this.closeModal();
-      };
-    }
-
-    if (backdrop) {
-      backdrop.onclick = (e) => {
-        if (e.target === backdrop) {
-          this.closeModal();
-        }
-      };
+    if (closeBtn && backdrop) {
+      closeBtn.addEventListener('click', () => this.closeModal());
+      backdrop.addEventListener('click', (e) => {
+        if (e.target === backdrop) this.closeModal();
+      });
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && backdrop.style.display === 'flex') {
           this.closeModal();
@@ -170,18 +119,22 @@ class OrcaAuth {
       });
     }
 
-    if (tabSignup) {
-      tabSignup.onclick = (e) => {
-        e.preventDefault();
-        this.switchTab('signup');
-      };
-    }
+    const switchTab = (activeTab, activeForm, inactiveTab, inactiveForm) => {
+      if (activeTab) activeTab.classList.add('active');
+      if (inactiveTab) inactiveTab.classList.remove('active');
+      if (activeForm) activeForm.style.display = 'flex';
+      if (inactiveForm) inactiveForm.style.display = 'none';
+      if (errorEl) errorEl.style.display = 'none';
+    };
 
-    if (tabLogin) {
-      tabLogin.onclick = (e) => {
-        e.preventDefault();
-        this.switchTab('login');
-      };
+    if (tabSignup && formSignup && tabLogin && formLogin) {
+      tabSignup.addEventListener('click', () => {
+        switchTab(tabSignup, formSignup, tabLogin, formLogin);
+      });
+
+      tabLogin.addEventListener('click', () => {
+        switchTab(tabLogin, formLogin, tabSignup, formSignup);
+      });
     }
 
     // Submit Login
@@ -335,7 +288,7 @@ class OrcaAuth {
                 <span class="sidebar-user-role">Officer · Active</span>
               </div>
             </div>
-            <button class="sidebar-logout-btn" id="btn-sidebar-logout" title="Sign Out / Logout" onclick="window.orcaAuth && window.orcaAuth.logout()">
+            <button class="sidebar-logout-btn" id="btn-sidebar-logout" title="Sign Out / Logout">
               <i data-lucide="log-out"></i>
             </button>
           </div>
@@ -344,7 +297,9 @@ class OrcaAuth {
         if (logoutBtn) {
           logoutBtn.addEventListener('click', (e) => {
             e.stopPropagation();
-            this.logout();
+            if (confirm(`Operational Officer: ${displayName} (${this.currentUser.email}).\nDo you want to sign out?`)) {
+              this.logout();
+            }
           });
         }
       } else {
