@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "ORCA - Ocean Reasoning & Collaborative Agents",
   "scripts": {
-    "build": "npm run build --prefix frontend",
+    "build": "cd frontend && npm install && npm run build",
     "frontend": "npm run dev --prefix frontend",
     "frontend:build": "npm run build --prefix frontend",
     "frontend:preview": "npm run preview --prefix frontend"
