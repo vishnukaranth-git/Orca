@@ -30,15 +30,15 @@ class OrcaMapController {
 
     // Feature Layers
     this.layers = {
-      oceanRegions: L.layerGroup(),
-      pfz: L.layerGroup(),
-      restricted: L.layerGroup(),
-      hazards: L.layerGroup(),
-      vessels: L.layerGroup(),
-      routes: L.layerGroup(),
-      eez: L.layerGroup(),
-      streetviewCoverage: L.layerGroup(),
-      historicalStations: L.layerGroup()
+      oceanRegions: (typeof L !== 'undefined' && L.layerGroup) ? L.layerGroup() : null,
+      pfz: (typeof L !== 'undefined' && L.layerGroup) ? L.layerGroup() : null,
+      restricted: (typeof L !== 'undefined' && L.layerGroup) ? L.layerGroup() : null,
+      hazards: (typeof L !== 'undefined' && L.layerGroup) ? L.layerGroup() : null,
+      vessels: (typeof L !== 'undefined' && L.layerGroup) ? L.layerGroup() : null,
+      routes: (typeof L !== 'undefined' && L.layerGroup) ? L.layerGroup() : null,
+      eez: (typeof L !== 'undefined' && L.layerGroup) ? L.layerGroup() : null,
+      streetviewCoverage: (typeof L !== 'undefined' && L.layerGroup) ? L.layerGroup() : null,
+      historicalStations: (typeof L !== 'undefined' && L.layerGroup) ? L.layerGroup() : null
     };
 
     // Real Google Maps Street View & Alternative 360 State
@@ -254,7 +254,12 @@ class OrcaMapController {
   }
 
   init() {
-    if (!document.getElementById(this.containerId)) return;
+    if (typeof L === 'undefined' || !document.getElementById(this.containerId)) return;
+
+    // Ensure all feature layer groups exist
+    for (const key of ['oceanRegions', 'pfz', 'restricted', 'hazards', 'vessels', 'routes', 'eez', 'streetviewCoverage', 'historicalStations']) {
+      if (!this.layers[key]) this.layers[key] = L.layerGroup();
+    }
 
     // 1. Initialize Leaflet Map
     this.map = L.map(this.containerId, {
