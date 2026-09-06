@@ -2,6 +2,9 @@
 .env
 .env.local
 *.env
+Satellite_descending_from_space_*.mp4
+data/
+
 
 # Python & Virtual Environments
 .venv/
@@ -28,12 +31,3 @@ frontend/.vite/
 .DS_Store
 Thumbs.db
 *.log
-
-# Data & Local Databases
-data/
-*.db
-*.sqlite
-
-# Root Video Raw Artifacts
-/*.mp4
-

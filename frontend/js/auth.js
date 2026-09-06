@@ -98,90 +98,42 @@ class OrcaAuth {
     }, 250);
   }
 
-  switchMode(mode = 'signup') {
-    const tabLogin = document.getElementById('auth-tab-login');
-    const tabSignup = document.getElementById('auth-tab-signup');
-    const formLogin = document.getElementById('auth-form-login');
-    const formSignup = document.getElementById('auth-form-signup');
-    const errorEl = document.getElementById('auth-modal-error');
-
-    if (errorEl) errorEl.style.display = 'none';
-
-    if (mode === 'login') {
-      if (tabLogin) tabLogin.classList.add('active');
-      if (tabSignup) tabSignup.classList.remove('active');
-      if (formLogin) {
-        formLogin.style.display = 'flex';
-        formLogin.classList.add('active');
-      }
-      if (formSignup) {
-        formSignup.style.display = 'none';
-        formSignup.classList.remove('active');
-      }
-      const emailInp = document.getElementById('login-email');
-      if (emailInp) setTimeout(() => emailInp.focus(), 60);
-    } else {
-      if (tabSignup) tabSignup.classList.add('active');
-      if (tabLogin) tabLogin.classList.remove('active');
-      if (formSignup) {
-        formSignup.style.display = 'flex';
-        formSignup.classList.add('active');
-      }
-      if (formLogin) {
-        formLogin.style.display = 'none';
-        formLogin.classList.remove('active');
-      }
-      const nameInp = document.getElementById('signup-name');
-      if (nameInp) setTimeout(() => nameInp.focus(), 60);
-    }
-    if (window.lucide) lucide.createIcons();
-  }
-
   bindModalEvents() {
-    if (this._eventsBound) return;
-    this._eventsBound = true;
-
     const backdrop = document.getElementById('orca-auth-modal-backdrop');
     const closeBtn = document.getElementById('btn-close-auth-modal');
     const tabLogin = document.getElementById('auth-tab-login');
     const tabSignup = document.getElementById('auth-tab-signup');
     const formLogin = document.getElementById('auth-form-login');
     const formSignup = document.getElementById('auth-form-signup');
+    const errorEl = document.getElementById('auth-modal-error');
 
-    if (closeBtn) {
-      closeBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        this.closeModal();
-      });
-    }
-
-    if (backdrop) {
+    if (closeBtn && backdrop) {
+      closeBtn.addEventListener('click', () => this.closeModal());
       backdrop.addEventListener('click', (e) => {
         if (e.target === backdrop) this.closeModal();
       });
-    }
-
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        const bd = document.getElementById('orca-auth-modal-backdrop');
-        if (bd && bd.style.display === 'flex') {
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && backdrop.style.display === 'flex') {
           this.closeModal();
         }
-      }
-    });
-
-    if (tabSignup) {
-      tabSignup.addEventListener('click', (e) => {
-        e.preventDefault();
-        this.switchMode('signup');
       });
     }
 
-    if (tabLogin) {
-      tabLogin.addEventListener('click', (e) => {
-        e.preventDefault();
-        this.switchMode('login');
+    const switchTab = (activeTab, activeForm, inactiveTab, inactiveForm) => {
+      if (activeTab) activeTab.classList.add('active');
+      if (inactiveTab) inactiveTab.classList.remove('active');
+      if (activeForm) activeForm.style.display = 'flex';
+      if (inactiveForm) inactiveForm.style.display = 'none';
+      if (errorEl) errorEl.style.display = 'none';
+    };
+
+    if (tabSignup && formSignup && tabLogin && formLogin) {
+      tabSignup.addEventListener('click', () => {
+        switchTab(tabSignup, formSignup, tabLogin, formLogin);
+      });
+
+      tabLogin.addEventListener('click', () => {
+        switchTab(tabLogin, formLogin, tabSignup, formSignup);
       });
     }
 
@@ -189,10 +141,8 @@ class OrcaAuth {
     if (formLogin) {
       formLogin.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const emailEl = document.getElementById('login-email');
-        const passEl = document.getElementById('login-password');
-        const email = emailEl ? emailEl.value.trim() : '';
-        const password = passEl ? passEl.value.trim() : '';
+        const email = document.getElementById('login-email').value.trim();
+        const password = document.getElementById('login-password').value.trim();
         await this.handleLogin(email, password);
       });
     }
@@ -201,12 +151,9 @@ class OrcaAuth {
     if (formSignup) {
       formSignup.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const nameEl = document.getElementById('signup-name');
-        const emailEl = document.getElementById('signup-email');
-        const passEl = document.getElementById('signup-password');
-        const name = nameEl ? nameEl.value.trim() : '';
-        const email = emailEl ? emailEl.value.trim() : '';
-        const password = passEl ? passEl.value.trim() : '';
+        const name = document.getElementById('signup-name').value.trim();
+        const email = document.getElementById('signup-email').value.trim();
+        const password = document.getElementById('signup-password').value.trim();
         await this.handleSignup(name, email, password);
       });
     }
@@ -226,10 +173,21 @@ class OrcaAuth {
   }
 
   openAccessPortal(mode = 'signup') {
-    this.bindModalEvents();
-    this.switchMode(mode);
-
     const backdrop = document.getElementById('orca-auth-modal-backdrop');
+    const tabLogin = document.getElementById('auth-tab-login');
+    const tabSignup = document.getElementById('auth-tab-signup');
+    const formLogin = document.getElementById('auth-form-login');
+    const formSignup = document.getElementById('auth-form-signup');
+    const errorEl = document.getElementById('auth-modal-error');
+
+    if (errorEl) errorEl.style.display = 'none';
+
+    if (mode === 'login') {
+      if (tabLogin) tabLogin.click();
+    } else {
+      if (tabSignup) tabSignup.click();
+    }
+
     if (backdrop) backdrop.style.display = 'flex';
     if (window.lucide) lucide.createIcons();
   }
@@ -241,8 +199,6 @@ class OrcaAuth {
   closeModal() {
     const backdrop = document.getElementById('orca-auth-modal-backdrop');
     if (backdrop) backdrop.style.display = 'none';
-    const errorEl = document.getElementById('auth-modal-error');
-    if (errorEl) errorEl.style.display = 'none';
   }
 
   showError(msg) {
@@ -254,8 +210,9 @@ class OrcaAuth {
   }
 
   async handleSignup(name, email, password) {
-    if (!password || password.length < 4) {
-      this.showError('Password must be at least 4 characters.');
+    // Validation: password must contain only letters and name characters
+    if (!password || !/^[a-zA-Z\s]+$/.test(password)) {
+      this.showError('Security passphrase must contain only letters (A-Z, a-z).');
       return;
     }
 
@@ -267,27 +224,15 @@ class OrcaAuth {
       });
       const res = await resp.json();
       if (!resp.ok || !res.data) {
-        const errMsg = (res.errors && res.errors[0]?.message) || 'Account registration failed';
-        throw new Error(errMsg);
+        throw new Error((res.errors && res.errors[0]?.message) || 'Station registration failed');
       }
-
-      // Reset form
-      const formSignup = document.getElementById('auth-form-signup');
-      if (formSignup) formSignup.reset();
-
       this.saveSession(res.data.user, res.data.token);
       this.closeModal();
       if (window.orcaApp) {
         window.orcaApp.switchView('ask-orca');
       }
     } catch (err) {
-      if (err.message && err.message.toLowerCase().includes('already exists')) {
-        const loginEmail = document.getElementById('login-email');
-        if (loginEmail) loginEmail.value = email;
-        this.showError(`${err.message} You can click "Sign In" above to log into this account.`);
-      } else {
-        this.showError(err.message);
-      }
+      this.showError(err.message);
     }
   }
 
@@ -300,13 +245,8 @@ class OrcaAuth {
       });
       const res = await resp.json();
       if (!resp.ok || !res.data) {
-        throw new Error((res.errors && res.errors[0]?.message) || 'Sign in failed. Check your email and password.');
+        throw new Error((res.errors && res.errors[0]?.message) || 'Officer authentication failed');
       }
-
-      // Reset form
-      const formLogin = document.getElementById('auth-form-login');
-      if (formLogin) formLogin.reset();
-
       this.saveSession(res.data.user, res.data.token);
       this.closeModal();
       if (window.orcaApp) {
@@ -421,13 +361,4 @@ class OrcaAuth {
 }
 
 window.orcaAuth = new OrcaAuth();
-if (typeof document !== 'undefined') {
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      window.orcaAuth.init();
-    });
-  } else {
-    window.orcaAuth.init();
-  }
-}
 

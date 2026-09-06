@@ -8,8 +8,6 @@ class Settings(BaseSettings):
     groq_api_key: str | None = None
     groq_model: str = "openai/gpt-oss-120b"
     google_maps_api_key: str | None = None
-    supabase_url: str | None = None
-    supabase_key: str | None = None
     allowed_origins: str = "*"
     version: str = "0.1.0"
 

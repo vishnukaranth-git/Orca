@@ -26,47 +26,6 @@ class OrcaApp {
     return window.location.port === '3000' ? 'http://localhost:8000' : '';
   }
 
-  getViewFromUrl() {
-    const rawPath = window.location.pathname.toLowerCase().replace(/\/+$/, '') || '/';
-    const ROUTE_MAP = {
-      '/': 'landing',
-      '': 'landing',
-      '/index.html': 'landing',
-      '/landing': 'landing',
-      '/ask-orca': 'ask-orca',
-      '/command-center': 'command',
-      '/command': 'command',
-      '/fishing-zones': 'pfz',
-      '/pfz': 'pfz',
-      '/disaster-watch': 'disasters',
-      '/disasters': 'disasters',
-      '/satellite-lab': 'satellite',
-      '/satellite': 'satellite',
-      '/safe-routes': 'routes',
-      '/routes': 'routes',
-      '/historical-trends': 'historical',
-      '/historical': 'historical',
-      '/what-if': 'simulator',
-      '/simulator': 'simulator'
-    };
-    return ROUTE_MAP[rawPath] || 'landing';
-  }
-
-  getRouteFromView(viewId) {
-    const VIEW_TO_ROUTE = {
-      'landing': '/',
-      'ask-orca': '/ask-orca',
-      'command': '/command-center',
-      'pfz': '/fishing-zones',
-      'disasters': '/disaster-watch',
-      'satellite': '/satellite-lab',
-      'routes': '/safe-routes',
-      'historical': '/historical-trends',
-      'simulator': '/what-if'
-    };
-    return VIEW_TO_ROUTE[viewId] || '/';
-  }
-
   init() {
     console.log("Initializing ORCA Marine Intelligence Platform (Indian Ocean & Asian Waters)...");
 
@@ -83,9 +42,6 @@ class OrcaApp {
     this.simulator.init();
     this.aiAssistant.init();
     this.mapController.init();
-    if (window.orcaAuth) {
-      window.orcaAuth.init();
-    }
 
     this.bindNavigation();
     this.bindRouteControls();
@@ -96,15 +52,8 @@ class OrcaApp {
     this.fetchLiveTelemetry();
     this.loadPFZData();
 
-    // Initial View: Determine from current URL path
-    const initialView = this.getViewFromUrl();
-    this.switchView(initialView, false);
-
-    // Listen for browser navigation (back/forward buttons)
-    window.addEventListener('popstate', (e) => {
-      const targetView = (e.state && e.state.viewId) ? e.state.viewId : this.getViewFromUrl();
-      this.switchView(targetView, false);
-    });
+    // Default view: Full-Screen Cinematic Landing Page
+    this.switchView('landing');
 
     // Popover click-outside dismissal
     document.addEventListener('click', (e) => {
@@ -267,15 +216,8 @@ class OrcaApp {
     }
   }
 
-  switchView(viewId, updateHistory = true) {
+  switchView(viewId) {
     this.currentView = viewId;
-
-    if (updateHistory && typeof window !== 'undefined' && window.history) {
-      const targetPath = this.getRouteFromView(viewId);
-      if (window.location.pathname !== targetPath) {
-        window.history.pushState({ viewId }, '', targetPath);
-      }
-    }
 
     const appContainer = document.getElementById('orca-app');
     if (appContainer) {
@@ -313,9 +255,6 @@ class OrcaApp {
       setTimeout(() => {
         this.mapController.map.invalidateSize();
       }, 100);
-      setTimeout(() => {
-        this.mapController.map.invalidateSize();
-      }, 350);
 
       // Manage view-specific map layers (so routes only appear on safe-routes view, etc.)
       if (this.mapController.layers.routes) {
@@ -1174,49 +1113,8 @@ class OrcaApp {
   }
 }
 
-// Native Fullscreen Controller
-window.toggleOrcaFullscreen = function() {
-  try {
-    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-      const el = document.documentElement;
-      if (el.requestFullscreen) {
-        el.requestFullscreen().catch(err => console.warn("Fullscreen request:", err));
-      } else if (el.webkitRequestFullscreen) {
-        el.webkitRequestFullscreen();
-      } else if (el.msRequestFullscreen) {
-        el.msRequestFullscreen();
-      }
-    } else {
-      if (document.exitFullscreen) {
-        document.exitFullscreen();
-      } else if (document.webkitExitFullscreen) {
-        document.webkitExitFullscreen();
-      } else if (document.msExitFullscreen) {
-        document.msExitFullscreen();
-      }
-    }
-  } catch (e) {
-    console.warn("Fullscreen toggle exception", e);
-  }
-};
-
-const syncFullscreenIcons = () => {
-  const isFull = Boolean(document.fullscreenElement || document.webkitFullscreenElement);
-  document.querySelectorAll('#fullscreen-icon, .fs-icon-state').forEach(ic => {
-    ic.setAttribute('data-lucide', isFull ? 'minimize' : 'maximize');
-  });
-  document.querySelectorAll('.fullscreen-text').forEach(tx => {
-    tx.textContent = isFull ? 'Exit Fullscreen' : 'Fullscreen';
-  });
-  if (window.lucide) lucide.createIcons();
-};
-
-document.addEventListener('fullscreenchange', syncFullscreenIcons);
-document.addEventListener('webkitfullscreenchange', syncFullscreenIcons);
-
 // Global App bootstrap
 window.addEventListener('DOMContentLoaded', () => {
   window.orcaApp = new OrcaApp();
   window.orcaApp.init();
 });
-

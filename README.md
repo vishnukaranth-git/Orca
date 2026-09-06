@@ -188,6 +188,49 @@ python -m pytest tests/test_providers.py
 
 ---
 
+## 🚀 Deploying to Vercel
+
+ORCA is configured for **zero-config full-stack deployment on Vercel** via [`vercel.json`](vercel.json):
+- **Frontend**: Automatically built with Vite (`frontend/dist`) and served globally on Vercel's Edge Network.
+- **Backend API**: Automatically served via Vercel Python Serverless Functions through [`api/index.py`](api/index.py).
+
+### Option 1: Deploy via Vercel Web Dashboard (Recommended)
+
+1. Push your code to GitHub:
+   ```bash
+   git push origin main
+   ```
+2. Go to [Vercel Dashboard](https://vercel.com/new).
+3. Import the repository (`vishnukaranth-git/ocra` or `vishnukaranth-git/Orca`).
+4. In **Project Settings**:
+   - **Framework Preset**: Select `Other` (or Vite) — `vercel.json` automatically manages the build and output directories.
+   - **Build Command**: `cd frontend && npm install && npm run build` (set automatically by `vercel.json`)
+   - **Output Directory**: `frontend/dist` (set automatically by `vercel.json`)
+5. In **Environment Variables**, add:
+   - `GROQ_API_KEY`: Your Groq API key for multi-agent LLM reasoning
+   - `GROQ_MODEL`: `llama-3.3-70b-versatile` (or your preferred model)
+   - `DEMO_MODE`: `true` (or `false` for live data feeds)
+   - `ALLOWED_ORIGINS`: `*`
+6. Click **Deploy**! 🚀
+
+### Option 2: Deploy via Vercel CLI
+
+```bash
+# Install Vercel CLI if not already installed
+npm i -g vercel
+
+# Log in to Vercel
+vercel login
+
+# Deploy to preview
+vercel
+
+# Deploy to production
+vercel --prod
+```
+
+---
+
 ## 📄 License
 
 This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
