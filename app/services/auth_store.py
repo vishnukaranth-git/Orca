@@ -7,8 +7,17 @@ from pathlib import Path
 from datetime import datetime, timezone
 from typing import Dict, List, Optional, Any
 
-DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data"
-DATA_DIR.mkdir(parents=True, exist_ok=True)
+if os.getenv("VERCEL"):
+    DATA_DIR = Path("/tmp/orca_data")
+else:
+    DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data"
+
+try:
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+except Exception:
+    DATA_DIR = Path("/tmp/orca_data")
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+
 USERS_FILE = DATA_DIR / "users.json"
 HISTORY_FILE = DATA_DIR / "chat_history.json"
 
@@ -35,26 +44,35 @@ class AuthHistoryStore:
         }
 
     def _load_data(self):
-        if not USERS_FILE.exists():
-            USERS_FILE.write_text(json.dumps({}), encoding="utf-8")
-        if not HISTORY_FILE.exists():
-            HISTORY_FILE.write_text(json.dumps({}), encoding="utf-8")
-
+        self.users = {}
+        self.history = {}
         try:
-            self.users = json.loads(USERS_FILE.read_text(encoding="utf-8"))
+            if not USERS_FILE.exists():
+                USERS_FILE.write_text(json.dumps({}), encoding="utf-8")
+            else:
+                self.users = json.loads(USERS_FILE.read_text(encoding="utf-8"))
         except Exception:
             self.users = {}
 
         try:
-            self.history = json.loads(HISTORY_FILE.read_text(encoding="utf-8"))
+            if not HISTORY_FILE.exists():
+                HISTORY_FILE.write_text(json.dumps({}), encoding="utf-8")
+            else:
+                self.history = json.loads(HISTORY_FILE.read_text(encoding="utf-8"))
         except Exception:
             self.history = {}
 
     def _save_users(self):
-        USERS_FILE.write_text(json.dumps(self.users, indent=2), encoding="utf-8")
+        try:
+            USERS_FILE.write_text(json.dumps(self.users, indent=2), encoding="utf-8")
+        except Exception:
+            pass
 
     def _save_history(self):
-        HISTORY_FILE.write_text(json.dumps(self.history, indent=2), encoding="utf-8")
+        try:
+            HISTORY_FILE.write_text(json.dumps(self.history, indent=2), encoding="utf-8")
+        except Exception:
+            pass
 
     def _hash_pw(self, password: str) -> str:
         return hashlib.sha256(password.encode("utf-8")).hexdigest()
