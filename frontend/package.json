@@ -9,7 +9,7 @@
     "preview": "vite preview --port 3000",
     "start": "vite --port 3000 --host"
   },
-  "devDependencies": {
+  "dependencies": {
     "vite": "^6.0.0"
   }
 }
