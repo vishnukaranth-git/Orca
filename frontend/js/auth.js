@@ -335,7 +335,7 @@ class OrcaAuth {
                 <span class="sidebar-user-role">Officer · Active</span>
               </div>
             </div>
-            <button class="sidebar-logout-btn" id="btn-sidebar-logout" title="Sign Out / Logout">
+            <button class="sidebar-logout-btn" id="btn-sidebar-logout" title="Sign Out / Logout" onclick="window.orcaAuth && window.orcaAuth.logout()">
               <i data-lucide="log-out"></i>
             </button>
           </div>
@@ -344,9 +344,7 @@ class OrcaAuth {
         if (logoutBtn) {
           logoutBtn.addEventListener('click', (e) => {
             e.stopPropagation();
-            if (confirm(`Operational Officer: ${displayName} (${this.currentUser.email}).\nDo you want to sign out?`)) {
-              this.logout();
-            }
+            this.logout();
           });
         }
       } else {

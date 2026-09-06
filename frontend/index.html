@@ -54,35 +54,35 @@
 
       <div class="sidebar-section-header" data-i18n="nav_section_title">MISSION NAVIGATION</div>
       <nav class="sidebar-nav-list">
-        <button class="nav-tab-btn highlight-tab active" data-view="ask-orca" id="tab-ask-orca">
+        <button class="nav-tab-btn highlight-tab active" data-view="ask-orca" id="tab-ask-orca" onclick="window.orcaApp && window.orcaApp.switchView('ask-orca')">
           <i data-lucide="sparkles"></i>
           <span data-i18n="tab_ask_orca">Ask ORCA</span>
         </button>
-        <button class="nav-tab-btn" data-view="command" id="tab-command">
+        <button class="nav-tab-btn" data-view="command" id="tab-command" onclick="window.orcaApp && window.orcaApp.switchView('command')">
           <i data-lucide="layout-dashboard"></i>
           <span data-i18n="tab_command">Command Center</span>
         </button>
-        <button class="nav-tab-btn" data-view="pfz" id="tab-pfz">
+        <button class="nav-tab-btn" data-view="pfz" id="tab-pfz" onclick="window.orcaApp && window.orcaApp.switchView('pfz')">
           <i data-lucide="fish"></i>
           <span data-i18n="tab_pfz">Fishing Zones</span>
         </button>
-        <button class="nav-tab-btn" data-view="disasters" id="tab-disasters">
+        <button class="nav-tab-btn" data-view="disasters" id="tab-disasters" onclick="window.orcaApp && window.orcaApp.switchView('disasters')">
           <i data-lucide="alert-triangle"></i>
           <span data-i18n="tab_disasters">Disaster Watch</span>
         </button>
-        <button class="nav-tab-btn" data-view="satellite" id="tab-satellite">
+        <button class="nav-tab-btn" data-view="satellite" id="tab-satellite" onclick="window.orcaApp && window.orcaApp.switchView('satellite')">
           <i data-lucide="satellite"></i>
           <span data-i18n="tab_satellite">Satellite Lab</span>
         </button>
-        <button class="nav-tab-btn" data-view="routes" id="tab-routes">
+        <button class="nav-tab-btn" data-view="routes" id="tab-routes" onclick="window.orcaApp && window.orcaApp.switchView('routes')">
           <i data-lucide="navigation"></i>
           <span data-i18n="tab_routes">Safe Routes</span>
         </button>
-        <button class="nav-tab-btn" data-view="historical" id="tab-historical">
+        <button class="nav-tab-btn" data-view="historical" id="tab-historical" onclick="window.orcaApp && window.orcaApp.switchView('historical')">
           <i data-lucide="line-chart"></i>
           <span data-i18n="tab_historical">Historical Trends</span>
         </button>
-        <button class="nav-tab-btn" data-view="simulator" id="tab-simulator">
+        <button class="nav-tab-btn" data-view="simulator" id="tab-simulator" onclick="window.orcaApp && window.orcaApp.switchView('simulator')">
           <i data-lucide="sliders"></i>
           <span data-i18n="tab_simulator">What-If</span>
         </button>
@@ -98,10 +98,10 @@
           </div>
         </div>
         <div class="sidebar-lang-selector" id="sidebar-lang-selector" title="Switch Language (English / ಕನ್ನಡ / हिन्दी / தமிழ்)">
-          <button class="lang-pill-btn active" data-lang="en">EN</button>
-          <button class="lang-pill-btn" data-lang="kn">ಕನ್ನಡ</button>
-          <button class="lang-pill-btn" data-lang="hi">हिन्दी</button>
-          <button class="lang-pill-btn" data-lang="ta">தமிழ்</button>
+          <button class="lang-pill-btn active" data-lang="en" onclick="window.orcaI18n && window.orcaI18n.setLanguage('en')">EN</button>
+          <button class="lang-pill-btn" data-lang="kn" onclick="window.orcaI18n && window.orcaI18n.setLanguage('kn')">ಕನ್ನಡ</button>
+          <button class="lang-pill-btn" data-lang="hi" onclick="window.orcaI18n && window.orcaI18n.setLanguage('hi')">हिन्दी</button>
+          <button class="lang-pill-btn" data-lang="ta" onclick="window.orcaI18n && window.orcaI18n.setLanguage('ta')">தமிழ்</button>
         </div>
       </div>
     </aside>
@@ -482,7 +482,7 @@
           <!-- LEFT: CONVERSATION SESSIONS & CHAT HISTORY -->
           <div class="ask-orca-history-col">
             <div class="history-col-top">
-              <button class="new-chat-btn" id="btn-new-chat">
+              <button class="new-chat-btn" id="btn-new-chat" onclick="window.orcaAIAssistant && window.orcaAIAssistant.startNewChat()">
                 <i data-lucide="plus"></i>
                 <span data-i18n="chat_new_query">New Intelligence Query</span>
               </button>
@@ -515,7 +515,7 @@
                 <div class="hero-chat-input-wrapper">
                   <i data-lucide="sparkles" class="hero-input-icon"></i>
                   <input type="text" id="ask-orca-hero-input" placeholder="Ask ORCA in English, Kannada, Hindi, or Tamil..." autofocus />
-                  <button class="hero-send-btn" id="ask-orca-hero-send" title="Ask ORCA">
+                  <button type="button" class="hero-send-btn" id="ask-orca-hero-send" title="Ask ORCA" onclick="window.orcaAIAssistant && window.orcaAIAssistant.submitQuery(document.getElementById('ask-orca-hero-input').value)">
                     <span data-i18n="btn_hero_ask">Ask ORCA</span>
                     <i data-lucide="arrow-up-right"></i>
                   </button>
@@ -525,15 +525,15 @@
                 <div class="hero-suggestions-container">
                   <div class="suggestions-label" data-i18n="hero_suggested_label">Suggested questions</div>
                   <div class="hero-suggestions-grid">
-                    <button class="hero-suggestion-btn" data-query="Is it safe to fish tomorrow near Mangalore?">
+                    <button type="button" class="hero-suggestion-btn" data-query="Is it safe to fish tomorrow near Mangalore?" onclick="window.orcaAIAssistant && window.orcaAIAssistant.submitQuery('Is it safe to fish tomorrow near Mangalore?')">
                       <i data-lucide="shield"></i>
                       <span>Is it safe to fish tomorrow near Mangalore?</span>
                     </button>
-                    <button class="hero-suggestion-btn" data-query="Where is the nearest PFZ today?">
+                    <button type="button" class="hero-suggestion-btn" data-query="Where is the nearest PFZ today?" onclick="window.orcaAIAssistant && window.orcaAIAssistant.submitQuery('Where is the nearest PFZ today?')">
                       <i data-lucide="fish"></i>
                       <span>Where is the nearest PFZ today?</span>
                     </button>
-                    <button class="hero-suggestion-btn" data-query="Are there any cyclone or high-wave warnings near my location?">
+                    <button type="button" class="hero-suggestion-btn" data-query="Are there any cyclone or high-wave warnings near my location?" onclick="window.orcaAIAssistant && window.orcaAIAssistant.submitQuery('Are there any cyclone or high-wave warnings near my location?')">
                       <i data-lucide="alert-triangle"></i>
                       <span>Are there any cyclone or high-wave warnings near my location?</span>
                     </button>
@@ -552,7 +552,7 @@
               <div class="bottom-chat-input-bar" id="bottom-chat-input-bar">
                 <div class="bottom-input-inner">
                   <input type="text" id="ask-orca-bottom-input" placeholder="Ask ORCA in English or Kannada (e.g. What about afternoon?)..." />
-                  <button class="bottom-send-btn" id="ask-orca-bottom-send" title="Send Query">
+                  <button type="button" class="bottom-send-btn" id="ask-orca-bottom-send" title="Send Query" onclick="window.orcaAIAssistant && window.orcaAIAssistant.submitQuery(document.getElementById('ask-orca-bottom-input').value)">
                     <i data-lucide="arrow-up-right"></i>
                   </button>
                 </div>
