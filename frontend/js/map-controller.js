@@ -841,6 +841,9 @@ class OrcaMapController {
     if (regionKey === 'all') {
       this.locate();
       this.inspectRegion('arabian_sea');
+      if (window.orcaApp && typeof window.orcaApp.syncHistoricalToRegion === 'function') {
+        window.orcaApp.syncHistoricalToRegion('arabian_sea');
+      }
       return;
     }
 
@@ -849,6 +852,10 @@ class OrcaMapController {
 
     this.map.flyToBounds(reg.bounds, { duration: 1.2, padding: [40, 40], maxZoom: reg.zoom });
     this.inspectRegion(regionKey);
+
+    if (window.orcaApp && typeof window.orcaApp.syncHistoricalToRegion === 'function') {
+      window.orcaApp.syncHistoricalToRegion(regionKey);
+    }
   }
 
   flyTo(lat, lng, zoom = 9) {
@@ -1833,12 +1840,20 @@ class OrcaMapController {
     this.layers.historicalStations.clearLayers();
 
     const stations = [
-      { id: 'mangalore', name: "Mangalore Offshore Buoy BD02", pos: [12.9141, 74.8560], depth: "42m", region: "Arabian Sea" },
-      { id: 'kochi', name: "Kochi Deepwater Buoy CB02", pos: [9.9312, 76.2673], depth: "58m", region: "Lakshadweep Basin" },
-      { id: 'mumbai', name: "Mumbai High Climatology Rig", pos: [18.9500, 72.8200], depth: "75m", region: "Maharashtra Shelf" },
-      { id: 'cape', name: "Wadge Bank Ocean Observatory", pos: [7.8500, 77.3000], depth: "64m", region: "Cape Comorin" },
-      { id: 'chennai', name: "Chennai Coastal Buoy BD08", pos: [13.0827, 80.2707], depth: "50m", region: "Bay of Bengal" },
-      { id: 'vizag', name: "Visakhapatnam Deep Trench", pos: [17.6868, 83.2185], depth: "110m", region: "Andhra Basin" }
+      { id: 'mangalore', name: "Mangalore Offshore Buoy BD02", pos: [12.9141, 74.8560], depth: "42m", region: "Arabian Sea (Karnataka)" },
+      { id: 'mumbai', name: "Mumbai High Climatology Rig", pos: [18.9500, 72.8200], depth: "75m", region: "Northern Arabian Sea (Maharashtra)" },
+      { id: 'porbandar', name: "Porbandar Coastal Buoy AD06", pos: [21.6400, 69.5800], depth: "38m", region: "Gujarat Shelf (Arabian Sea)" },
+      { id: 'kochi', name: "Kochi Deepwater Buoy CB02", pos: [9.9312, 76.2673], depth: "58m", region: "Lakshadweep Basin (Kerala)" },
+      { id: 'kavaratti', name: "Kavaratti Coral Observatory", pos: [10.5600, 72.6400], depth: "32m", region: "Lakshadweep Archipelago" },
+      { id: 'cape', name: "Wadge Bank Ocean Observatory", pos: [7.8500, 77.3000], depth: "64m", region: "Cape Comorin / Wadge Bank" },
+      { id: 'mannar', name: "Tuticorin Marine Observatory GM01", pos: [8.7600, 78.2500], depth: "28m", region: "Gulf of Mannar" },
+      { id: 'palk_strait', name: "Rameswaram Sounding Buoy PS01", pos: [9.2800, 79.3100], depth: "14m", region: "Palk Strait & Palk Bay" },
+      { id: 'equatorial', name: "Central RAMA Deep Mooring", pos: [0.0000, 80.5000], depth: "3800m", region: "Equatorial Indian Ocean" },
+      { id: 'chennai', name: "Chennai Coastal Buoy BD08", pos: [13.0827, 80.2707], depth: "50m", region: "Bay of Bengal (Coromandel)" },
+      { id: 'vizag', name: "Visakhapatnam Deep Trench", pos: [17.6868, 83.2185], depth: "110m", region: "Andhra Basin (Bay of Bengal)" },
+      { id: 'paradip', name: "Paradip Deep Mooring BD11", pos: [20.2600, 86.6700], depth: "68m", region: "Northern Bay of Bengal" },
+      { id: 'andaman', name: "Port Blair Offshore Buoy BD10", pos: [11.6234, 92.7265], depth: "85m", region: "Andaman Sea (South Andaman)" },
+      { id: 'nicobar', name: "Great Nicobar Trench Buoy", pos: [7.0000, 93.7500], depth: "420m", region: "Andaman Sea (Nicobar Channel)" }
     ];
 
     stations.forEach(st => {

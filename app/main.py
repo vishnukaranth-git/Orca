@@ -219,7 +219,8 @@ async def query(request: Request, body: QueryRequest):
     result = await service.orchestrator.process_query(
         query=body.query,
         session_id=body.session_id,
-        explicit_location=body.location
+        explicit_location=body.location,
+        language=body.language
     )
     return out(request, result)
 
@@ -231,6 +232,58 @@ async def query_history(request: Request, session_id: str = "default_session"):
 @app.post("/api/query/stream")
 async def query_stream(request: Request, body: QueryRequest):
     return await query(request, body)
+
+# --------------------------------------------------------------------------
+# User Authentication & Chat History Persistence Endpoints
+# --------------------------------------------------------------------------
+from pydantic import BaseModel
+from app.services.auth_store import auth_store
+
+class AuthRegisterRequest(BaseModel):
+    email: str
+    password: str
+    name: str | None = None
+
+class AuthLoginRequest(BaseModel):
+    email: str
+    password: str
+
+class ChatSaveRequest(BaseModel):
+    user_id: str
+    query: str
+    data: dict
+
+@app.post("/api/auth/register")
+async def auth_register(request: Request, body: AuthRegisterRequest):
+    try:
+        res = auth_store.register(body.email, body.password, body.name)
+        return out(request, res)
+    except ValueError as ve:
+        return JSONResponse(
+            status_code=400,
+            content={"success": False, "data": None, "errors": [{"code": "validation_error", "message": str(ve)}]}
+        )
+
+@app.post("/api/auth/login")
+async def auth_login(request: Request, body: AuthLoginRequest):
+    try:
+        res = auth_store.login(body.email, body.password)
+        return out(request, res)
+    except ValueError as ve:
+        return JSONResponse(
+            status_code=400,
+            content={"success": False, "data": None, "errors": [{"code": "auth_error", "message": str(ve)}]}
+        )
+
+@app.get("/api/chat/history")
+async def chat_history(request: Request, user_id: str):
+    history = auth_store.get_user_history(user_id)
+    return out(request, {"history": history, "count": len(history)})
+
+@app.post("/api/chat/save")
+async def chat_save(request: Request, body: ChatSaveRequest):
+    updated = auth_store.append_user_chat(body.user_id, body.query, body.data)
+    return out(request, {"saved": True, "count": len(updated)})
 
 # Mount frontend
 frontend_dir = Path(__file__).resolve().parent.parent / "frontend"

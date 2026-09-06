@@ -132,8 +132,11 @@ class ORCAService:
         marine_hist = await self.ocean.historical_7day(location)
         weather_hist = await self.weather.historical_7day(location)
         return {
+            "sea_name": marine_hist.get("sea_name", "Indian Ocean Basin"),
             "days": marine_hist.get("days", []),
             "wave_heights_m": marine_hist.get("wave_heights_m", []),
+            "swell_wave_heights_m": marine_hist.get("swell_wave_heights_m", []),
+            "wave_periods_s": marine_hist.get("wave_periods_s", []),
             "sst_celsius": marine_hist.get("sst_celsius", []),
             "wind_kmh": weather_hist.get("wind_kmh", []),
             "sources": [marine_hist.get("source"), weather_hist.get("source")]

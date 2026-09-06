@@ -95,6 +95,8 @@ class OrcaSimulator {
     const card = document.getElementById(cardId);
     if (!card) return;
 
+    const t = (k) => (window.orcaI18n ? window.orcaI18n.t(k) : k);
+
     const timeLabel = card.querySelector('.sc-time-label');
     const riskVal = card.querySelector('.sc-risk-val');
     const waveVal = card.querySelector('.sc-wave-val');
@@ -107,7 +109,7 @@ class OrcaSimulator {
 
     const fuelEfficiency = Math.max(45, Math.round(100 - (data.wave_height_m * 14 + data.wind_knots * 1.5)));
 
-    if (timeLabel) timeLabel.textContent = `Departure: ${data.time}`;
+    if (timeLabel) timeLabel.textContent = `${t('sim_departure')} ${data.time}`;
     if (riskVal) riskVal.textContent = `${data.risk.score}/100`;
     if (waveVal) waveVal.textContent = `${data.wave_height_m} m`;
     if (periodVal) periodVal.textContent = `${data.wave_period_s || 7.2} s`;
@@ -117,8 +119,8 @@ class OrcaSimulator {
     if (fuelVal) fuelVal.textContent = `${fuelEfficiency}%`;
 
     if (statusEl) {
-      const level = data.risk.level.toUpperCase();
-      statusEl.textContent = `${level} RISK (${level === 'LOW' ? 'FAVORABLE' : level === 'MODERATE' ? 'CAUTION' : 'HIGH RISK'})`;
+      const level = data.risk.level.toLowerCase();
+      statusEl.textContent = level === 'low' ? t('sim_status_low') : level === 'moderate' ? t('sim_status_mod') : t('sim_status_high');
       statusEl.className = 'sc-safety-status ' + (data.risk.score >= 60 ? 'high' : data.risk.score >= 35 ? 'moderate' : 'low');
     }
   }
@@ -126,6 +128,8 @@ class OrcaSimulator {
   renderComparisonTable(scA, scB) {
     const tbody = document.getElementById('sim-comp-tbody');
     if (!tbody) return;
+
+    const t = (k) => (window.orcaI18n ? window.orcaI18n.t(k) : k);
 
     const fuelA = Math.max(45, Math.round(100 - (scA.wave_height_m * 14 + scA.wind_knots * 1.5)));
     const fuelB = Math.max(45, Math.round(100 - (scB.wave_height_m * 14 + scB.wind_knots * 1.5)));
@@ -137,7 +141,7 @@ class OrcaSimulator {
 
     tbody.innerHTML = `
       <tr>
-        <td><b>Marine Risk Score</b></td>
+        <td><b>${t('sim_risk_score').replace(':', '')}</b></td>
         <td style="color:#22d3b6;text-align:center;font-family:var(--font-mono);font-weight:700;">${scA.risk.score}/100</td>
         <td style="color:#f59e0b;text-align:center;font-family:var(--font-mono);font-weight:700;">${scB.risk.score}/100</td>
         <td style="text-align:right;font-family:var(--font-mono);color:${riskDiff > 0 ? '#22d3b6' : riskDiff < 0 ? '#f59e0b' : '#94a3b8'};">
@@ -145,7 +149,7 @@ class OrcaSimulator {
         </td>
       </tr>
       <tr>
-        <td><b>Significant Wave Swell</b></td>
+        <td><b>${t('sim_wave_swell').replace(':', '')}</b></td>
         <td style="color:#22d3b6;text-align:center;font-family:var(--font-mono);">${scA.wave_height_m} m</td>
         <td style="color:#f59e0b;text-align:center;font-family:var(--font-mono);">${scB.wave_height_m} m</td>
         <td style="text-align:right;font-family:var(--font-mono);color:${waveDiff > 0 ? '#22d3b6' : waveDiff < 0 ? '#f59e0b' : '#94a3b8'};">
@@ -153,7 +157,7 @@ class OrcaSimulator {
         </td>
       </tr>
       <tr>
-        <td><b>Surface Wind Speed</b></td>
+        <td><b>${t('sim_surface_wind').replace(':', '')}</b></td>
         <td style="color:#22d3b6;text-align:center;font-family:var(--font-mono);">${Math.round(scA.wind_knots * 1.852)} km/h</td>
         <td style="color:#f59e0b;text-align:center;font-family:var(--font-mono);">${Math.round(scB.wind_knots * 1.852)} km/h</td>
         <td style="text-align:right;font-family:var(--font-mono);color:${windDiff > 0 ? '#22d3b6' : windDiff < 0 ? '#f59e0b' : '#94a3b8'};">
@@ -161,7 +165,7 @@ class OrcaSimulator {
         </td>
       </tr>
       <tr>
-        <td><b>Catch Potential Window</b></td>
+        <td><b>${t('sim_catch_potential').replace(':', '')}</b></td>
         <td style="color:#22d3b6;text-align:center;font-family:var(--font-mono);">${scA.fishing_suitability_pct || 85}%</td>
         <td style="color:#f59e0b;text-align:center;font-family:var(--font-mono);">${scB.fishing_suitability_pct || 80}%</td>
         <td style="text-align:right;font-family:var(--font-mono);color:${fishDiff > 0 ? '#22d3b6' : fishDiff < 0 ? '#f59e0b' : '#94a3b8'};">
@@ -169,7 +173,7 @@ class OrcaSimulator {
         </td>
       </tr>
       <tr>
-        <td><b>Estimated Fuel Economy</b></td>
+        <td><b>${t('sim_fuel_eff').replace(':', '')}</b></td>
         <td style="color:#22d3b6;text-align:center;font-family:var(--font-mono);">${fuelA}%</td>
         <td style="color:#f59e0b;text-align:center;font-family:var(--font-mono);">${fuelB}%</td>
         <td style="text-align:right;font-family:var(--font-mono);color:${fuelA >= fuelB ? '#22d3b6' : '#f59e0b'};">

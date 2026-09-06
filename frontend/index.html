@@ -10,10 +10,10 @@
   <!-- Valley Sans Font Preload -->
   <link rel="preload" href="fonts/ValleySans-Variable.woff2" as="font" type="font/woff2" crossorigin>
 
-  <!-- Google Fonts & JetBrains Mono -->
+  <!-- Google Fonts & JetBrains Mono & Playfair Display -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
   
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
@@ -48,71 +48,61 @@
         </div>
         <div class="brand-title-group">
           <h1>ORCA</h1>
-          <p>OCEAN INTELLIGENCE</p>
+          <p data-i18n="brand_subtitle">OCEAN INTELLIGENCE</p>
         </div>
       </div>
 
-      <!-- Tactical Mission Telemetry Badge -->
-      <div class="sidebar-telemetry-strip">
-        <div class="telemetry-pill">
-          <span class="pulse-led-green"></span>
-          <span>SYS STATUS: ONLINE</span>
-        </div>
-        <div class="telemetry-coords-line">
-          <span>DEPTH: 4,812M</span> &middot; <span>IO-BASIN</span>
-        </div>
-      </div>
-
-      <div class="sidebar-section-header">MISSION NAVIGATION</div>
+      <div class="sidebar-section-header" data-i18n="nav_section_title">MISSION NAVIGATION</div>
       <nav class="sidebar-nav-list">
         <button class="nav-tab-btn highlight-tab active" data-view="ask-orca" id="tab-ask-orca">
           <i data-lucide="sparkles"></i>
-          <span>Ask ORCA</span>
+          <span data-i18n="tab_ask_orca">Ask ORCA</span>
         </button>
         <button class="nav-tab-btn" data-view="command" id="tab-command">
           <i data-lucide="layout-dashboard"></i>
-          <span>Command Center</span>
+          <span data-i18n="tab_command">Command Center</span>
         </button>
         <button class="nav-tab-btn" data-view="pfz" id="tab-pfz">
           <i data-lucide="fish"></i>
-          <span>Fishing Zones</span>
+          <span data-i18n="tab_pfz">Fishing Zones</span>
         </button>
         <button class="nav-tab-btn" data-view="disasters" id="tab-disasters">
           <i data-lucide="alert-triangle"></i>
-          <span>Disaster Watch</span>
+          <span data-i18n="tab_disasters">Disaster Watch</span>
         </button>
         <button class="nav-tab-btn" data-view="satellite" id="tab-satellite">
           <i data-lucide="satellite"></i>
-          <span>Satellite Lab</span>
+          <span data-i18n="tab_satellite">Satellite Lab</span>
         </button>
         <button class="nav-tab-btn" data-view="routes" id="tab-routes">
           <i data-lucide="navigation"></i>
-          <span>Safe Routes</span>
+          <span data-i18n="tab_routes">Safe Routes</span>
         </button>
         <button class="nav-tab-btn" data-view="historical" id="tab-historical">
           <i data-lucide="line-chart"></i>
-          <span>Historical Trends</span>
+          <span data-i18n="tab_historical">Historical Trends</span>
         </button>
         <button class="nav-tab-btn" data-view="simulator" id="tab-simulator">
           <i data-lucide="sliders"></i>
-          <span>What-If</span>
+          <span data-i18n="tab_simulator">What-If</span>
         </button>
       </nav>
 
       <div class="sidebar-footer">
+        <div class="sidebar-user-card" id="sidebar-user-card"></div>
         <div class="sidebar-bottom-badge">
           <div class="sidebar-status-dot"></div>
           <div class="sidebar-status-text">
-            <span class="status-title">ORCA AGENTS</span>
-            <span class="status-sub">7 Core Active · IO Basin</span>
+            <span class="status-title" data-i18n="sidebar_agents_title">ORCA AGENTS</span>
+            <span class="status-sub" data-i18n="sidebar_agents_sub">7 Core Active · IO Basin</span>
           </div>
         </div>
-        <div class="sidebar-telemetry-meta">
-          <span>ORBIT: SENTINEL-1/3 SYNC</span>
+        <div class="sidebar-lang-selector" id="sidebar-lang-selector" title="Switch Language (English / ಕನ್ನಡ / हिन्दी / தமிழ்)">
+          <button class="lang-pill-btn active" data-lang="en">EN</button>
+          <button class="lang-pill-btn" data-lang="kn">ಕನ್ನಡ</button>
+          <button class="lang-pill-btn" data-lang="hi">हिन्दी</button>
+          <button class="lang-pill-btn" data-lang="ta">தமிழ்</button>
         </div>
-        <button class="lang-toggle-btn sidebar-lang-btn" id="lang-toggle" title="Switch Language (English / Kannada)">
-          <span>EN</span> | <span style="opacity:0.6;">ಕನ್ನಡ</span>
-        </button>
       </div>
     </aside>
 
@@ -134,19 +124,19 @@
             </button>
             <button class="map-ctrl-btn" onclick="orcaApp.mapController.locate()" title="Center on India & Indian Ocean Basin">
               <i data-lucide="crosshair" style="width:13px;height:13px;"></i>
-              <span>Locate</span>
+              <span data-i18n="hud_locate">Locate</span>
             </button>
             <button class="map-ctrl-btn active" id="btn-toggle-basemap" onclick="orcaApp.toggleBasemapMode()" title="Toggle Satellite Imagery / Tactical Dark Basemap">
               <i data-lucide="globe" style="width:13px;height:13px;"></i>
-              <span id="basemap-mode-label">Satellite</span>
+              <span id="basemap-mode-label" data-i18n="hud_satellite">Satellite</span>
             </button>
             <button class="map-ctrl-btn" id="btn-toggle-streetview-coverage" onclick="orcaApp.mapController.toggleStreetViewCoverage()" title="Toggle Google Street View Coverage Overlay">
               <i data-lucide="camera" style="width:13px;height:13px;"></i>
-              <span>Street View</span>
+              <span data-i18n="hud_streetview">Street View</span>
             </button>
             <button class="map-ctrl-btn" id="btn-toggle-layers-popover" onclick="orcaApp.toggleLayersPopover()" title="Map Overlays & Feature Layers">
               <i data-lucide="layers" style="width:13px;height:13px;"></i>
-              <span>Layers</span>
+              <span data-i18n="hud_layers">Layers</span>
             </button>
           </div>
         </div>
@@ -166,7 +156,7 @@
             <div class="streetview-actions">
               <button class="streetview-return-btn" id="streetview-return-btn" onclick="orcaApp.mapController.closeStreetView()" title="Return to ORCA Satellite Map (Esc)">
                 <i data-lucide="arrow-left" style="width:14px;height:14px;"></i>
-                <span>RETURN TO SATELLITE MAP</span>
+                <span data-i18n="sv_return">RETURN TO SATELLITE MAP</span>
               </button>
             </div>
           </div>
@@ -197,7 +187,7 @@
 
         <!-- Minimal Geographic Region Selector Pill -->
         <div class="map-region-selector-bar">
-          <span class="region-selector-tag"><i data-lucide="compass" style="width:11px;height:11px;color:var(--accent-aqua);"></i> SECTORS</span>
+          <span class="region-selector-tag"><i data-lucide="compass" style="width:11px;height:11px;color:var(--accent-aqua);"></i> <span data-i18n="sec_tag">SECTORS</span></span>
           <button class="region-selector-pill active" data-region="all" onclick="orcaApp.mapController.focusRegion('all')">All Basin</button>
           <button class="region-selector-pill" data-region="arabian_sea" onclick="orcaApp.mapController.focusRegion('arabian_sea')">Arabian Sea</button>
           <button class="region-selector-pill" data-region="bay_of_bengal" onclick="orcaApp.mapController.focusRegion('bay_of_bengal')">Bay of Bengal</button>
@@ -210,40 +200,40 @@
 
         <!-- Layers Dropdown Popover (Controlled by Layers Button) -->
         <div class="map-layers-popover" id="map-layers-popover" style="display:none;">
-          <div style="font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.08em;color:var(--accent-cyan);border-bottom:1px solid rgba(36,160,200,0.2);padding-bottom:4px;margin-bottom:2px;">GEOSPATIAL LAYERS</div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.08em;color:var(--accent-cyan);border-bottom:1px solid rgba(36,160,200,0.2);padding-bottom:4px;margin-bottom:2px;" data-i18n="layers_header">GEOSPATIAL LAYERS</div>
           <label class="layer-toggle-row">
-            <span>Satellite Labels &amp; Borders</span>
+            <span data-i18n="layer_labels">Satellite Labels &amp; Borders</span>
             <input type="checkbox" checked onchange="orcaApp.mapController.toggleLayer('labels', this.checked)">
           </label>
           <label class="layer-toggle-row">
             <span style="display:flex;align-items:center;gap:6px;">
               <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#38bdf8;box-shadow:0 0 6px #38bdf8;"></span>
-              Street View Coverage
+              <span data-i18n="layer_streetview">Street View Coverage</span>
             </span>
             <input type="checkbox" id="layer-toggle-streetview" onchange="orcaApp.mapController.toggleLayer('streetviewCoverage', this.checked)">
           </label>
           <label class="layer-toggle-row">
-            <span>Ocean Basins &amp; Sectors</span>
+            <span data-i18n="layer_basins">Ocean Basins &amp; Sectors</span>
             <input type="checkbox" checked onchange="orcaApp.mapController.toggleLayer('oceanRegions', this.checked)">
           </label>
           <label class="layer-toggle-row">
-            <span>Potential Fishing Zones (PFZ)</span>
+            <span data-i18n="layer_pfz">Potential Fishing Zones (PFZ)</span>
             <input type="checkbox" checked onchange="orcaApp.mapController.toggleLayer('pfz', this.checked)">
           </label>
           <label class="layer-toggle-row">
-            <span>Restricted Maritime Zones</span>
+            <span data-i18n="layer_restricted">Restricted Maritime Zones</span>
             <input type="checkbox" checked onchange="orcaApp.mapController.toggleLayer('restricted', this.checked)">
           </label>
           <label class="layer-toggle-row">
-            <span>Marine Hazard Alerts</span>
+            <span data-i18n="layer_hazards">Marine Hazard Alerts</span>
             <input type="checkbox" checked onchange="orcaApp.mapController.toggleLayer('hazards', this.checked)">
           </label>
           <label class="layer-toggle-row">
-            <span>AIS Vessels</span>
+            <span data-i18n="layer_vessels">AIS Vessels</span>
             <input type="checkbox" checked onchange="orcaApp.mapController.toggleLayer('vessels', this.checked)">
           </label>
           <label class="layer-toggle-row">
-            <span>Indian EEZ Boundary</span>
+            <span data-i18n="layer_eez">Indian EEZ Boundary</span>
             <input type="checkbox" checked onchange="orcaApp.mapController.toggleLayer('eez', this.checked)">
           </label>
         </div>
@@ -253,6 +243,217 @@
           <span id="map-scale-text">100 km</span>
           <div class="scale-line"></div>
         </div>
+      </div>
+
+      <!-- VIEW 0: STANDALONE FULL-SCREEN CINEMATIC LANDING HERO & OVERVIEW -->
+      <div class="view-panel active" id="view-landing">
+        
+        <!-- Persistent Full-Page Background Video using provided video from project folder -->
+        <div class="landing-hero-video-wrap">
+          <video class="hero-video-bg" autoplay loop muted playsinline disablePictureInPicture controlsList="nodownload nofullscreen noremoteplayback" poster="ocean_satellite_bg.jpg" id="landing-hero-video">
+            <source src="satellite_ocean_bg.mp4" type="video/mp4">
+          </video>
+          <!-- Very subtle readability overlay: localized transparent gradient to protect text contrast without washing out video -->
+          <div class="landing-video-overlay-subtle"></div>
+        </div>
+
+        <!-- 100vh Full-Screen Cinematic Hero Container -->
+        <div class="landing-hero-100vh" id="landing-hero-container">
+
+          <!-- Minimal Transparent Top Navigation Bar Overlay -->
+          <header class="landing-top-nav">
+            <!-- Left: Brand -->
+            <div class="landing-nav-brand" onclick="orcaApp.switchView('landing')">
+              <div class="brand-logo-hud">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3 8c3-2 6-2 9 0s6 2 9 0"/><path d="M3 12c3-2 6-2 9 0s6 2 9 0"/><path d="M3 16c3-2 6-2 9 0s6 2 9 0"/></svg>
+              </div>
+              <div class="brand-title-group">
+                <h1>ORCA</h1>
+                <p>OCEAN INTELLIGENCE</p>
+              </div>
+            </div>
+
+            <!-- Right: Language Selector -->
+            <div class="landing-nav-right">
+              <div class="landing-lang-selector" title="Language Switcher">
+                <button class="lang-pill-btn active" data-lang="en">EN</button>
+                <button class="lang-pill-btn" data-lang="kn">ಕನ್ನಡ</button>
+                <button class="lang-pill-btn" data-lang="hi">हिन्दी</button>
+                <button class="lang-pill-btn" data-lang="ta">தமிழ்</button>
+              </div>
+            </div>
+          </header>
+
+          <!-- Main Hero Content Box (Center-Left Negative Space) -->
+          <div class="landing-hero-body">
+            <div class="landing-eyebrow">
+              <i data-lucide="sparkles"></i>
+              <span data-i18n="landing_hero_eyebrow">AI-POWERED MARINE INTELLIGENCE</span>
+            </div>
+            <h1 class="landing-headline" data-i18n="landing_hero_headline">
+              From Ocean Data<br>
+              to Actionable Intelligence.
+            </h1>
+            <p class="landing-subtext" data-i18n="landing_hero_subtext">
+              Ask complex marine questions in natural language. Discover evidence, analyze ocean conditions, and make informed decisions.
+            </p>
+            <div class="landing-cta-group">
+              <button class="landing-primary-cta" onclick="orcaAuth.openAccessPortal('signup')">
+                <span data-i18n="landing_cta_generate">Generate Analysis</span>
+                <i data-lucide="arrow-right"></i>
+              </button>
+              <button class="landing-secondary-cta" onclick="document.getElementById('landing-workflow-section')?.scrollIntoView({ behavior: 'smooth' });">
+                <span data-i18n="landing_cta_explore">Explore ORCA</span>
+                <i data-lucide="chevron-down"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 11: Below-Hero Workflow Section (Light Theme) -->
+        <section class="landing-section-light" id="landing-workflow-section">
+          <div class="landing-section-container">
+            <div class="landing-section-header">
+              <span class="landing-sec-eyebrow" data-i18n="landing_reasoning_eyebrow">MULTI-AGENT REASONING</span>
+              <h2 class="landing-sec-title" data-i18n="landing_reasoning_title">How ORCA Turns Questions Into Intelligence</h2>
+              <p class="landing-sec-subtitle" data-i18n="landing_reasoning_sub">Six deterministic stages that ground every response in verifiable physical oceanography.</p>
+            </div>
+            <div class="landing-workflow-grid">
+              <div class="landing-wf-card">
+                <div class="landing-wf-num">01</div>
+                <div class="landing-wf-name" data-i18n="landing_wf_01_name">ASK</div>
+                <p class="landing-wf-desc" data-i18n="landing_wf_01_desc">Ask a marine question in natural language.</p>
+              </div>
+              <div class="landing-wf-card">
+                <div class="landing-wf-num">02</div>
+                <div class="landing-wf-name" data-i18n="landing_wf_02_name">PLAN</div>
+                <p class="landing-wf-desc" data-i18n="landing_wf_02_desc">Understand intent and decompose the task.</p>
+              </div>
+              <div class="landing-wf-card">
+                <div class="landing-wf-num">03</div>
+                <div class="landing-wf-name" data-i18n="landing_wf_03_name">DISCOVER</div>
+                <p class="landing-wf-desc" data-i18n="landing_wf_03_desc">Select relevant data sources and tools.</p>
+              </div>
+              <div class="landing-wf-card">
+                <div class="landing-wf-num">04</div>
+                <div class="landing-wf-name" data-i18n="landing_wf_04_name">ANALYZE</div>
+                <p class="landing-wf-desc" data-i18n="landing_wf_04_desc">Specialized agents analyze the required marine information.</p>
+              </div>
+              <div class="landing-wf-card">
+                <div class="landing-wf-num">05</div>
+                <div class="landing-wf-name" data-i18n="landing_wf_05_name">VALIDATE</div>
+                <p class="landing-wf-desc" data-i18n="landing_wf_05_desc">Cross-agent evidence is compared and validated.</p>
+              </div>
+              <div class="landing-wf-card">
+                <div class="landing-wf-num">06</div>
+                <div class="landing-wf-name" data-i18n="landing_wf_06_name">EXPLAIN</div>
+                <p class="landing-wf-desc" data-i18n="landing_wf_06_desc">Generate a clear evidence-based response.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Section 13: Scientific Foundation -->
+        <section class="landing-section-light" id="landing-science-section">
+          <div class="landing-section-container">
+            <div class="landing-section-header">
+              <span class="landing-sec-eyebrow" data-i18n="landing_science_eyebrow">EARTH OBSERVATION &amp; OCEANOGRAPHY</span>
+              <h2 class="landing-sec-title" data-i18n="landing_science_title">Built on Marine Science &amp; Earth Observation</h2>
+              <p class="landing-sec-subtitle" data-i18n="landing_science_sub">Real sources, operational datasets, and peer-reviewed numerical models powering ORCA.</p>
+            </div>
+
+            <div class="landing-science-grid">
+              <!-- Source 1 -->
+              <div class="landing-science-card">
+                <div class="sci-badge">SOURCE 01</div>
+                <h3 class="sci-name">INCOIS Ocean State Forecasting (OSF)</h3>
+                <div class="sci-field">
+                  <span class="sci-lbl">WHAT IT PROVIDES:</span>
+                  <p class="sci-val">Directional wave spectra, significant wave height (Hs), peak swell period (Tp), and ocean surface currents.</p>
+                </div>
+                <div class="sci-field">
+                  <span class="sci-lbl">HOW ORCA USES IT:</span>
+                  <p class="sci-val">Evaluates hydrodynamic boarding risk and establishes safe operational thresholds for coastal and offshore vessels.</p>
+                </div>
+                <div class="sci-field">
+                  <span class="sci-lbl">REFERENCE:</span>
+                  <p class="sci-val ref">INCOIS, Ministry of Earth Sciences (MoES), Govt. of India (WaveWatch III &amp; SWAN Numerical Ingestion).</p>
+                </div>
+              </div>
+
+              <!-- Source 2 -->
+              <div class="landing-science-card">
+                <div class="sci-badge">SOURCE 02</div>
+                <h3 class="sci-name">PFZ Thermal &amp; Chlorophyll Convergence</h3>
+                <div class="sci-field">
+                  <span class="sci-lbl">WHAT IT PROVIDES:</span>
+                  <p class="sci-val">Copernicus Sentinel-3 OLCI Chlorophyll-a paired with MODIS/VIIRS Sea Surface Temperature (SST) fronts.</p>
+                </div>
+                <div class="sci-field">
+                  <span class="sci-lbl">HOW ORCA USES IT:</span>
+                  <p class="sci-val">Identifies oceanic frontal zones and upwelling dynamic boundaries for optimized, fuel-efficient pelagic fishing.</p>
+                </div>
+                <div class="sci-field">
+                  <span class="sci-lbl">REFERENCE:</span>
+                  <p class="sci-val ref">Solanki et al., INCOIS Multi-Sensor Potential Fishing Zone (PFZ) Methodology &amp; Validation Protocol.</p>
+                </div>
+              </div>
+
+              <!-- Source 3 -->
+              <div class="landing-science-card">
+                <div class="sci-badge">SOURCE 03</div>
+                <h3 class="sci-name">Copernicus ERA5 Ocean Climatology</h3>
+                <div class="sci-field">
+                  <span class="sci-lbl">WHAT IT PROVIDES:</span>
+                  <p class="sci-val">30-day ocean reanalysis baselines, historical wave climatology, and Sea Surface Temperature anomaly deltas.</p>
+                </div>
+                <div class="sci-field">
+                  <span class="sci-lbl">HOW ORCA USES IT:</span>
+                  <p class="sci-val">Differentiates normal seasonal monsoon patterns from abnormal marine heatwaves and hydrodynamic hazards.</p>
+                </div>
+                <div class="sci-field">
+                  <span class="sci-lbl">REFERENCE:</span>
+                  <p class="sci-val ref">ECMWF / Copernicus Climate Change Service (ERA5 Global Marine Meteorological Reanalysis).</p>
+                </div>
+              </div>
+
+              <!-- Source 4 -->
+              <div class="landing-science-card">
+                <div class="sci-badge">SOURCE 04</div>
+                <h3 class="sci-name">Authoritative Disaster Bulletins (GDACS &amp; USGS)</h3>
+                <div class="sci-field">
+                  <span class="sci-lbl">WHAT IT PROVIDES:</span>
+                  <p class="sci-val">Global Disaster Alert and Coordination System cyclone tracks, storm surge warnings, and seismic tsunami advisories.</p>
+                </div>
+                <div class="sci-field">
+                  <span class="sci-lbl">HOW ORCA USES IT:</span>
+                  <p class="sci-val">Strict authoritative ingestion ensures zero simulated tsunamis or false alarms, upholding maritime safety honesty.</p>
+                </div>
+                <div class="sci-field">
+                  <span class="sci-lbl">REFERENCE:</span>
+                  <p class="sci-val ref">UN/EC GDACS &amp; UNESCO/IOC Indian Ocean Tsunami Warning and Mitigation System (IOTWMS).</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Minimal Light Footer -->
+        <footer class="landing-footer-light">
+          <div class="landing-footer-inner">
+            <div class="landing-footer-brand">
+              <span class="landing-footer-logo">ORCA</span>
+              <span class="landing-footer-sub">Ocean Reasoning &amp; Collaborative Agents &middot; Grounded in Marine Science &middot; Indian Ocean Basin</span>
+            </div>
+            <div class="landing-footer-links">
+              <button onclick="orcaApp.switchView('ask-orca')">Ask ORCA</button>
+              <button onclick="orcaApp.switchView('command')">Command Center</button>
+              <button onclick="orcaApp.switchView('pfz')">Fishing Zones</button>
+              <button onclick="orcaApp.switchView('disasters')">Disaster Watch</button>
+            </div>
+          </div>
+        </footer>
+
       </div>
 
       <!-- VIEW 1: COMMAND CENTER (Map-First Experience) -->
@@ -275,7 +476,7 @@
       </div>
 
       <!-- VIEW 2: ASK ORCA — PRIMARY AGENTIC AI EXPERIENCE -->
-      <div class="view-panel active" id="view-ask-orca">
+      <div class="view-panel" id="view-ask-orca">
         <div class="ask-orca-chat-layout">
           
           <!-- LEFT: CONVERSATION SESSIONS & CHAT HISTORY -->
@@ -283,12 +484,12 @@
             <div class="history-col-top">
               <button class="new-chat-btn" id="btn-new-chat">
                 <i data-lucide="plus"></i>
-                <span>New Intelligence Query</span>
+                <span data-i18n="chat_new_query">New Intelligence Query</span>
               </button>
             </div>
             <div class="col-header">
               <i data-lucide="history"></i>
-              <span>RECENT QUERIES</span>
+              <span data-i18n="chat_recent_queries">RECENT QUERIES</span>
             </div>
             <div class="history-list" id="ask-orca-history-list">
               <!-- Dynamically populated from session history -->
@@ -298,46 +499,45 @@
           <!-- MAIN CONVERSATIONAL CHAT AREA -->
           <div class="ask-orca-main-area">
             
-            <!-- INITIAL CHATGPT-LIKE HERO SCREEN (Shown when thread is empty) -->
+            <!-- INITIAL HERO PROMPT SCREEN — ASK ORCA WORKSPACE -->
             <div class="ask-orca-hero-view" id="ask-orca-hero-view">
-              <div class="hero-brand-badge">
-                <div class="hero-logo-orb">
-                  <i data-lucide="compass" style="width:28px;height:28px;color:var(--accent-aqua);"></i>
+              <div class="ask-orca-workspace-hero">
+                <div class="workspace-hero-brand">
+                  <div class="workspace-sparkle-badge">
+                    <i data-lucide="sparkles"></i>
+                    <span>AI-POWERED MARINE INTELLIGENCE</span>
+                  </div>
+                  <h2 class="workspace-title">What would you like to know about the ocean?</h2>
+                  <p class="workspace-subtitle">Ask real-time questions about sea state, fishing zones, cyclones, currents, or navigation safety across the Indian Ocean.</p>
                 </div>
-                <h1 class="hero-title">ASK ORCA</h1>
-                <p class="hero-subtitle">Ocean Intelligence Assistant</p>
-              </div>
 
-              <p class="hero-description">
-                Ask anything about the ocean, marine conditions, fishing zones, weather, safety, routes, disasters, satellite observations, or coastal conditions.
-              </p>
+                <!-- Interactive Chat Input Box -->
+                <div class="hero-chat-input-wrapper">
+                  <i data-lucide="sparkles" class="hero-input-icon"></i>
+                  <input type="text" id="ask-orca-hero-input" placeholder="Ask ORCA in English, Kannada, Hindi, or Tamil..." autofocus />
+                  <button class="hero-send-btn" id="ask-orca-hero-send" title="Ask ORCA">
+                    <span data-i18n="btn_hero_ask">Ask ORCA</span>
+                    <i data-lucide="arrow-up-right"></i>
+                  </button>
+                </div>
 
-              <!-- Large Centered Input Box -->
-              <div class="hero-chat-input-wrapper">
-                <i data-lucide="sparkles" class="hero-input-icon"></i>
-                <input type="text" id="ask-orca-hero-input" placeholder="Ask ORCA anything..." autofocus />
-                <button class="hero-send-btn" id="ask-orca-hero-send" title="Ask ORCA">
-                  <span>Ask ORCA</span>
-                  <i data-lucide="arrow-up-right"></i>
-                </button>
-              </div>
-
-              <!-- Spacing 25px -->
-              <div class="hero-suggestions-container">
-                <div class="suggestions-label">Suggested questions</div>
-                <div class="hero-suggestions-grid">
-                  <button class="hero-suggestion-btn" data-query="Is it safe to fish tomorrow near Mangalore?">
-                    <i data-lucide="shield"></i>
-                    <span>Is it safe to fish tomorrow near Mangalore?</span>
-                  </button>
-                  <button class="hero-suggestion-btn" data-query="Where is the nearest PFZ today?">
-                    <i data-lucide="fish"></i>
-                    <span>Where is the nearest PFZ today?</span>
-                  </button>
-                  <button class="hero-suggestion-btn" data-query="Are there any cyclone or high-wave warnings near my location?">
-                    <i data-lucide="alert-triangle"></i>
-                    <span>Are there any cyclone or high-wave warnings near my location?</span>
-                  </button>
+                <!-- Quick Suggested Questions -->
+                <div class="hero-suggestions-container">
+                  <div class="suggestions-label" data-i18n="hero_suggested_label">Suggested questions</div>
+                  <div class="hero-suggestions-grid">
+                    <button class="hero-suggestion-btn" data-query="Is it safe to fish tomorrow near Mangalore?">
+                      <i data-lucide="shield"></i>
+                      <span>Is it safe to fish tomorrow near Mangalore?</span>
+                    </button>
+                    <button class="hero-suggestion-btn" data-query="Where is the nearest PFZ today?">
+                      <i data-lucide="fish"></i>
+                      <span>Where is the nearest PFZ today?</span>
+                    </button>
+                    <button class="hero-suggestion-btn" data-query="Are there any cyclone or high-wave warnings near my location?">
+                      <i data-lucide="alert-triangle"></i>
+                      <span>Are there any cyclone or high-wave warnings near my location?</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -474,21 +674,21 @@
           <!-- Top Mission Control Header -->
           <div class="pfz-browser-header">
             <div class="pfz-browser-title-wrap">
-              <span class="pfz-browser-badge"><i data-lucide="fish" style="width:12px;height:12px;"></i> SATELLITE DERIVED · INCOIS METHODOLOGY</span>
-              <h2>POTENTIAL FISHING ZONES (INDIAN WATERS &amp; EEZ)</h2>
-              <p class="subtitle">Multi-Factor Explainable PFZ Intelligence · Chlorophyll-a &amp; SST Thermal Fronts</p>
+              <span class="pfz-browser-badge"><i data-lucide="fish" style="width:12px;height:12px;"></i> <span data-i18n="pfz_badge">SATELLITE DERIVED · INCOIS METHODOLOGY</span></span>
+              <h2 data-i18n="pfz_title">POTENTIAL FISHING ZONES (INDIAN WATERS &amp; EEZ)</h2>
+              <p class="subtitle" data-i18n="pfz_subtitle">Multi-Factor Explainable PFZ Intelligence · Chlorophyll-a &amp; SST Thermal Fronts</p>
             </div>
             <div class="pfz-browser-header-actions">
               <div class="dock-actions">
-                <button class="filter-btn" data-sort="all">All</button>
-                <button class="filter-btn active" data-sort="best">Best Overall</button>
-                <button class="filter-btn" data-sort="nearest">Nearest</button>
-                <button class="filter-btn" data-sort="safest">Safest</button>
-                <button class="filter-btn" data-sort="potential">Highest Catch</button>
+                <button class="filter-btn" data-sort="all" data-i18n="filter_all">All</button>
+                <button class="filter-btn active" data-sort="best" data-i18n="filter_best">Best Overall</button>
+                <button class="filter-btn" data-sort="nearest" data-i18n="filter_nearest">Nearest</button>
+                <button class="filter-btn" data-sort="safest" data-i18n="filter_safest">Safest</button>
+                <button class="filter-btn" data-sort="potential" data-i18n="filter_potential">Highest Catch</button>
               </div>
               <button class="pfz-view-map-cta-btn" onclick="orcaApp.switchView('command')" title="Open Interactive Satellite Map">
                 <i data-lucide="map" style="width:14px;height:14px;"></i>
-                <span>VIEW ON MAP</span>
+                <span data-i18n="btn_view_on_map">VIEW ON MAP</span>
               </button>
             </div>
           </div>
@@ -496,19 +696,19 @@
           <!-- Live Telemetry KPI Bar -->
           <div class="pfz-telemetry-banner">
             <div class="pfz-banner-item">
-              <span class="lbl">OPERATIONAL ZONES</span>
-              <span class="val highlight">8 ACTIVE SECTORS</span>
+              <span class="lbl" data-i18n="pfz_lbl_operational_zones">OPERATIONAL ZONES</span>
+              <span class="val highlight" data-i18n="pfz_lbl_active_sectors">8 ACTIVE SECTORS</span>
             </div>
             <div class="pfz-banner-item">
-              <span class="lbl">EO SENSORS</span>
+              <span class="lbl" data-i18n="pfz_lbl_eo_sensors">EO SENSORS</span>
               <span class="val">EOS-06 OCM-3 &amp; SENTINEL-3</span>
             </div>
             <div class="pfz-banner-item">
-              <span class="lbl">ACTIVE SORT / FILTER</span>
+              <span class="lbl" data-i18n="pfz_lbl_active_sort">ACTIVE SORT / FILTER</span>
               <span class="val highlight" id="pfz-active-filter-label">BEST OVERALL</span>
             </div>
             <div class="pfz-banner-item">
-              <span class="lbl">COASTAL REFERENCE ORIGIN</span>
+              <span class="lbl" data-i18n="pfz_lbl_coastal_origin">COASTAL REFERENCE ORIGIN</span>
               <span class="val" id="pfz-reference-hub-label">NEW MANGALORE (12.91°N, 74.86°E)</span>
             </div>
           </div>
@@ -528,15 +728,15 @@
           <!-- Top Mission Control Header -->
           <div class="disaster-browser-header">
             <div class="disaster-browser-title-wrap">
-              <span class="disaster-browser-badge"><i data-lucide="shield-alert" style="width:12px;height:12px;"></i> GDACS · USGS · INCOIS OFFICIAL BULLETINS</span>
-              <h2>DISASTER WATCH &amp; MARITIME HAZARD MONITOR</h2>
-              <p class="subtitle">Live Global &amp; Regional Marine Intelligence · Cyclones, Storm Surges &amp; Seismic Advisories</p>
+              <span class="disaster-browser-badge"><i data-lucide="shield-alert" style="width:12px;height:12px;"></i> <span data-i18n="disaster_badge">GDACS · USGS · INCOIS OFFICIAL BULLETINS</span></span>
+              <h2 data-i18n="disaster_title">DISASTER WATCH &amp; MARITIME HAZARD MONITOR</h2>
+              <p class="subtitle" data-i18n="disaster_subtitle">Live Global &amp; Regional Marine Intelligence · Cyclones, Storm Surges &amp; Seismic Advisories</p>
             </div>
             <div class="disaster-browser-header-actions">
-              <span class="official-seal-tag">OFFICIAL BULLETINS ONLY</span>
+              <span class="official-seal-tag" data-i18n="disaster_official_tag">OFFICIAL BULLETINS ONLY</span>
               <button class="disaster-view-map-cta-btn" onclick="orcaApp.switchView('command')" title="Open Interactive Satellite Map">
                 <i data-lucide="map" style="width:14px;height:14px;"></i>
-                <span>VIEW ON MAP</span>
+                <span data-i18n="btn_view_on_map">VIEW ON MAP</span>
               </button>
             </div>
           </div>
@@ -544,20 +744,20 @@
           <!-- Live Telemetry KPI Bar -->
           <div class="disaster-telemetry-banner">
             <div class="disaster-banner-item">
-              <span class="lbl">GLOBAL MONITORING FEEDS</span>
-              <span class="val highlight">GDACS (UN/EC) &amp; USGS SEISMIC</span>
+              <span class="lbl" data-i18n="disaster_meta_global_feeds">GLOBAL MONITORING FEEDS</span>
+              <span class="val highlight" data-i18n="disaster_meta_gdacs_usgs">GDACS (UN/EC) &amp; USGS SEISMIC</span>
             </div>
             <div class="disaster-banner-item">
-              <span class="lbl">INDIAN OCEAN BASIN THREAT</span>
-              <span class="val highlight" style="color:#22d3b6;">NO TSUNAMI WATCH ACTIVE</span>
+              <span class="lbl" data-i18n="disaster_meta_basin_threat">INDIAN OCEAN BASIN THREAT</span>
+              <span class="val highlight" style="color:#22d3b6;" data-i18n="disaster_meta_no_tsunami">NO TSUNAMI WATCH ACTIVE</span>
             </div>
             <div class="disaster-banner-item">
-              <span class="lbl">COASTAL WARNING SECTORS</span>
-              <span class="val">SWELL SURGE &amp; SQUALLY WEATHER</span>
+              <span class="lbl" data-i18n="disaster_meta_coastal_warning">COASTAL WARNING SECTORS</span>
+              <span class="val" data-i18n="disaster_meta_swell_surge">SWELL SURGE &amp; SQUALLY WEATHER</span>
             </div>
             <div class="disaster-banner-item">
-              <span class="lbl">DATA HONESTY PROTOCOL</span>
-              <span class="val">DIRECT AUTHORITATIVE INGESTION ONLY</span>
+              <span class="lbl" data-i18n="disaster_meta_data_honesty">DATA HONESTY PROTOCOL</span>
+              <span class="val" data-i18n="disaster_meta_direct_ingestion">DIRECT AUTHORITATIVE INGESTION ONLY</span>
             </div>
           </div>
 
@@ -571,7 +771,7 @@
           <!-- Full Width Authoritative Notice Footer -->
           <div class="disaster-full-notice-bar">
             <i data-lucide="shield-check" style="color:var(--accent-aqua);width:16px;height:16px;flex-shrink:0;"></i>
-            <span>ORCA does not independently simulate or synthesize fake tsunamis or disasters. All seismic and tsunami notifications are directly ingested from authoritative international and national tsunami warning centers (IOTWMS / INCOIS / USGS / GDACS).</span>
+            <span data-i18n="disaster_notice_text">ORCA does not independently simulate or synthesize fake tsunamis or disasters. All seismic and tsunami notifications are directly ingested from authoritative international and national tsunami warning centers (IOTWMS / INCOIS / USGS / GDACS).</span>
           </div>
         </div>
       </div>
@@ -582,15 +782,15 @@
           <!-- Top Mission Header -->
           <div class="sat-lab-header">
             <div class="sat-title-group">
-              <span class="sat-badge"><i data-lucide="satellite" style="width:11px;height:11px;"></i> COPERNICUS &amp; ISRO EO SATELLITE LAB</span>
-              <h2>SATELLITE INTELLIGENCE LAB</h2>
-              <p class="subtitle">Multispectral Earth Observation · Sentinel-1 SAR, Sentinel-2 Optical &amp; Sentinel-3 OLCI/SLSTR</p>
+              <span class="sat-badge"><i data-lucide="satellite" style="width:11px;height:11px;"></i> <span data-i18n="sat_badge">COPERNICUS &amp; ISRO EO SATELLITE LAB</span></span>
+              <h2 data-i18n="sat_title">SATELLITE INTELLIGENCE LAB</h2>
+              <p class="subtitle" data-i18n="sat_subtitle">Multispectral Earth Observation · Sentinel-1 SAR, Sentinel-2 Optical &amp; Sentinel-3 OLCI/SLSTR</p>
             </div>
 
             <div class="sat-header-controls">
               <!-- Sector Selector Dropdown -->
               <div class="sat-sector-select-wrap">
-                <label><i data-lucide="map-pin" style="width:12px;height:12px;color:var(--accent-aqua);"></i> SECTOR:</label>
+                <label><i data-lucide="map-pin" style="width:12px;height:12px;color:var(--accent-aqua);"></i> <span data-i18n="sat_sector_label">SECTOR:</span></label>
                 <select id="sat-sector-select" class="sat-sector-dropdown" onchange="orcaApp.satelliteLab && orcaApp.satelliteLab.setSector(this.value)">
                   <option value="mangalore">Malpe Shelf &amp; Mangalore (Arabian Sea)</option>
                   <option value="veraval">Saurashtra / Veraval Bank (Gujarat)</option>
@@ -602,16 +802,16 @@
 
               <!-- Band Selector Buttons -->
               <div class="sat-band-buttons">
-                <button class="sat-band-btn active" data-band="sst" onclick="orcaApp.satelliteLab && orcaApp.satelliteLab.setBand('sst')"><i data-lucide="flame" style="width:12px;height:12px;"></i> SST Anomaly</button>
-                <button class="sat-band-btn" data-band="chl" onclick="orcaApp.satelliteLab && orcaApp.satelliteLab.setBand('chl')"><i data-lucide="waves" style="width:12px;height:12px;"></i> Chlorophyll-a</button>
-                <button class="sat-band-btn" data-band="flood" onclick="orcaApp.satelliteLab && orcaApp.satelliteLab.setBand('flood')"><i data-lucide="shield-alert" style="width:12px;height:12px;"></i> SAR Flood Radar</button>
-                <button class="sat-band-btn" data-band="optical" onclick="orcaApp.satelliteLab && orcaApp.satelliteLab.setBand('optical')"><i data-lucide="eye" style="width:12px;height:12px;"></i> True Color Optical</button>
+                <button class="sat-band-btn active" data-band="sst" onclick="orcaApp.satelliteLab && orcaApp.satelliteLab.setBand('sst')"><i data-lucide="flame" style="width:12px;height:12px;"></i> <span data-i18n="sat_band_sst">SST Anomaly</span></button>
+                <button class="sat-band-btn" data-band="chl" onclick="orcaApp.satelliteLab && orcaApp.satelliteLab.setBand('chl')"><i data-lucide="waves" style="width:12px;height:12px;"></i> <span data-i18n="sat_band_chl">Chlorophyll-a</span></button>
+                <button class="sat-band-btn" data-band="flood" onclick="orcaApp.satelliteLab && orcaApp.satelliteLab.setBand('flood')"><i data-lucide="shield-alert" style="width:12px;height:12px;"></i> <span data-i18n="sat_band_flood">SAR Flood Radar</span></button>
+                <button class="sat-band-btn" data-band="optical" onclick="orcaApp.satelliteLab && orcaApp.satelliteLab.setBand('optical')"><i data-lucide="eye" style="width:12px;height:12px;"></i> <span data-i18n="sat_band_optical">True Color Optical</span></button>
               </div>
 
               <!-- Action button to plot anomaly on live tactical map -->
               <button class="sat-plot-map-btn" onclick="orcaApp.satelliteLab && orcaApp.satelliteLab.plotCurrentSectorOnMap()" title="Plot this satellite observation directly onto the tactical map">
                 <i data-lucide="crosshair" style="width:13px;height:13px;"></i>
-                <span>PLOT ON MAP</span>
+                <span data-i18n="sat_btn_plot">PLOT ON MAP</span>
               </button>
             </div>
           </div>
@@ -635,17 +835,17 @@
             <!-- Floating Satellite Telemetry Overlays -->
             <div class="sat-hud-tag pre" id="sat-hud-pre-tag">
               <span class="live-dot" style="background:#64748b;"></span>
-              <span id="sat-hud-pre-label">PRE-EVENT BASELINE (04:00 UTC)</span>
+              <span id="sat-hud-pre-label" data-i18n="sat_pre_event">PRE-EVENT BASELINE (04:00 UTC)</span>
             </div>
             <div class="sat-hud-tag post" id="sat-hud-post-tag">
               <span class="live-dot" style="background:#22d3b6;"></span>
-              <span id="sat-hud-post-label">LIVE ORBITAL PASS (10:45 UTC)</span>
+              <span id="sat-hud-post-label" data-i18n="sat_post_event">LIVE ORBITAL PASS (10:45 UTC)</span>
             </div>
 
             <!-- Real-time Cursor Sounding Telemetry (Bottom Left) -->
             <div class="sat-cursor-telemetry" id="sat-cursor-telemetry">
               <i data-lucide="crosshair" style="width:12px;height:12px;color:var(--accent-aqua);flex-shrink:0;"></i>
-              <span id="sat-cursor-telemetry-text">CURSOR SOUNDING: Move cursor across satellite swath to inspect pixel telemetry</span>
+              <span id="sat-cursor-telemetry-text" data-i18n="sat_cursor_sounding">CURSOR SOUNDING: Move cursor across satellite swath to inspect pixel telemetry</span>
             </div>
 
             <!-- Scientific Scale Bar Legend (Bottom Right) -->
@@ -681,14 +881,14 @@
         <div class="side-dock-panel left-side-dock">
           <div class="panel-header-bar">
             <div>
-              <h2>SAFE ROUTE RECOMMENDATION</h2>
-              <p class="subtitle">Bathymetric Fairway Routing & Geofenced Sanctuary Clearance</p>
+              <h2 data-i18n="route_title">SAFE ROUTE RECOMMENDATION</h2>
+              <p class="subtitle" data-i18n="route_subtitle">Bathymetric Fairway Routing &amp; Geofenced Sanctuary Clearance</p>
             </div>
           </div>
 
           <div class="route-planner-box">
             <div class="input-field-group">
-              <label>ORIGIN PORT / HARBOR</label>
+              <label data-i18n="route_origin_label">ORIGIN PORT / HARBOR</label>
               <select id="route-origin-select" class="orca-select">
                 <option value="12.9141,74.8560">New Mangalore Port (Arabian Sea)</option>
                 <option value="18.9500,72.8200">Mumbai / JNPT Port (Maharashtra)</option>
@@ -700,7 +900,7 @@
             </div>
 
             <div class="input-field-group">
-              <label>TARGET DESTINATION / FISHING ZONE</label>
+              <label data-i18n="route_dest_label">TARGET DESTINATION / FISHING ZONE</label>
               <select id="route-dest-select" class="orca-select">
                 <option value="13.1200,74.7200">Zone Alpha (Offshore Malpe Shelf)</option>
                 <option value="20.7500,70.1500">Zone Beta (Saurashtra / Veraval Bank)</option>
@@ -714,7 +914,7 @@
 
             <button class="action-submit-btn" id="btn-calculate-route">
               <i data-lucide="navigation"></i>
-              <span>CALCULATE SAFE CORRIDOR</span>
+              <span data-i18n="route_btn_calc">CALCULATE SAFE CORRIDOR</span>
             </button>
           </div>
 
@@ -729,37 +929,55 @@
         <div class="side-dock-panel left-side-dock" style="width:540px;">
           <div class="panel-header-bar">
             <div>
-              <h2>7-DAY HISTORICAL TREND ANALYSIS</h2>
-              <p class="subtitle">Open-Meteo Marine Archive &amp; Climatological Observation</p>
+              <h2 data-i18n="hist_title">7-DAY HISTORICAL TREND ANALYSIS</h2>
+              <p class="subtitle" data-i18n="hist_subtitle">Open-Meteo Marine Archive &amp; Climatological Observation</p>
             </div>
           </div>
 
           <!-- Station Selector & Telemetry Summary -->
           <div class="hist-controls-box" style="display:flex;flex-direction:column;gap:8px;">
             <div class="input-field-group">
-              <label>OBSERVATION BUOY / CLIMATOLOGICAL SECTOR</label>
+              <label data-i18n="hist_station_label">OBSERVATION BUOY / CLIMATOLOGICAL SECTOR</label>
               <select id="hist-station-select" class="orca-select">
-                <option value="12.9141,74.8560" data-id="mangalore" selected>Mangalore Offshore Buoy BD02 (Arabian Sea)</option>
-                <option value="9.9312,76.2673" data-id="kochi">Kochi Deepwater Buoy CB02 (Lakshadweep Basin)</option>
-                <option value="18.9500,72.8200" data-id="mumbai">Mumbai High Climatology Rig (Maharashtra Shelf)</option>
-                <option value="7.8500,77.3000" data-id="cape">Wadge Bank Ocean Observatory (Cape Comorin)</option>
-                <option value="13.0827,80.2707" data-id="chennai">Chennai Coastal Buoy BD08 (Bay of Bengal)</option>
-                <option value="17.6868,83.2185" data-id="vizag">Visakhapatnam Deep Trench (Andhra Basin)</option>
+                <optgroup label="ARABIAN SEA BASIN">
+                  <option value="12.9141,74.8560" data-id="mangalore" selected>Mangalore Offshore Buoy BD02 (Arabian Sea)</option>
+                  <option value="18.9500,72.8200" data-id="mumbai">Mumbai High Climatology Rig (Northern Arabian Sea)</option>
+                  <option value="21.6400,69.5800" data-id="porbandar">Porbandar Coastal Buoy AD06 (Gujarat Shelf)</option>
+                </optgroup>
+                <optgroup label="LAKSHADWEEP SEA">
+                  <option value="9.9312,76.2673" data-id="kochi">Kochi Deepwater Buoy CB02 (Lakshadweep Basin)</option>
+                  <option value="10.5600,72.6400" data-id="kavaratti">Kavaratti Coral Observatory (Lakshadweep Sea)</option>
+                </optgroup>
+                <optgroup label="SOUTHERN CHANNELS &amp; EQUATORIAL">
+                  <option value="7.8500,77.3000" data-id="cape">Wadge Bank Ocean Observatory (Cape Comorin)</option>
+                  <option value="8.7600,78.2500" data-id="mannar">Tuticorin Marine Observatory GM01 (Gulf of Mannar)</option>
+                  <option value="9.2800,79.3100" data-id="palk_strait">Rameswaram Sounding Buoy PS01 (Palk Strait)</option>
+                  <option value="0.0000,80.5000" data-id="equatorial">Central RAMA Deep Mooring (Equatorial Indian Ocean)</option>
+                </optgroup>
+                <optgroup label="BAY OF BENGAL">
+                  <option value="13.0827,80.2707" data-id="chennai">Chennai Coastal Buoy BD08 (Bay of Bengal)</option>
+                  <option value="17.6868,83.2185" data-id="vizag">Visakhapatnam Deep Trench (Andhra Basin)</option>
+                  <option value="20.2600,86.6700" data-id="paradip">Paradip Deep Mooring BD11 (Northern Bay of Bengal)</option>
+                </optgroup>
+                <optgroup label="ANDAMAN SEA">
+                  <option value="11.6234,92.7265" data-id="andaman">Port Blair Offshore Buoy BD10 (Andaman Sea)</option>
+                  <option value="7.0000,93.7500" data-id="nicobar">Great Nicobar Trench Buoy (Ten Degree Channel)</option>
+                </optgroup>
               </select>
             </div>
 
             <!-- Mini Telemetry Strip -->
             <div id="hist-telemetry-strip" style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;font-size:11.5px;background:rgba(3,14,24,0.7);padding:8px;border-radius:4px;border:1px solid rgba(36,160,200,0.18);">
-              <div><span style="color:var(--text-muted);">7-Day Mean Swell:</span> <b id="hist-mean-swell" style="font-family:var(--font-mono);color:#22d3b6;">1.32 m</b></div>
-              <div><span style="color:var(--text-muted);">Max Significant:</span> <b id="hist-max-wave" style="font-family:var(--font-mono);color:#fbbf24;">1.65 m</b></div>
-              <div><span style="color:var(--text-muted);">Mean SST Temp:</span> <b id="hist-mean-sst" style="font-family:var(--font-mono);color:#38bdf8;">28.4 °C</b></div>
+              <div><span style="color:var(--text-muted);" data-i18n="hist_mean_swell">7-Day Mean Swell:</span> <b id="hist-mean-swell" style="font-family:var(--font-mono);color:#22d3b6;">1.32 m</b></div>
+              <div><span style="color:var(--text-muted);" data-i18n="hist_peak_wave">Peak Significant:</span> <b id="hist-max-wave" style="font-family:var(--font-mono);color:#fbbf24;">1.65 m</b></div>
+              <div><span style="color:var(--text-muted);" data-i18n="hist_mean_sst">Mean SST Temp:</span> <b id="hist-mean-sst" style="font-family:var(--font-mono);color:#38bdf8;">28.4 °C</b></div>
             </div>
           </div>
 
           <div class="chart-box-card">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-              <h4 style="font-size:12px;color:#d1e8f2;margin:0;">Wave Height &amp; Swell Dynamics (Last 7 Days)</h4>
-              <span class="telemetry-tag" style="color:#22d3b6;">HISTORICAL ARCHIVE</span>
+              <h4 style="font-size:12px;color:#d1e8f2;margin:0;" data-i18n="hist_wave_chart_title">Wave Height &amp; Swell Dynamics (Last 7 Days)</h4>
+              <span class="telemetry-tag" style="color:#22d3b6;" data-i18n="tag_historical_archive">HISTORICAL ARCHIVE</span>
             </div>
             <div style="height:155px;position:relative;">
               <canvas id="hist-wave-chart"></canvas>
@@ -768,8 +986,8 @@
 
           <div class="chart-box-card" style="margin-top:8px;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-              <h4 style="font-size:12px;color:#d1e8f2;margin:0;">Sea Surface Temperature (SST °C) Trend</h4>
-              <span class="telemetry-tag" style="color:#f59e0b;">THERMAL MEMORY</span>
+              <h4 style="font-size:12px;color:#d1e8f2;margin:0;" data-i18n="hist_sst_chart_title">Sea Surface Temperature (SST °C) Trend</h4>
+              <span class="telemetry-tag" style="color:#f59e0b;" data-i18n="tag_thermal_memory">THERMAL MEMORY</span>
             </div>
             <div style="height:155px;position:relative;">
               <canvas id="hist-sst-chart"></canvas>
@@ -784,14 +1002,14 @@
           <!-- Mission Control Header -->
           <div class="sim-header">
             <div class="sim-title-wrap">
-              <span class="sim-browser-badge"><i data-lucide="gauge" style="width:12px;height:12px;"></i> DECISION INTELLIGENCE · MULTI-SCENARIO PROJECTION</span>
-              <h2>WHAT-IF DEPARTURE TIME SIMULATOR</h2>
-              <p class="subtitle">Multi-Dimensional Risk Radar &amp; Hourly Forecast Tradeoff Analysis</p>
+              <span class="sim-browser-badge"><i data-lucide="gauge" style="width:12px;height:12px;"></i> <span data-i18n="sim_badge">DECISION INTELLIGENCE · MULTI-SCENARIO PROJECTION</span></span>
+              <h2 data-i18n="sim_title">WHAT-IF DEPARTURE TIME SIMULATOR</h2>
+              <p class="subtitle" data-i18n="sim_subtitle">Multi-Dimensional Risk Radar &amp; Hourly Forecast Tradeoff Analysis</p>
             </div>
             <div class="sim-header-controls">
               <!-- Location Sector Selector -->
               <div class="sim-select-block">
-                <label><i data-lucide="map-pin" style="width:12px;height:12px;color:var(--accent-aqua);"></i> SECTOR:</label>
+                <label><i data-lucide="map-pin" style="width:12px;height:12px;color:var(--accent-aqua);"></i> <span data-i18n="sim_sector_label">SECTOR:</span></label>
                 <select id="sim-location-select" class="orca-select small">
                   <option value="12.9141,74.8560" selected>Mangalore Shelf (Arabian Sea)</option>
                   <option value="9.9312,76.2673">Kochi Offshore (Lakshadweep Basin)</option>
@@ -802,7 +1020,7 @@
                 </select>
               </div>
               <div class="sim-select-block">
-                <span style="color:#22d3b6;">SCENARIO A:</span>
+                <span style="color:#22d3b6;" data-i18n="sim_scenario_a">SCENARIO A:</span>
                 <select id="sim-time-a" class="orca-select small">
                   <option value="05:00" selected>05:00 AM (Dawn)</option>
                   <option value="07:00">07:00 AM (Early Morning)</option>
@@ -812,7 +1030,7 @@
                 </select>
               </div>
               <div class="sim-select-block">
-                <span style="color:#f59e0b;">SCENARIO B:</span>
+                <span style="color:#f59e0b;" data-i18n="sim_scenario_b">SCENARIO B:</span>
                 <select id="sim-time-b" class="orca-select small">
                   <option value="05:00">05:00 AM (Dawn)</option>
                   <option value="07:00">07:00 AM (Early Morning)</option>
@@ -831,7 +1049,7 @@
               <i data-lucide="shield-check" style="width:20px;height:20px;color:#22d3b6;"></i>
             </div>
             <div class="rec-text-wrap">
-              <div class="rec-headline">AI MARITIME DISPATCH RECOMMENDATION</div>
+              <div class="rec-headline" data-i18n="sim_rec_headline">AI MARITIME DISPATCH RECOMMENDATION</div>
               <div class="rec-message" id="sim-delta-risk">Evaluating live hourly marine forecast models...</div>
             </div>
           </div>
@@ -841,19 +1059,19 @@
             <div class="sim-scenario-card" id="sc-a">
               <div class="sc-header sc-a-border">
                 <div style="display:flex;justify-content:space-between;align-items:center;">
-                  <span class="sc-badge">SCENARIO A</span>
+                  <span class="sc-badge" data-i18n="sim_badge_a">SCENARIO A</span>
                   <span class="sc-tag-time" style="color:#22d3b6;">DAWN WINDOW</span>
                 </div>
                 <h3 class="sc-time-label">Departure: 05:00 AM</h3>
               </div>
               <div class="sc-metrics">
-                <div class="sc-metric-row"><span>Risk Score:</span><b class="sc-risk-val" style="color:#22d3b6;">24/100</b></div>
-                <div class="sc-metric-row"><span>Wave Swell:</span><b class="sc-wave-val">1.1 m</b></div>
-                <div class="sc-metric-row"><span>Wave Period:</span><b class="sc-period-val">7.8 s</b></div>
-                <div class="sc-metric-row"><span>Surface Wind:</span><b class="sc-wind-val">12 km/h (6.5 kn)</b></div>
-                <div class="sc-metric-row"><span>Wind Gusts:</span><b class="sc-gust-val">15 km/h</b></div>
-                <div class="sc-metric-row"><span>Catch Potential:</span><b class="sc-fish-val">92%</b></div>
-                <div class="sc-metric-row"><span>Fuel Efficiency:</span><b class="sc-fuel-val" style="color:#22d3b6;">94%</b></div>
+                <div class="sc-metric-row"><span data-i18n="sim_risk_score">Risk Score:</span><b class="sc-risk-val" style="color:#22d3b6;">24/100</b></div>
+                <div class="sc-metric-row"><span data-i18n="sim_wave_swell">Wave Swell:</span><b class="sc-wave-val">1.1 m</b></div>
+                <div class="sc-metric-row"><span data-i18n="sim_wave_period">Wave Period:</span><b class="sc-period-val">7.8 s</b></div>
+                <div class="sc-metric-row"><span data-i18n="sim_surface_wind">Surface Wind:</span><b class="sc-wind-val">12 km/h (6.5 kn)</b></div>
+                <div class="sc-metric-row"><span data-i18n="sim_wind_gusts">Wind Gusts:</span><b class="sc-gust-val">15 km/h</b></div>
+                <div class="sc-metric-row"><span data-i18n="sim_catch_potential">Catch Potential:</span><b class="sc-fish-val">92%</b></div>
+                <div class="sc-metric-row"><span data-i18n="sim_fuel_eff">Fuel Efficiency:</span><b class="sc-fuel-val" style="color:#22d3b6;">94%</b></div>
                 <div class="sc-safety-status low">LOW RISK (FAVORABLE)</div>
               </div>
             </div>
@@ -862,8 +1080,8 @@
             <div class="sim-center-panel">
               <div class="sim-chart-card">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-                  <span style="font-family:var(--font-display);font-size:13px;font-weight:700;color:#fff;">MULTI-DIMENSIONAL MARITIME RADAR</span>
-                  <span style="font-family:var(--font-mono);font-size:10px;color:#94a3b8;">NORMALIZED METRICS (0 - 100)</span>
+                  <span style="font-family:var(--font-display);font-size:13px;font-weight:700;color:#fff;" data-i18n="sim_radar_title">MULTI-DIMENSIONAL MARITIME RADAR</span>
+                  <span style="font-family:var(--font-mono);font-size:10px;color:#94a3b8;" data-i18n="sim_radar_sub">NORMALIZED METRICS (0 - 100)</span>
                 </div>
                 <div class="sim-radar-canvas-wrap">
                   <canvas id="sim-chart-canvas"></canvas>
@@ -875,10 +1093,10 @@
                 <table class="sim-comp-table">
                   <thead>
                     <tr>
-                      <th>PARAMETER</th>
-                      <th style="color:#22d3b6;text-align:center;">SCENARIO A</th>
-                      <th style="color:#f59e0b;text-align:center;">SCENARIO B</th>
-                      <th style="text-align:right;">VARIANCE / ADVANTAGE</th>
+                      <th data-i18n="sim_param_col">PARAMETER</th>
+                      <th style="color:#22d3b6;text-align:center;" data-i18n="sim_badge_a">SCENARIO A</th>
+                      <th style="color:#f59e0b;text-align:center;" data-i18n="sim_badge_b">SCENARIO B</th>
+                      <th style="text-align:right;" data-i18n="sim_variance_col">VARIANCE / ADVANTAGE</th>
                     </tr>
                   </thead>
                   <tbody id="sim-comp-tbody">
@@ -892,19 +1110,19 @@
             <div class="sim-scenario-card" id="sc-b">
               <div class="sc-header sc-b-border">
                 <div style="display:flex;justify-content:space-between;align-items:center;">
-                  <span class="sc-badge" style="background:rgba(245,158,11,0.2);color:#fbbf24;border-color:#fbbf24;">SCENARIO B</span>
+                  <span class="sc-badge" style="background:rgba(245,158,11,0.2);color:#fbbf24;border-color:#fbbf24;" data-i18n="sim_badge_b">SCENARIO B</span>
                   <span class="sc-tag-time" style="color:#f59e0b;">MID-DAY WINDOW</span>
                 </div>
                 <h3 class="sc-time-label">Departure: 10:00 AM</h3>
               </div>
               <div class="sc-metrics">
-                <div class="sc-metric-row"><span>Risk Score:</span><b class="sc-risk-val" style="color:#fbbf24;">48/100</b></div>
-                <div class="sc-metric-row"><span>Wave Swell:</span><b class="sc-wave-val">1.6 m</b></div>
-                <div class="sc-metric-row"><span>Wave Period:</span><b class="sc-period-val">6.5 s</b></div>
-                <div class="sc-metric-row"><span>Surface Wind:</span><b class="sc-wind-val">22 km/h (11.8 kn)</b></div>
-                <div class="sc-metric-row"><span>Wind Gusts:</span><b class="sc-gust-val">28 km/h</b></div>
-                <div class="sc-metric-row"><span>Catch Potential:</span><b class="sc-fish-val">84%</b></div>
-                <div class="sc-metric-row"><span>Fuel Efficiency:</span><b class="sc-fuel-val" style="color:#fbbf24;">76%</b></div>
+                <div class="sc-metric-row"><span data-i18n="sim_risk_score">Risk Score:</span><b class="sc-risk-val" style="color:#fbbf24;">48/100</b></div>
+                <div class="sc-metric-row"><span data-i18n="sim_wave_swell">Wave Swell:</span><b class="sc-wave-val">1.6 m</b></div>
+                <div class="sc-metric-row"><span data-i18n="sim_wave_period">Wave Period:</span><b class="sc-period-val">6.5 s</b></div>
+                <div class="sc-metric-row"><span data-i18n="sim_surface_wind">Surface Wind:</span><b class="sc-wind-val">22 km/h (11.8 kn)</b></div>
+                <div class="sc-metric-row"><span data-i18n="sim_wind_gusts">Wind Gusts:</span><b class="sc-gust-val">28 km/h</b></div>
+                <div class="sc-metric-row"><span data-i18n="sim_catch_potential">Catch Potential:</span><b class="sc-fish-val">84%</b></div>
+                <div class="sc-metric-row"><span data-i18n="sim_fuel_eff">Fuel Efficiency:</span><b class="sc-fuel-val" style="color:#fbbf24;">76%</b></div>
                 <div class="sc-safety-status moderate">MODERATE RISK (CAUTION)</div>
               </div>
             </div>
@@ -915,6 +1133,8 @@
     </main>
 
   </div>
+
+
 
   <!-- Scripts -->
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -947,10 +1167,123 @@
     })();
   </script>
 
+  <!-- ORCA Mission Access & Clearance Portal Modal -->
+  <div class="orca-auth-modal-backdrop" id="orca-auth-modal-backdrop" style="display:none;">
+    <div class="orca-auth-modal-window">
+      <!-- Modal Header -->
+      <div class="auth-modal-header">
+        <div class="auth-modal-title-wrap">
+          <div class="auth-modal-icon-badge">
+            <i data-lucide="shield" style="width:18px;height:18px;color:#38bdf8;"></i>
+          </div>
+          <div>
+            <div class="auth-modal-title" data-i18n="modal_clearance_title">ORCA OCEAN INTELLIGENCE</div>
+            <div class="auth-modal-subtitle" data-i18n="modal_clearance_sub">Ocean Intelligence Platform &amp; Operator Gateway</div>
+          </div>
+        </div>
+        <button class="btn-close-auth-modal" id="btn-close-auth-modal" title="Close">
+          <i data-lucide="x" style="width:16px;height:16px;"></i>
+        </button>
+      </div>
+
+      <!-- Clearance Mode Selector Tabs (Create Account & Sign In) -->
+      <div class="auth-modal-tabs">
+        <button class="auth-tab-btn active" id="auth-tab-signup">
+          <i data-lucide="user-plus" style="width:13px;height:13px;"></i>
+          <span data-i18n="tab_commission_station">Create Account</span>
+        </button>
+        <button class="auth-tab-btn" id="auth-tab-login">
+          <i data-lucide="log-in" style="width:13px;height:13px;"></i>
+          <span data-i18n="tab_officer_signin">Sign In</span>
+        </button>
+      </div>
+
+      <!-- Error / Notice Banner -->
+      <div class="auth-modal-error" id="auth-modal-error" style="display:none;"></div>
+
+      <!-- Tab 1: Create Account Form -->
+      <form class="auth-tab-content auth-form active" id="auth-form-signup" autocomplete="off">
+        <div class="auth-field-group">
+          <label for="signup-name" data-i18n="lbl_signup_name">Full Name</label>
+          <div class="auth-input-wrap">
+            <i data-lucide="user"></i>
+            <input type="text" id="signup-name" placeholder="Enter your full name" autocomplete="off" required>
+          </div>
+        </div>
+
+        <div class="auth-field-group">
+          <label for="signup-email" data-i18n="lbl_signup_email">Email Address</label>
+          <div class="auth-input-wrap">
+            <i data-lucide="mail"></i>
+            <input type="email" id="signup-email" placeholder="name@example.com" autocomplete="off" required>
+          </div>
+        </div>
+
+        <div class="auth-field-group">
+          <label for="signup-password" data-i18n="lbl_signup_pw">Password</label>
+          <div class="auth-input-wrap">
+            <i data-lucide="lock"></i>
+            <input type="password" id="signup-password" placeholder="Create a password (min 4 characters)" minlength="4" autocomplete="new-password" required>
+          </div>
+        </div>
+
+        <div class="auth-form-actions">
+          <button type="submit" class="auth-submit-btn primary">
+            <span data-i18n="btn_signup_submit">Create Account &amp; Launch Console</span>
+            <i data-lucide="arrow-right" style="width:14px;height:14px;"></i>
+          </button>
+        </div>
+
+        <div style="text-align:center;margin-top:10px;font-size:12px;color:#94a3b8;">
+          <span>Already have an account?</span>
+          <button type="button" onclick="document.getElementById('auth-tab-login').click()" style="background:none;border:none;color:#38bdf8;font-weight:700;cursor:pointer;margin-left:4px;text-decoration:underline;">Sign In</button>
+        </div>
+      </form>
+
+      <!-- Tab 2: Sign In Form -->
+      <form class="auth-tab-content auth-form" id="auth-form-login" style="display:none;" autocomplete="off">
+        <div class="auth-field-group">
+          <label for="login-email" data-i18n="lbl_login_callsign">Email Address</label>
+          <div class="auth-input-wrap">
+            <i data-lucide="mail"></i>
+            <input type="email" id="login-email" placeholder="name@example.com" autocomplete="off" required>
+          </div>
+        </div>
+
+        <div class="auth-field-group">
+          <label for="login-password" data-i18n="lbl_login_key">Password</label>
+          <div class="auth-input-wrap">
+            <i data-lucide="lock"></i>
+            <input type="password" id="login-password" placeholder="Enter your password" autocomplete="current-password" required>
+          </div>
+        </div>
+
+        <div class="auth-form-actions">
+          <button type="submit" class="auth-submit-btn primary">
+            <span data-i18n="btn_login_submit">Sign In &amp; Launch Console</span>
+            <i data-lucide="check-circle" style="width:14px;height:14px;"></i>
+          </button>
+        </div>
+
+        <div style="text-align:center;margin-top:10px;font-size:12px;color:#94a3b8;">
+          <span>Don't have an account?</span>
+          <button type="button" onclick="document.getElementById('auth-tab-signup').click()" style="background:none;border:none;color:#38bdf8;font-weight:700;cursor:pointer;margin-left:4px;text-decoration:underline;">Create Account</button>
+        </div>
+      </form>
+
+      <div class="auth-modal-footer" style="text-align:center;margin-top:16px;font-size:11px;color:#64748b;display:flex;align-items:center;justify-content:center;gap:6px;">
+        <i data-lucide="lock" style="width:11px;height:11px;color:#38bdf8;"></i>
+        <span>Secure local session &amp; cloud storage sync</span>
+      </div>
+    </div>
+  </div>
+
   <!-- Interactive 360 Panorama Viewer (Pannellum) -->
   <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
 
   <script src="js/background-fx.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/auth.js"></script>
   <script src="js/map-controller.js"></script>
   <script src="js/agent-network.js"></script>
   <script src="js/satellite-lab.js"></script>

@@ -23,6 +23,7 @@ class Envelope(BaseModel):
 class QueryRequest(BaseModel):
     query: str = Field(min_length=2, max_length=2000)
     session_id: str | None = None
+    language: str | None = None
     user_context: dict[str, Any] = Field(default_factory=dict)
     location: Coordinates | None = None
 

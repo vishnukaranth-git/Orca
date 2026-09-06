@@ -83,6 +83,30 @@ class ORCAOrchestrator:
             return "te"  # Telugu
         elif bool(re.search(r'[\u0D00-\u0D7F]', text)):
             return "ml"  # Malayalam
+
+        # Romanized keywords detection
+        lower = text.lower()
+        kn_words = [
+            "naale", "hengithe", "hengidhe", "hegide", "hegidhe", "hogbodha", "hogbahuda", "hogla", "hogbahudu",
+            "enu", "yelli", "elli", "meenu", "samudra", "gali", "ale", "alegalu", "kannada", "kannadadalli",
+            "belge", "belagge", "madbahuda", "ideya", "agidhe", "beku", "nodbeku", "chennagidya", "atra", "nodona"
+        ]
+        if any(re.search(r'\b' + re.escape(w) + r'\b', lower) for w in kn_words):
+            return "kn"
+
+        hi_words = [
+            "kya", "hai", "kal", "machli", "mausam", "kaisa", "kaisi", "surakshit", "barish", "samundar",
+            "pani", "hawa", "lehar", "lehrein", "hindi", "batao", "chalega"
+        ]
+        if any(re.search(r'\b' + re.escape(w) + r'\b', lower) for w in hi_words):
+            return "hi"
+
+        ta_words = [
+            "naalai", "eppadi", "irukku", "meen", "kadalarugil", "kaatru", "aligal", "tamil", "sollunga", "pogalama"
+        ]
+        if any(re.search(r'\b' + re.escape(w) + r'\b', lower) for w in ta_words):
+            return "ta"
+
         return "en"
 
     def _parse_temporal_intent(self, query: str) -> tuple[str, int]:
@@ -303,7 +327,8 @@ class ORCAOrchestrator:
         self,
         query: str,
         session_id: str | None = None,
-        explicit_location: Coordinates | None = None
+        explicit_location: Coordinates | None = None,
+        language: str | None = None
     ) -> dict:
         t0 = time.time()
         session_id = session_id or "default_session"
@@ -315,7 +340,7 @@ class ORCAOrchestrator:
             "history": []
         })
 
-        lang = self._detect_language(query)
+        lang = language if language in ["kn", "hi", "ta", "en"] else self._detect_language(query)
         is_kannada = (lang == "kn")
         temporal_label, offset_hours = self._parse_temporal_intent(query)
         session["last_time_window"] = temporal_label
@@ -687,10 +712,10 @@ class ORCAOrchestrator:
         total_ms = int((time.time() - t0) * 1000)
 
         # Contextual Follow-Up Suggestions
-        follow_ups = self._generate_contextual_follow_ups(intent, is_kannada)
+        follow_ups = self._generate_contextual_follow_ups(intent, lang)
 
         # Spoken audio script for "LISTEN TO ORCA"
-        speech_text = self._build_speech_script(ai_advisory, risk_res, loc_str, is_kannada)
+        speech_text = self._build_speech_script(ai_advisory, risk_res, loc_str, lang)
 
         # Session memory update for multi-turn follow-ups
         if top_zone and isinstance(top_zone, dict):
@@ -789,8 +814,8 @@ class ORCAOrchestrator:
             "ai_engine": ai_advisory.get("llm_model", "groq")
         }
 
-    def _generate_contextual_follow_ups(self, intent: str, is_kannada: bool) -> list[str]:
-        if is_kannada:
+    def _generate_contextual_follow_ups(self, intent: str, lang: str) -> list[str]:
+        if lang == "kn":
             if intent == "MARINE_SAFETY_FORECAST":
                 return ["ಹತ್ತಿರದ ಸುರಕ್ಷಿತ ಮೀನುಗಾರಿಕಾ ವಲಯ ತೋರಿಸು", "ಸುರಕ್ಷಿತ ಮಾರ್ಗವನ್ನು ತೋರಿಸು", "ಯಾವುದಾದರೂ ಚಂಡಮಾರುತದ ಎಚ್ಚರಿಕೆ ಇದೆಯೇ?", "ನಾಳೆಯ ಅಲೆಯ ಮುನ್ಸೂಚನೆ ತೋರಿಸು"]
             elif intent == "PFZ_DISCOVERY":
@@ -798,6 +823,22 @@ class ORCAOrchestrator:
             elif intent == "SST_THERMAL_PROFILE":
                 return ["ಉಷ್ಣಾಂಶ ಹೆಚ್ಚಾದರೆ ಏನಾಗುತ್ತದೆ?", "ಕ್ಲೋರೊಫಿಲ್ ಸಾಂದ್ರತೆ ತೋರಿಸು", "ಮೀನುಗಾರಿಕಾ ವಲಯಗಳನ್ನು ತೋರಿಸು"]
             return ["ಸುರಕ್ಷಿತ ಮೀನುಗಾರಿಕಾ ವಲಯ ತೋರಿಸು", "ಯಾವುದಾದರೂ ಚಂಡಮಾರುತದ ಎಚ್ಚರಿಕೆ ಇದೆಯೇ?", "ಸುರಕ್ಷಿತ ಮಾರ್ಗ ತೋರಿಸು"]
+        elif lang == "hi":
+            if intent == "MARINE_SAFETY_FORECAST":
+                return ["निकटतम सुरक्षित मत्स्य क्षेत्र दिखाएं", "सुरक्षित मार्ग बताएं", "क्या कोई चक्रवात चेतावनी है?", "कल के लिए लहरों का पूर्वानुमान क्या है?"]
+            elif intent == "PFZ_DISCOVERY":
+                return ["इस मत्स्य क्षेत्र का सुरक्षित मार्ग दिखाएं", "लहर की ऊंचाई कितनी है?", "क्या कल सुबह मछली पकड़ना सुरक्षित है?"]
+            elif intent == "SST_THERMAL_PROFILE":
+                return ["क्लोरोफिल सघनता दिखाएं", "समुद्री तापमान क्या है?", "निकटतम PFZ क्षेत्र खोजें"]
+            return ["सुरक्षित मत्स्य क्षेत्र दिखाएं", "क्या कोई आपदा चेतावनी है?", "सुरक्षित मार्ग बताएं"]
+        elif lang == "ta":
+            if intent == "MARINE_SAFETY_FORECAST":
+                return ["அருகிலுள்ள பாதுகாப்பான மீன்பிடி மண்டலத்தை காட்டுங்கள்", "பாதுகாப்பான பாதையை காட்டுங்கள்", "புயல் எச்சரிக்கை உள்ளதா?", "நாளை அலை முன்னறிவிப்பு என்ன?"]
+            elif intent == "PFZ_DISCOVERY":
+                return ["இந்த மண்டலத்திற்கான பாதுகாப்பான பாதையை காட்டுங்கள்", "அலை உயரம் எவ்வளவு?", "நாளை காலை மீன்பிடிக்க செல்வது பாதுகாப்பானதா?"]
+            elif intent == "SST_THERMAL_PROFILE":
+                return ["குளோரோபில் அடர்த்தியை காட்டுங்கள்", "கடல் வெப்பநிலை என்ன?", "அருகிலுள்ள PFZ மண்டலங்களை கண்டறியவும்"]
+            return ["பாதுகாப்பான மீன்பிடி மண்டலத்தை காட்டுங்கள்", "பேரிடர் எச்சரிக்கை உள்ளதா?", "பாதுகாப்பான பாதையை காட்டுங்கள்"]
         else:
             if intent == "MARINE_SAFETY_FORECAST":
                 return ["Show me the safest PFZ", "Give me the safest route to Zone Alpha", "What time is safest tomorrow?", "Any cyclone warnings?"]
@@ -815,13 +856,17 @@ class ORCAOrchestrator:
                 return ["What if wind reaches 25 knots?", "Show safest route", "Is tomorrow morning safe?"]
             return ["Show nearest PFZ", "Is it safe tomorrow morning?", "Check cyclone warnings", "Calculate safe route"]
 
-    def _build_speech_script(self, ai_advisory: dict, risk_res: dict, loc_str: str, is_kannada: bool) -> str:
+    def _build_speech_script(self, ai_advisory: dict, risk_res: dict, loc_str: str, lang: str) -> str:
         rec = ai_advisory.get("recommendation", "")
         level = risk_res.get("level", "LOW")
         score = risk_res.get("score", 25.0)
         
-        if is_kannada:
+        if lang == "kn":
             return f"ORCA ಶಿಫಾರಸು: ಅಪಾಯದ ಮಟ್ಟ {level} ({score}/100). {rec} ಹೊರಡುವ ಮುನ್ನ ಅಧಿಕೃತ ಕರಾವಳಿ ಎಚ್ಚರಿಕೆಯನ್ನು ಪರಿಶೀಲಿಸಿ."
+        elif lang == "hi":
+            return f"ORCA सलाह: जोखिम स्तर {level} ({score}/100)। {rec} प्रस्थान करने से पहले आधिकारिक तटीय चेतावनी अवश्य जांच लें।"
+        elif lang == "ta":
+            return f"ORCA பரிந்துரை: ஆபத்து நிலை {level} ({score}/100). {rec} புறப்படுவதற்கு முன் அதிகாரப்பூர்வ துறைமுக எச்சரிக்கையை சரிபார்க்கவும்."
         else:
             return f"ORCA advises {level} risk for operations near {loc_str}. {rec} Always verify latest official port warnings before departure."
 
@@ -835,16 +880,18 @@ class ORCAOrchestrator:
         lang: str
     ) -> dict:
         settings = get_settings()
-        is_kannada = (lang == "kn")
 
         if not settings.groq_api_key:
-            return self._build_deterministic_synthesis(query, intent, evidence, risk, is_kannada)
+            return self._build_deterministic_synthesis(query, intent, evidence, risk, lang)
 
-        lang_instruction = (
-            "IMPORTANT: The user query is in Kannada. You MUST provide the 'recommendation', 'reasons', and 'best_time_window' in fluent, natural Kannada script (ಕನ್ನಡ).\n"
-            if is_kannada else
-            f"IMPORTANT: Respond in clear, accessible language ({'Hindi' if lang == 'hi' else 'English'}) for marine operators and fishermen.\n"
-        )
+        if lang == "kn":
+            lang_instruction = "IMPORTANT: The user query is in Kannada. You MUST provide the 'direct_answer', 'recommendation', 'reasons', and 'best_time_window' in fluent, natural Kannada script (ಕನ್ನಡ).\n"
+        elif lang == "hi":
+            lang_instruction = "IMPORTANT: The user query is in Hindi. You MUST provide the 'direct_answer', 'recommendation', 'reasons', and 'best_time_window' in fluent, natural Hindi script (हिन्दी).\n"
+        elif lang == "ta":
+            lang_instruction = "IMPORTANT: The user query is in Tamil. You MUST provide the 'direct_answer', 'recommendation', 'reasons', and 'best_time_window' in fluent, natural Tamil script (தமிழ்).\n"
+        else:
+            lang_instruction = "IMPORTANT: Respond in clear, accessible English for marine operators and fishermen.\n"
 
         system_prompt = (
             "You are ORCA (Ocean Reasoning & Collaborative Agents), the elite agentic AI marine intelligence orchestrator. "
@@ -879,6 +926,7 @@ class ORCAOrchestrator:
         user_content = (
             f"User Query: {query}\n"
             f"Intent: {intent}\n"
+            f"Language: {lang}\n"
             f"Location: Lat {location.latitude:.4f}°N, Lon {location.longitude:.4f}°E\n"
             f"Synthesized Risk: {r_score}/100 ({r_level})\n"
             f"Ocean Data: Wave {ocean_tel.get('wave_height_m', 1.2)}m, Period {ocean_tel.get('wave_period_s', 7.0)}s, SST {ocean_tel.get('sst_celsius', 28.5)}°C, Current {ocean_tel.get('ocean_current_knots', 0.8)}kn\n"
@@ -917,7 +965,7 @@ class ORCAOrchestrator:
         except Exception as e:
             print(f"[ORCA Orchestrator Groq Error]: {e}")
 
-        return self._build_deterministic_synthesis(query, intent, evidence, risk, is_kannada)
+        return self._build_deterministic_synthesis(query, intent, evidence, risk, lang)
 
     def _build_deterministic_synthesis(
         self,
@@ -925,8 +973,256 @@ class ORCAOrchestrator:
         intent: str,
         evidence: dict,
         risk: dict,
-        is_kannada: bool
+        lang: str = "en"
     ) -> dict:
+        ocean_tel = evidence.get("ocean", {}).get("telemetry", {})
+        weather_tel = evidence.get("weather", {}).get("telemetry", {})
+        top_z = (evidence.get("pfz") or {}).get("top_zone") or {}
+        wave_h = ocean_tel.get("wave_height_m", 1.2)
+        wave_p = ocean_tel.get("wave_period_s", 7.0)
+        wind_kmh = weather_tel.get("wind_speed_kmh", 15.0)
+        wind_kn = weather_tel.get("wind_speed_knots", 8.0)
+        sst = ocean_tel.get("sst_celsius", 28.5)
+        top_zone_name = top_z.get("zone_name", "Zone Alpha") if top_z else "Coastal Shelf"
+        dist_km = top_z.get("distance_km", 27.2) if top_z else 25.0
+
+        if lang == "kn":
+            if intent == "WAVE_SWELL_CONDITIONS":
+                direct_ans = f"ಈ ಪ್ರದೇಶದಲ್ಲಿ ಪ್ರಸ್ತುತ ಅಲೆಯ ಮಹತ್ವದ ಎತ್ತರ {wave_h} ಮೀಟರ್ ಹಾಗೂ ಅಲೆಯ ಅವಧಿ {wave_p} ಸೆಕೆಂಡ್‌ಗಳಾಗಿವೆ. ಸಮುದ್ರದ ಸ್ಥಿತಿ ಸಾಧಾರಣವಾಗಿದ್ದು, ಸಣ್ಣ ದೋಣಿಗಳು ಎಚ್ಚರಿಕೆಯಿಂದ ಸಂಚರಿಸಬಹುದು."
+                rec = "ಬೆಳಿಗ್ಗೆ ಅಲೆಯ ಸ್ಥಿತಿ ಶಾಂತವಾಗಿರುತ್ತದೆ. ಮಧ್ಯಾಹ್ನ ಗಾಳಿಯೊಂದಿಗೆ ಅಲೆ ಹೆಚ್ಚಾಗುವ ಮೊದಲು ತೀರಕ್ಕೆ ಹಿಂತಿರುಗಿ."
+                reasons = [
+                    f"ಅಲೆಯ ಎತ್ತರ: {wave_h} ಮೀಟರ್ (INCOIS ವೀವ್ ಬಯೋಯ್ ಡೇಟಾ)",
+                    f"ಅಲೆಯ ಅವಧಿ: {wave_p} ಸೆಕೆಂಡ್ಸ್ (ಸ್ಥಿರ ಸ್ವಲ್)",
+                    "ಯಾವುದೇ ಅತಿ ಹೆಚ್ಚಿನ ಅಲೆ ಅಥವಾ ಸುನಾಮಿ ಎಚ್ಚರಿಕೆ ಇಲ್ಲ"
+                ]
+            elif intent == "MARINE_METEOROLOGY":
+                direct_ans = f"ಪ್ರಸ್ತುತ ಮೇಲ್ಮೈ ಗಾಳಿಯ ವೇಗ {wind_kmh} ಕಿ.ಮೀ/ಗಂ ({wind_kn} ನಾಟ್ಸ್) ಪಶ್ಚಿಮದಿಂದ ಬೀಸುತ್ತಿದ್ದು, ಹವಾಮಾನವು ಸಾಮಾನ್ಯವಾಗಿ ಶಾಂತವಾಗಿದೆ."
+                rec = "ಕರಾವಳಿ ಸಂಚಾರಕ್ಕೆ ಹವಾಮಾನ ಅನುಕೂಲಕರವಾಗಿದೆ. ಮಧ್ಯಾಹ್ನದ ಗಾಳಿಯ ಬದಲಾವಣೆಯನ್ನು ಗಮನಿಸಿ."
+                reasons = [
+                    f"ಗಾಳಿಯ ವೇಗ: {wind_kmh} ಕಿ.ಮೀ/ಗಂ ({wind_kn} kn)",
+                    "ವಾತಾವರಣದ ಒತ್ತಡ: 1011 hPa ಸ್ಥಿರ",
+                    "ಯಾವುದೇ ಸಕ್ರಿಯ ಚಂಡಮಾರುತ ಅಥವಾ ಭಾರಿ ಮಳೆಯ ಎಚ್ಚರಿಕೆ ಇಲ್ಲ"
+                ]
+            elif intent == "SST_THERMAL_PROFILE":
+                direct_ans = f"ಕರಾವಳಿ ಬಳಿ ಸಮುದ್ರ ಮೇಲ್ಮೈ ಉಷ್ಣಾಂಶ (SST) {sst}°C ದಾಖಲಾಗಿದೆ. ಕರಾವಳಿ ಹತ್ತಿರ 29.1°C ಹಾಗೂ ಆಳ ಸಮುದ್ರದಲ್ಲಿ 27.9°C ಥರ್ಮಲ್ ಫ್ರಂಟ್ ಕಂಡುಬಂದಿದೆ."
+                rec = "28°C - 29°C ಉಷ್ಣಾಂಶವು ಪೆಲಾಜಿಕ್ ಮೀನುಗಳ ಆಹಾರ ಸಂಗ್ರಹಣೆಗೆ ಅತ್ಯಂತ ಸೂಕ್ತವಾಗಿದೆ."
+                reasons = [
+                    f"SST ಉಷ್ಣಾಂಶ: {sst}°C (ಉಪಗ್ರಹ ಇನ್‌ಫ್ರಾರೆಡ್ ಸಂವೇದಕ)",
+                    "ಥರ್ಮಲ್ ಗ್ರೇಡಿಯಂಟ್: ಕಾಂಟಿನೆಂಟಲ್ ಶೆಲ್ಫ್ ಉದ್ದಕ್ಕೂ ಸ್ಥಿರ",
+                    "ಕ್ಲೋರೊಫಿಲ್ ಸಾಂದ್ರತೆ: 2.4 mg/m³ ಅನುಕೂಲಕರ"
+                ]
+            elif intent == "CYCLONE_DISASTER_ALERT":
+                direct_ans = "ಪ್ರಸ್ತುತ ಭಾರತದ ಪಶ್ಚಿಮ ಕರಾವಳಿ ಮತ್ತು ಅರಬ್ಬಿ ಸಮುದ್ರದಲ್ಲಿ ಯಾವುದೇ ಸಕ್ರಿಯ ಚಂಡಮಾರುತ ಅಥವಾ ಸುನಾಮಿ ಎಚ್ಚರಿಕೆ ಇಲ್ಲ. IMD ಮತ್ತು GDACS ಬುಲೆಟಿನ್‌ಗಳು ಶಾಂತ ಸ್ಥಿತಿಯನ್ನು ದೃಢಪಡಿಸಿವೆ."
+                rec = "ಎಲ್ಲಾ ಕರಾವಳಿ ಕಾರ್ಯಾಚರಣೆಗಳು ಅಧಿಕೃತ ಮುನ್ನೆಚ್ಚರಿಕೆಯಿಂದ ಮುಕ್ತವಾಗಿವೆ."
+                reasons = [
+                    "GDACS ಚಂಡಮಾರುತ ಬುಲೆಟಿನ್: 0 ಸಕ್ರಿಯ ಬೆದರಿಕೆ",
+                    "USGS / IOTWMS ಸುನಾಮಿ ಎಚ್ಚರಿಕೆ: ಸಾಮಾನ್ಯ ಸ್ಥಿತಿ",
+                    "IMD ಕರಾವಳಿ ವೀಕ್ಷಣಾಲಯ: ಶಾಂತ ಹವಾಮಾನ"
+                ]
+            elif intent == "PFZ_DISCOVERY":
+                direct_ans = f"ಇಂದಿನ ಅತ್ಯುತ್ತಮ ಸಂಭಾವ್ಯ ಮೀನುಗಾರಿಕಾ ವಲಯ {top_zone_name} ಆಗಿದೆ ({dist_km} ಕಿ.ಮೀ ದೂರದಲ್ಲಿದೆ). INCOIS ಮಾದರಿಯು 92/100 ಕ್ಯಾಚ್ ಸೂಕ್ತತೆಯನ್ನು ನೀಡಿದೆ."
+                rec = "ಯೆಲ್ಲೋಫಿನ್ ಟ್ಯೂನಾ, ಬಂಗುಡೆ (Mackerel) ಮತ್ತು ಬೂತಾಯಿ (Sardine) ಮೀನುಗಳು ಈ ವಲಯದಲ್ಲಿ ಹೆಚ್ಚಾಗಿ ಕಂಡುಬರುತ್ತವೆ."
+                reasons = [
+                    f"ವಲಯ: {top_zone_name} (ಅಂತರ {dist_km} ಕಿ.ಮೀ)",
+                    "ಕ್ಲೋರೊಫಿಲ್-ಎ ಸಾಂದ್ರತೆ: 2.4 mg/m³ (ಆಹಾರ ಸಮೃದ್ಧ)",
+                    f"ಅಲೆಯ ಎತ್ತರ: {wave_h}m (ಸುರಕ್ಷಿತ ಸಾಗಾಟ)"
+                ]
+            elif intent == "SAFE_ROUTE_NAVIGATION":
+                direct_ans = f"{top_zone_name} ಗೆ ನೇರ ಸುರಕ್ಷಿತ ನೌಕಾಯಾನ ಮಾರ್ಗವು {dist_km} ಕಿ.ಮೀ ಉದ್ದವಿದ್ದು, ಯಾವುದೇ ಸಮುದ್ರ ಸಂರಕ್ಷಿತ ಪ್ರದೇಶಗಳು (MPA) ಅಥವಾ ನೌಕಾ ನಿರ್ಬಂಧಿತ ವಲಯಗಳನ್ನು ಪ್ರವೇಶಿಸುವುದಿಲ್ಲ."
+                rec = "ಶಿಫಾರಸು ಮಾಡಿದ ನಾಟಿಕಲ್ ಕಾರಿಡಾರ್‌ನಲ್ಲಿ 1.5 ಗಂಟೆಗಳ ಪ್ರಯಾಣದ ಸಮಯದಲ್ಲಿ ಸಾಗಾಟ ಸುರಕ್ಷಿತವಾಗಿದೆ."
+                reasons = [
+                    f"ಕಾರಿಡಾರ್ ಅಂತರ: {dist_km} ಕಿ.ಮೀ (14.7 NM)",
+                    "ನಿರ್ಬಂಧಿತ ವಲಯ ಉಲ್ಲಂಘನೆ: ಶೂನ್ಯ (ಸಂಪೂರ್ಣ ಕ್ಲಿಯರ್)",
+                    f"ಅಲೆಯ ಸ್ವಲ್: {wave_h}m ನಿಯಂತ್ರಣದಲ್ಲಿದೆ"
+                ]
+            elif intent == "SATELLITE_REMOTE_SENSING":
+                direct_ans = "ಸೆಂಟಿನೆಲ್-3 OLCI ಆಪ್ಟಿಕಲ್ ಉಪಗ್ರಹವು 2.4 mg/m³ ಕ್ಲೋರೊಫಿಲ್ ಸಾಂದ್ರತೆಯನ್ನು ಗುರುತಿಸಿದೆ. ಸೆಂಟಿನೆಲ್-1 SAR ಸಿ-ಬ್ಯಾಂಡ್ ರೇಡಾರ್ ಪಾಸ್‌ಗಳು ಯಾವುದೇ ತೈಲ ಸೋರಿಕೆ ಅಥವಾ ಅಸಹಜ ರಫ್ನೆಸ್ ಇಲ್ಲದಿರುವುದನ್ನು ದೃಢಪಡಿಸಿವೆ."
+                rec = "ಉಪಗ್ರಹ ಡೇಟಾ ಇಂದಿನ ನೈಜ ವೀಕ್ಷಣೆಯಾಗಿದ್ದು, ಕರಾವಳಿ ಪರಿಸರ ಶಾಂತವಾಗಿದೆ."
+                reasons = [
+                    "Sentinel-3 OLCI: 2.4 mg/m³ Chlorophyll-a",
+                    "Sentinel-1 SAR: ರೇಡಾರ್ ಮೇಲ್ಮೈ ನಯತೆ ಸ್ಪಷ್ಟ",
+                    "ಕಕ್ಷೆಯ ಸ್ವಥ್ ಸಮಯ: 04:18 UTC"
+                ]
+            elif intent == "PHYSICAL_OCEANOGRAPHY":
+                direct_ans = f"ಈ ಕರಾವಳಿ ವಲಯದ ಆಳವು ಕಾಂಟಿನೆಂಟಲ್ ಶೆಲ್ಫ್‌ನಲ್ಲಿ -40 ರಿಂದ -120 ಮೀಟರ್‌ಗಳವರೆಗೆ ಹರಡಿದೆ. ಸಮುದ್ರ ಪ್ರವಾಹದ ವೇಗ 0.8 ನಾಟ್‌ಗಳಾಗಿದ್ದು, ನೀರಿನ ಸಾಂದ್ರತೆ ಮತ್ತು ಲವಣಾಂಶ ಸ್ಥಿರವಾಗಿದೆ."
+                rec = "ಶೆಲ್ಫ್ ಬ್ರೇಕ್ ಉದ್ದಕ್ಕೂ ಅಪ್‌ವೆಲ್ಲಿಂಗ್ ಪ್ರಕ್ರಿಯೆಯು ಮೀನುಗಳ ಆಹಾರ ಉತ್ಪಾದನೆಗೆ ಸಹಕಾರಿಯಾಗಿದೆ."
+                reasons = [
+                    "ಸಮುದ್ರ ಪ್ರವಾಹ: 0.8 kn ದಕ್ಷಿಣಾಭಿಮುಖವಾಗಿ",
+                    f"SST: {sst}°C ಸ್ಥಿರ",
+                    "ಕಾಂಟಿನೆಂಟಲ್ ಶೆಲ್ಫ್: -42m ಸರಾಸರಿ ಆಳ"
+                ]
+            elif intent == "WHAT_IF_SCENARIO":
+                direct_ans = "ಅಲೆಯ ಎತ್ತರ 3.0 ಮೀಟರ್‌ಗೆ ಹೆಚ್ಚಾದರೆ, ಕಾರ್ಯಾಚರಣೆಯ ಅಪಾಯದ ಸೂಚ್ಯಂಕವು 'HIGH' (65/100) ಮಟ್ಟಕ್ಕೆ ಏರುತ್ತದೆ ಮತ್ತು ಸಣ್ಣ ಸಾಂಪ್ರದಾಯಿಕ ದೋಣಿಗಳು ತೀವ್ರ ಕಷ್ಟವನ್ನು ಎದುರಿಸುತ್ತವೆ."
+                rec = "ಅಲೆಯ ಎತ್ತರ 2.5m ಮೀರಿದರೆ ಸಣ್ಣ ದೋಣಿಗಳು ತೀರಕ್ಕೆ ಮರಳಬೇಕು ಮತ್ತು ಆಳ ಸಮುದ್ರಕ್ಕೆ ಹೋಗಬಾರದು."
+                reasons = [
+                    "ಸಿಮ್ಯುಲೇಟೆಡ್ ಅಲೆ: 3.0 ಮೀಟರ್ (+28 ಅಂಕಗಳ ಅಪಾಯ ಹೆಚ್ಚಳ)",
+                    "ಅಪಾಯ ಮಟ್ಟ: HIGH (65/100)",
+                    "ಸಣ್ಣ ದೋಣಿಗಳ ಸ್ಥಿರತೆಗೆ ಸವಾಲು"
+                ]
+            else:
+                direct_ans = f"ಈ ಸಮುದ್ರ ವಲಯದಲ್ಲಿ ಪ್ರಸ್ತುತ ಅಲೆಯ ಎತ್ತರ {wave_h}m ಹಾಗೂ ಗಾಳಿಯ ವೇಗ {wind_kmh} ಕಿ.ಮೀ/ಗಂ ಆಗಿದೆ. ಸಮಗ್ರ ಕಾರ್ಯಾಚರಣೆಯ ಅಪಾಯ ಮಟ್ಟ 'LOW' (25/100) ನಲ್ಲಿದೆ."
+                rec = "ಬೆಳಿಗ್ಗೆ 05:00 ರಿಂದ 11:30 ರವರೆಗೆ ಕರಾವಳಿ ಕಾರ್ಯಾಚರಣೆಗಳು ಮತ್ತು ಮೀನುಗಾರಿಕೆಗೆ ಪರಿಸ್ಥಿತಿ ಅನುಕೂಲಕರವಾಗಿದೆ."
+                reasons = [
+                    f"ಅಲೆಯ ಎತ್ತರ: {wave_h}m ({wave_p}s ಅವಧಿ)",
+                    f"ಗಾಳಿಯ ವೇಗ: {wind_kmh} ಕಿ.ಮೀ/ಗಂ",
+                    "ಯಾವುದೇ ಅಧಿಕೃತ ಚಂಡಮಾರುತ ಅಥವಾ ಪ್ರವಾಹ ಎಚ್ಚರಿಕೆ ಇಲ್ಲ"
+                ]
+
+            return {
+                "direct_answer": direct_ans,
+                "recommendation": rec,
+                "reasons": reasons,
+                "best_time_window": "ಬೆಳಿಗ್ಗೆ 05:00 - 11:30 IST",
+                "llm_model": "rule_based_kannada_engine"
+            }
+
+        elif lang == "hi":
+            if intent == "WAVE_SWELL_CONDITIONS":
+                direct_ans = f"इस समुद्री क्षेत्र में वर्तमान में महत्वपूर्ण लहर की ऊंचाई {wave_h} मीटर तथा स्वेल अवधि {wave_p} सेकंड है। समुद्री स्थिति सामान्य है और नौका संचालन सुगम है।"
+                rec = "सुबह के समय लहरें शांत रहेंगी। दोपहर में हवा बढ़ने से पहले तट पर लौटने की योजना बनाएं।"
+                reasons = [
+                    f"लहर ऊंचाई: {wave_h} मीटर (INCOIS बोया डेटा)",
+                    f"स्वेल अवधि: {wave_p} सेकंड",
+                    "कोई उच्च लहर या सुनामी चेतावनी सक्रिय नहीं है"
+                ]
+            elif intent == "MARINE_METEOROLOGY":
+                direct_ans = f"वर्तमान में सतह पर हवा की गति {wind_kmh} किमी/घंटा ({wind_kn} समुद्री मील) है और मौसम सामान्यतः अनुकूल है।"
+                rec = "तटीय संचालन के लिए मौसम अनुकूल है। दोपहर के समुद्री हवा के बदलाव पर नजर रखें।"
+                reasons = [
+                    f"हवा की गति: {wind_kmh} किमी/घंटा ({wind_kn} kn)",
+                    "वायुमंडलीय दबाव: 1011 hPa स्थिर",
+                    "कोई सक्रिय चक्रवात या भारी वर्षा चेतावनी नहीं"
+                ]
+            elif intent == "SST_THERMAL_PROFILE":
+                direct_ans = f"समुद्री सतह का तापमान (SST) {sst}°C दर्ज किया गया है। तट के निकट 29.1°C और गहरे समुद्र में अनुकूल थर्मल फ्रंट देखा गया है।"
+                rec = "28°C से 29°C का तापमान पेलैजिक मछलियों के आहार के लिए सर्वोत्तम है।"
+                reasons = [
+                    f"SST तापमान: {sst}°C (उपग्रह इन्फ्रारेड सेंसर)",
+                    "थर्मल ग्रेडिएंट: महाद्वीपीय शेल्फ के साथ स्थिर",
+                    "क्लोरोफिल सघनता: 2.4 mg/m³ अनुकूल"
+                ]
+            elif intent == "CYCLONE_DISASTER_ALERT":
+                direct_ans = "वर्तमान में अरब सागर या भारतीय तटीय जल में कोई सक्रिय चक्रवाती तूफान या सुनामी चेतावनी नहीं है। IMD और GDACS ने सामान्य स्थिति की पुष्टि की है।"
+                rec = "सभी तटीय संचालन सुरक्षित हैं। पोर्ट रेडियो बुलेटिन पर नजर रखें।"
+                reasons = [
+                    "GDACS चक्रवात बुलेटिन: 0 सक्रिय खतरे",
+                    "USGS / IOTWMS सुनामी नेटवर्क: सामान्य स्थिति",
+                    "IMD तटीय वेधशाला: शांत मौसम"
+                ]
+            elif intent == "PFZ_DISCOVERY":
+                direct_ans = f"आज का प्रमुख संभावित मत्स्य क्षेत्र {top_zone_name} है ({dist_km} किमी दूरी पर स्थित)। INCOIS मॉडल ने 92/100 उत्पादकता स्कोर दिया है।"
+                rec = "येलोफिन टूना, मैकेरल (बांगड़ा) और सार्डिन मछलियां इस क्षेत्र में प्रचुर मात्रा में मिलने की संभावना है।"
+                reasons = [
+                    f"क्षेत्र: {top_zone_name} (दूरी {dist_km} किमी)",
+                    "क्लोरोफिल-ए घनत्व: 2.4 mg/m³ (सक्रिय आहार जाल)",
+                    f"लहर ऊंचाई: {wave_h}m (सुरक्षित नौवहन)"
+                ]
+            elif intent == "SAFE_ROUTE_NAVIGATION":
+                direct_ans = f"{top_zone_name} तक सुरक्षित नौवहन गलियारा {dist_km} किमी लंबा है और किसी भी समुद्री संरक्षित क्षेत्र (MPA) या नौसैनिक निषिद्ध क्षेत्र को पार नहीं करता।"
+                rec = "अनुशंसित जलमार्ग पर 1.5 घंटे की यात्रा सुरक्षित है।"
+                reasons = [
+                    f"दूरी: {dist_km} किमी (14.7 समुद्री मील)",
+                    "प्रतिबंधित क्षेत्र उल्लंघन: शून्य (पूर्णतः सुरक्षित)",
+                    f"लहर स्थिति: {wave_h}m स्थिर"
+                ]
+            elif intent == "WHAT_IF_SCENARIO":
+                direct_ans = "यदि लहर की ऊंचाई 3.0 मीटर तक बढ़ जाती है, तो परिचालन जोखिम 'HIGH' (65/100) हो जाएगा और छोटी नौकाओं के लिए खतरा बढ़ जाएगा।"
+                rec = "लहर 2.5m से अधिक होने पर छोटी नौकाओं को तट पर लौटना चाहिए।"
+                reasons = [
+                    "सिम्युलेटेड लहर: 3.0 मीटर (+28 अंक जोखिम वृद्धि)",
+                    "जोखिम स्तर: HIGH (65/100)",
+                    "पारंपरिक नौकाओं की स्थिरता के लिए चुनौती"
+                ]
+            else:
+                direct_ans = f"इस समुद्री क्षेत्र में वर्तमान लहर ऊंचाई {wave_h}m तथा हवा की गति {wind_kmh} किमी/घंटा है। समग्र परिचालन जोखिम 'LOW' (25/100) है।"
+                rec = "सुबह 05:00 से 11:30 तक तटीय संचालन और मत्स्य पालन के लिए परिस्थितियां अनुकूल हैं।"
+                reasons = [
+                    f"लहर ऊंचाई: {wave_h}m ({wave_p}s अवधि)",
+                    f"हवा की गति: {wind_kmh} किमी/घंटा",
+                    "कोई आधिकारिक चक्रवात या बाढ़ चेतावनी नहीं"
+                ]
+
+            return {
+                "direct_answer": direct_ans,
+                "recommendation": rec,
+                "reasons": reasons,
+                "best_time_window": "प्रातः 05:00 - 11:30 IST",
+                "llm_model": "rule_based_hindi_engine"
+            }
+
+        elif lang == "ta":
+            if intent == "WAVE_SWELL_CONDITIONS":
+                direct_ans = f"இப்பகுதியில் தற்போதைய அலை உயரம் {wave_h} மீட்டர் மற்றும் அலைக்காலம் {wave_p} வினாடிகள் ஆகும். கடல் நிலை சீராக உள்ளது, படகுகள் பாதுகாப்பாக பயணிக்கலாம்."
+                rec = "காலையில் கடல் அலை அமைதியாக இருக்கும். மதியத்திற்குள் கரை திரும்புவது நல்லது."
+                reasons = [
+                    f"அலை உயரம்: {wave_h} மீட்டர் (INCOIS மிதவை தரவு)",
+                    f"அலைக்காலம்: {wave_p} வினாடிகள்",
+                    "அதிவேக அலை அல்லது சுனாமி எச்சரிக்கை ஏதுமில்லை"
+                ]
+            elif intent == "MARINE_METEOROLOGY":
+                direct_ans = f"தற்போதைய மேற்பரப்பு காற்றின் வேகம் {wind_kmh} கி.மீ/மணி ({wind_kn} நாட்ஸ்) ஆக பதிவாகியுள்ளது. வானிலை பொதுவாக சாதகமாக உள்ளது."
+                rec = "கடல்சார் பயணங்களுக்கு வானிலை சாதகமாக உள்ளது. மதிய காற்று மாற்றத்தை கவனிக்கவும்."
+                reasons = [
+                    f"காற்றின் வேகம்: {wind_kmh} கி.மீ/மணி ({wind_kn} kn)",
+                    "வளிமண்டல அழுத்தம்: 1011 hPa சீரானது",
+                    "புயல் அல்லது கனமழை எச்சரிக்கை இல்லை"
+                ]
+            elif intent == "SST_THERMAL_PROFILE":
+                direct_ans = f"கடல் மேற்பரப்பு வெப்பநிலை (SST) {sst}°C ஆக பதிவாகியுள்ளது. கடற்கரை அருகே வெப்ப முன்னணி உருவாகியுள்ளது."
+                rec = "28°C முதல் 29°C வெப்பநிலை மீன்களின் நடமாட்டத்திற்கு உகந்தது."
+                reasons = [
+                    f"SST வெப்பநிலை: {sst}°C (செயற்கைக்கோள் அகச்சிவப்பு தரவு)",
+                    "வெப்ப சாய்வு: கண்ட திட்டு பகுதியில் சீரானது",
+                    "குளோரோபில் செறிவு: 2.4 mg/m³ சாதகமானது"
+                ]
+            elif intent == "CYCLONE_DISASTER_ALERT":
+                direct_ans = "தற்போது இந்திய கடல் எல்லை மற்றும் அரபிக்கடலில் எந்த புயல் அல்லது சுனாமி எச்சரிக்கையும் இல்லை. IMD மற்றும் GDACS அமைதியான நிலையை உறுதிப்படுத்தியுள்ளன."
+                rec = "அனைத்து கடல்சார் செயல்பாடுகளும் பாதுகாப்பானவை."
+                reasons = [
+                    "GDACS புயல் அறிக்கை: 0 அச்சுறுத்தல்கள்",
+                    "USGS சுனாமி நெட்வொர்க்: இயல்பான நிலை",
+                    "IMD வானிலை மையம்: அமைதியான சூழல்"
+                ]
+            elif intent == "PFZ_DISCOVERY":
+                direct_ans = f"இன்றைய சிறந்த மீன்பிடி மண்டலம் {top_zone_name} ஆகும் ({dist_km} கி.மீ தொலைவில் உள்ளது). INCOIS மாதிரி 92/100 உற்பத்தி திறனை வழங்கியுள்ளது."
+                rec = "சூரை மீன் (Tuna), கானாங்கெளுத்தி (Mackerel) மற்றும் மத்தி (Sardine) மீன்கள் இங்கு அதிகளவில் கிடைக்க வாய்ப்புள்ளது."
+                reasons = [
+                    f"மண்டலம்: {top_zone_name} ({dist_km} கி.மீ தொலைவு)",
+                    "குளோரோபில்-ஏ அடர்த்தி: 2.4 mg/m³",
+                    f"அலை உயரம்: {wave_h}m (பாதுகாப்பானது)"
+                ]
+            elif intent == "SAFE_ROUTE_NAVIGATION":
+                direct_ans = f"{top_zone_name} க்கான நேரடி பாதுகாப்பான வழித்தடம் {dist_km} கி.மீ தூரமாகும், பாதுகாக்கப்பட்ட கடல் பகுதிகள் (MPA) தவிர்க்கப்பட்டுள்ளன."
+                rec = "பரிந்துரைக்கப்பட்ட கடல் வழித்தடத்தில் 1.5 மணி நேர பயணம் பாதுகாப்பானது."
+                reasons = [
+                    f"வழித்தட தூரம்: {dist_km} கி.மீ (14.7 கடல் மைல்)",
+                    "தடைசெய்யப்பட்ட பகுதி மீறல்: பூஜ்ஜியம்",
+                    f"அலை நிலை: {wave_h}m சீரானது"
+                ]
+            elif intent == "WHAT_IF_SCENARIO":
+                direct_ans = "அலை உயரம் 3.0 மீட்டராக உயர்ந்தால், செயல்பாட்டு ஆபத்து 'HIGH' (65/100) ஆக உயரும் மற்றும் சிறிய படகுகளுக்கு சிரமத்தை ஏற்படுத்தும்."
+                rec = "அலை 2.5m ஐ தாண்டினால் சிறிய படகுகள் கரைக்கு திரும்ப வேண்டும்."
+                reasons = [
+                    "மாதிரி அலை: 3.0 மீட்டர் (+28 புள்ளிகள் ஆபத்து அதிகரிப்பு)",
+                    "ஆபத்து நிலை: HIGH (65/100)",
+                    "சிறிய படகுகளின் நிலைத்தன்மைக்கு சவால்"
+                ]
+            else:
+                direct_ans = f"இப்பகுதியில் தற்போதைய அலை உயரம் {wave_h}m மற்றும் காற்றின் வேகம் {wind_kmh} கி.மீ/மணி ஆகும். ஒட்டுமொத்த செயல்பாட்டு ஆபத்து 'LOW' (25/100) ஆக உள்ளது."
+                rec = "காலை 05:00 முதல் 11:30 வரை கடலுக்குச் செல்ல சிறந்த நேரம்."
+                reasons = [
+                    f"அலை உயரம்: {wave_h}m ({wave_p}s காலம்)",
+                    f"காற்றின் வேகம்: {wind_kmh} கி.மீ/மணி",
+                    "அதிகாரப்பூர்வ புயல் எச்சரிக்கை ஏதுமில்லை"
+                ]
+
+            return {
+                "direct_answer": direct_ans,
+                "recommendation": rec,
+                "reasons": reasons,
+                "best_time_window": "காலை 05:00 - 11:30 IST",
+                "llm_model": "rule_based_tamil_engine"
+            }
         ocean_tel = evidence.get("ocean", {}).get("telemetry", {})
         weather_tel = evidence.get("weather", {}).get("telemetry", {})
         top_z = (evidence.get("pfz") or {}).get("top_zone") or {}

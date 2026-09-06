@@ -28,3 +28,12 @@ frontend/.vite/
 .DS_Store
 Thumbs.db
 *.log
+
+# Data & Local Databases
+data/
+*.db
+*.sqlite
+
+# Root Video Raw Artifacts
+/*.mp4
+

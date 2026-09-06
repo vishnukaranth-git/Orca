@@ -15,18 +15,60 @@
 class OrcaAIAssistant {
   constructor() {
     this.isProcessing = false;
-    this.currentLanguage = 'en';
+    this.currentLanguage = (window.orcaI18n && window.orcaI18n.currentLang) || localStorage.getItem('orca_language') || 'en';
     this.sessionId = 'orca_session_' + Math.random().toString(36).substring(2, 9);
     this.conversationHistory = [];
     this.currentSpeechUtterance = null;
     this.isSpeaking = false;
     this.isPaused = false;
+    window.orcaAIAssistant = this;
   }
 
   init() {
     this.bindEvents();
     this.bindModalEvents();
     this.loadSessionHistory();
+    if (window.orcaI18n) {
+      window.orcaI18n.init();
+    }
+    if (window.orcaAuth) {
+      window.orcaAuth.init();
+    }
+    this.hydrateHeroEvidencePreview();
+  }
+
+  async hydrateHeroEvidencePreview() {
+    try {
+      const resp = await fetch(`${this.getApiBase()}/api/marine/current?latitude=12.9141&longitude=74.8560`);
+      if (resp.ok) {
+        const json = await resp.json();
+        const tel = json.data?.telemetry || {};
+        const waveEl = document.getElementById('hero-flow-wave');
+        const periodEl = document.getElementById('hero-flow-period');
+        const sstEl = document.getElementById('hero-flow-sst');
+        if (waveEl && tel.wave_height_meters !== undefined) waveEl.textContent = `${tel.wave_height_meters} m`;
+        if (periodEl && tel.wave_period_seconds !== undefined) periodEl.textContent = `${tel.wave_period_seconds} s`;
+        if (sstEl && tel.sst_celsius !== undefined) sstEl.textContent = `${tel.sst_celsius} °C`;
+      }
+    } catch (e) {
+      // Keep authoritative fallback values
+    }
+
+    try {
+      const weatherResp = await fetch(`${this.getApiBase()}/api/marine/current?latitude=12.9141&longitude=74.8560`);
+      if (weatherResp.ok) {
+        const wJson = await weatherResp.json();
+        const wTel = wJson.data?.weather_telemetry || {};
+        const windEl = document.getElementById('hero-flow-wind');
+        const gustsEl = document.getElementById('hero-flow-gusts');
+        const condEl = document.getElementById('hero-flow-cond');
+        if (windEl && wTel.wind_speed_kmh) windEl.textContent = `${wTel.wind_speed_kmh} km/h (${wTel.wind_speed_knots || 6.3} kn)`;
+        if (gustsEl && wTel.wind_gusts_knots) gustsEl.textContent = `${wTel.wind_gusts_knots} kn`;
+        if (condEl && wTel.condition) condEl.textContent = `${wTel.condition} / ${wTel.surface_pressure_hpa || 1011} hPa`;
+      }
+    } catch (e) {
+      // Keep authoritative fallback values
+    }
   }
 
   getApiBase() {
@@ -87,26 +129,9 @@ class OrcaAIAssistant {
     }
 
     // 5. Global Language Switcher in HUD
-    const langToggle = document.getElementById('lang-toggle');
-    if (langToggle) {
-      langToggle.addEventListener('click', () => {
-        this.currentLanguage = this.currentLanguage === 'en' ? 'kn' : 'en';
-        langToggle.innerHTML = this.currentLanguage === 'en'
-          ? '<span>EN</span> | <span style="opacity:0.6;">ಕನ್ನಡ</span>'
-          : '<span style="opacity:0.6;">EN</span> | <span style="color:#22d3b6;font-weight:bold;">ಕನ್ನಡ</span>';
-        
-        if (heroInput) {
-          heroInput.placeholder = this.currentLanguage === 'kn'
-            ? 'ಕನ್ನಡದಲ್ಲಿ ORCA ಗೆ ಪ್ರಶ್ನೆ ಕೇಳಿ...'
-            : 'Ask ORCA anything...';
-        }
-        if (bottomInput) {
-          bottomInput.placeholder = this.currentLanguage === 'kn'
-            ? 'ಕನ್ನಡದಲ್ಲಿ ORCA ಗೆ ಪ್ರಶ್ನೆ ಕೇಳಿ...'
-            : 'Ask ORCA in English or Kannada...';
-        }
-      });
-    }
+    window.addEventListener('orca:languageChanged', (e) => {
+      this.currentLanguage = e.detail?.lang || 'en';
+    });
   }
 
   bindModalEvents() {
@@ -210,16 +235,15 @@ class OrcaAIAssistant {
     // Remove active from other items
     list.querySelectorAll('.history-item').forEach(i => i.classList.remove('active'));
 
-    const now = new Date();
-    const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const riskLvl = (data.risk?.level || 'MODERATE').toUpperCase();
+    const riskScore = data.risk?.score ?? 25;
+    const rawRisk = (data.risk?.level || 'LOW').toUpperCase();
+    const riskLvl = rawRisk.replace('RISK', '').trim() || 'LOW';
+    const riskClass = (riskScore >= 75 ? 'critical' : riskScore >= 50 ? 'high' : riskScore >= 30 ? 'moderate' : 'low');
 
     item.innerHTML = `
       <div class="history-item-top">
-        <span class="query-text">${this.escapeHtml(queryText)}</span>
-      </div>
-      <div class="history-item-meta">
-        <span>${timeStr}</span> &middot; <span style="color:#00F5D4;">${riskLvl}</span>
+        <span class="query-text" title="${this.escapeHtml(queryText)}">${this.escapeHtml(queryText)}</span>
+        <span class="risk-pill ${riskClass}">${this.escapeHtml(riskLvl)}</span>
       </div>
     `;
 
@@ -275,12 +299,14 @@ class OrcaAIAssistant {
     // Call Backend Multi-Agent Orchestrator
     let reportData = null;
     try {
+      const activeLang = this.currentLanguage || (window.orcaI18n && window.orcaI18n.currentLang) || localStorage.getItem('orca_language') || 'en';
       const resp = await fetch(`${this.getApiBase()}/api/query`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           query: queryText,
-          session_id: this.sessionId
+          session_id: this.sessionId,
+          language: activeLang
         })
       });
       if (resp.ok) {
@@ -305,6 +331,9 @@ class OrcaAIAssistant {
     // Step 3: Append Structured ORCA Response Card into Chat Stream
     this.appendOrcaResponse(queryText, reportData);
     this.addHistorySidebarItem(queryText, reportData);
+    if (window.orcaAuth && typeof window.orcaAuth.persistUserChat === 'function') {
+      window.orcaAuth.persistUserChat(queryText, reportData);
+    }
     this.scrollToLatestMessage();
 
     // Step 4: Allow user to view completed synthesis or auto-transition after 1.5s
@@ -707,7 +736,7 @@ class OrcaAIAssistant {
     const recommendationText = data.recommendation || "";
 
     // Spoken Script (for Listen button)
-    const spokenText = `${directAnswer}. ${recommendationText && recommendationText !== directAnswer ? 'Recommendation: ' + recommendationText : ''}`;
+    const spokenText = data.speech_text || `${directAnswer}. ${recommendationText && recommendationText !== directAnswer ? recommendationText : ''}`;
 
     // Contextual Follow-up Chips (exactly 3)
     const followUps = (data.follow_up_suggestions || [
@@ -732,6 +761,10 @@ class OrcaAIAssistant {
       </li>
     `).join('');
 
+    const t = (k) => (window.orcaI18n ? window.orcaI18n.t(k) : k);
+    const tAgent = (ag) => (window.orcaI18n ? window.orcaI18n.tAgent(ag) : ag);
+    const tMetric = (m) => (window.orcaI18n ? window.orcaI18n.tMetric(m) : m);
+
     // Dynamic Evidence Cards from agents that actually executed
     const completedSteps = (data.execution_steps || []).filter(s => s.status === 'COMPLETED' && s.agent !== 'Planner Agent' && s.agent !== 'ORCA Synthesis Agent');
     const metaMap = this.getAgentMetadata();
@@ -744,11 +777,11 @@ class OrcaAIAssistant {
         const metricRowsHtml = metricEntries.length > 0
           ? metricEntries.map(([k, v]) => `
               <div class="ev-metric-item">
-                <span class="ev-metric-key">${this.escapeHtml(k)}:</span>
+                <span class="ev-metric-key">${this.escapeHtml(tMetric(k))}:</span>
                 <span class="ev-metric-val">${this.escapeHtml(String(v))}</span>
               </div>
             `).join('')
-          : `<div class="ev-metric-item"><span class="ev-metric-key">Telemetry:</span> <span class="ev-metric-val">${this.escapeHtml(step.detail || 'Verified Operational')}</span></div>`;
+          : `<div class="ev-metric-item"><span class="ev-metric-key">${this.escapeHtml(tMetric('Telemetry'))}:</span> <span class="ev-metric-val">${this.escapeHtml(step.detail || 'Verified Operational')}</span></div>`;
 
         // Clean concise source badge
         let rawSrc = step.source || meta.source || 'Operational Feed';
@@ -761,7 +794,7 @@ class OrcaAIAssistant {
             <div class="ev-agent-header">
               <div class="ev-agent-title-wrap">
                 <span class="ev-agent-symbol">${meta.symbol || '⚙️'}</span>
-                <span class="ev-agent-name">${this.escapeHtml(step.agent)}</span>
+                <span class="ev-agent-name">${this.escapeHtml(tAgent(step.agent))}</span>
               </div>
               <span class="ev-verified-pill">✓ LIVE</span>
             </div>
@@ -779,24 +812,24 @@ class OrcaAIAssistant {
       evidenceCardsHtml = `
         <div class="evidence-agent-card">
           <div class="ev-agent-header">
-            <div class="ev-agent-title-wrap"><span class="ev-agent-symbol">🌊</span><span class="ev-agent-name">Ocean Agent</span></div>
+            <div class="ev-agent-title-wrap"><span class="ev-agent-symbol">🌊</span><span class="ev-agent-name">${this.escapeHtml(tAgent('Ocean Agent'))}</span></div>
             <span class="ev-verified-pill">✓ LIVE</span>
           </div>
           <div class="ev-source-line"><span class="ev-source-label">SRC:</span><span class="ev-source-val">INCOIS Deep Sea Buoys</span></div>
           <div class="ev-metrics-list">
-            <div class="ev-metric-item"><span class="ev-metric-key">Wave Height:</span> <span class="ev-metric-val">${this.escapeHtml(waveVal)}</span></div>
-            <div class="ev-metric-item"><span class="ev-metric-key">SST:</span> <span class="ev-metric-val">${this.escapeHtml(sstVal)}</span></div>
+            <div class="ev-metric-item"><span class="ev-metric-key">${this.escapeHtml(tMetric('Wave Height'))}:</span> <span class="ev-metric-val">${this.escapeHtml(waveVal)}</span></div>
+            <div class="ev-metric-item"><span class="ev-metric-key">${this.escapeHtml(tMetric('SST'))}:</span> <span class="ev-metric-val">${this.escapeHtml(sstVal)}</span></div>
           </div>
         </div>
         <div class="evidence-agent-card">
           <div class="ev-agent-header">
-            <div class="ev-agent-title-wrap"><span class="ev-agent-symbol">💨</span><span class="ev-agent-name">Weather Agent</span></div>
+            <div class="ev-agent-title-wrap"><span class="ev-agent-symbol">💨</span><span class="ev-agent-name">${this.escapeHtml(tAgent('Weather Agent'))}</span></div>
             <span class="ev-verified-pill">✓ LIVE</span>
           </div>
           <div class="ev-source-line"><span class="ev-source-label">SRC:</span><span class="ev-source-val">IMD Synoptic Mesh</span></div>
           <div class="ev-metrics-list">
-            <div class="ev-metric-item"><span class="ev-metric-key">Wind Speed:</span> <span class="ev-metric-val">${this.escapeHtml(windVal)}</span></div>
-            <div class="ev-metric-item"><span class="ev-metric-key">Status:</span> <span class="ev-metric-val">Fair Condition</span></div>
+            <div class="ev-metric-item"><span class="ev-metric-key">${this.escapeHtml(tMetric('Wind Speed'))}:</span> <span class="ev-metric-val">${this.escapeHtml(windVal)}</span></div>
+            <div class="ev-metric-item"><span class="ev-metric-key">${this.escapeHtml(tMetric('Condition'))}:</span> <span class="ev-metric-val">Fair Condition</span></div>
           </div>
         </div>
       `;
@@ -807,7 +840,7 @@ class OrcaAIAssistant {
       <div class="orca-card-header">
         <div class="orca-card-header-left">
           <i data-lucide="compass" style="width:16px;height:16px;color:#2dd4bf;"></i>
-          <span class="orca-badge-tag">ORCA MARINE INTELLIGENCE</span>
+          <span class="orca-badge-tag">${this.escapeHtml(t('card_header_title') || 'ORCA MARINE INTELLIGENCE')}</span>
         </div>
         <span class="orca-card-time">${data.best_time_window || 'Operational Window · Real-Time'}</span>
       </div>
@@ -816,10 +849,10 @@ class OrcaAIAssistant {
       <div class="orca-assessment-block">
         <div class="assessment-header-row">
           <div class="assessment-title-group">
-            <span class="assessment-label">DIRECT INTELLIGENCE ANSWER</span>
+            <span class="assessment-label">${this.escapeHtml(t('direct_ans_label') || 'DIRECT INTELLIGENCE ANSWER')}</span>
             <span class="risk-badge-tag ${riskClass}">${riskLevel}</span>
           </div>
-          <span class="risk-score-pill">SCORE: ${riskScore}/100</span>
+          <span class="risk-score-pill">${this.escapeHtml(t('score_label') || 'SCORE:')} ${riskScore}/100</span>
         </div>
         <div class="common-user-summary" style="margin-top:10px;padding:12px 14px;background:rgba(15,23,42,0.65);border-radius:8px;border:1px solid rgba(255,255,255,0.08);">
           <p style="font-size:14px;line-height:1.65;color:#ffffff;font-weight:500;margin:0;">${this.escapeHtml(directAnswer)}</p>
@@ -828,7 +861,7 @@ class OrcaAIAssistant {
 
       <!-- 2. WHY / KEY EVIDENCE FINDINGS -->
       <div class="orca-why-block">
-        <div class="block-section-title">WHY / KEY EVIDENCE FINDINGS</div>
+        <div class="block-section-title">${this.escapeHtml(t('why_evidence_title') || 'WHY / KEY EVIDENCE FINDINGS')}</div>
         <ul class="why-bullet-list" style="display:flex;flex-direction:column;padding-left:0;list-style:none;">
           ${reasonsHtml}
         </ul>
@@ -837,8 +870,8 @@ class OrcaAIAssistant {
       <!-- 3. EVIDENCE FROM SPECIALIST AGENTS -->
       <div class="orca-evidence-block">
         <div class="evidence-block-header">
-          <span class="block-section-title">EVIDENCE FROM SPECIALIST AGENTS</span>
-          <span class="confidence-tag">MULTI-AGENT SENSOR FUSION &middot; CONFIDENCE: ${data.risk?.confidence_score || 94}%</span>
+          <span class="block-section-title">${this.escapeHtml(t('evidence_specialists_title') || 'EVIDENCE FROM SPECIALIST AGENTS')}</span>
+          <span class="confidence-tag">${this.escapeHtml(t('sensor_fusion_conf') || 'MULTI-AGENT SENSOR FUSION · CONFIDENCE:')} ${data.risk?.confidence_score || 94}%</span>
         </div>
         <div class="evidence-cards-grid">
           ${evidenceCardsHtml}
@@ -848,7 +881,7 @@ class OrcaAIAssistant {
       <!-- 4. RECOMMENDATION -->
       ${(recommendationText && recommendationText !== directAnswer) ? `
       <div class="orca-recommendation-block">
-        <div class="block-section-title">OPERATIONAL RECOMMENDATION &amp; ADVISORY</div>
+        <div class="block-section-title">${this.escapeHtml(t('op_recommendation_title') || 'OPERATIONAL RECOMMENDATION & ADVISORY')}</div>
         <div class="recommendation-box">
           <i data-lucide="shield-check" class="rec-icon"></i>
           <div class="rec-text">${this.escapeHtml(recommendationText)}</div>
@@ -861,7 +894,7 @@ class OrcaAIAssistant {
         <summary class="tech-evidence-summary">
           <div class="summary-left">
             <i data-lucide="database" style="width:13px;height:13px;color:#2dd4bf;"></i>
-            <span>TECHNICAL EVIDENCE (EXPAND FOR RESEARCHERS)</span>
+            <span>${this.escapeHtml(t('tech_evidence_title') || 'TECHNICAL EVIDENCE (EXPAND FOR RESEARCHERS)')}</span>
           </div>
           <i data-lucide="chevron-down" class="summary-chevron"></i>
         </summary>
@@ -877,7 +910,7 @@ class OrcaAIAssistant {
           <div style="margin-top:10px;display:flex;justify-content:flex-end;">
             <button class="tech-provenance-btn btn-show-evidence">
               <i data-lucide="table" style="width:12px;height:12px;"></i>
-              <span>View Full Scientific Provenance Table</span>
+              <span>${this.escapeHtml(t('provenance_btn_text') || 'View Full Scientific Provenance Table')}</span>
             </button>
           </div>
         </div>
@@ -888,7 +921,7 @@ class OrcaAIAssistant {
         <div class="card-action-btns-group">
           <button class="card-action-btn btn-view-map">
             <i data-lucide="map" style="width:13px;height:13px;"></i>
-            <span>View on Map</span>
+            <span>${this.escapeHtml(t('btn_view_on_map') || 'View on Map')}</span>
           </button>
         </div>
 
@@ -902,7 +935,7 @@ class OrcaAIAssistant {
               <span class="bar"></span>
             </span>
             <i data-lucide="volume-2" class="voice-icon-speaker" style="width:13px;height:13px;"></i>
-            <span class="voice-btn-text">🔊 Listen</span>
+            <span class="voice-btn-text">${this.escapeHtml(t('btn_listen') || '🔊 Listen')}</span>
           </button>
           <button class="card-action-btn btn-stop-voice" style="display:none;padding:5px 8px;" title="Stop Voice">
             <i data-lucide="square" style="width:10px;height:10px;"></i>
@@ -912,7 +945,7 @@ class OrcaAIAssistant {
 
       <!-- Exactly 3 Contextual Follow-Up Suggestions -->
       <div class="follow-up-suggestions-row">
-        <div class="follow-up-label"><i data-lucide="sparkles" style="width:11px;height:11px;color:#2dd4bf;margin-right:4px;"></i>SUGGESTED FOLLOW-UPS:</div>
+        <div class="follow-up-label"><i data-lucide="sparkles" style="width:11px;height:11px;color:#2dd4bf;margin-right:4px;"></i>${this.escapeHtml((t('hero_suggested_label') || 'SUGGESTED FOLLOW-UPS').toUpperCase())}:</div>
         <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;">
           ${followUps.map(s => `
             <button class="follow-up-chip">
@@ -975,10 +1008,14 @@ class OrcaAIAssistant {
       return;
     }
 
+    const t = (k) => (window.orcaI18n ? window.orcaI18n.t(k) : k);
+    const activeLang = this.currentLanguage || (window.orcaI18n && window.orcaI18n.currentLang) || 'en';
+
     if (this.isSpeaking && !this.isPaused) {
       window.speechSynthesis.pause();
       this.isPaused = true;
-      if (btnText) btnText.textContent = '▶ Resume';
+      const resumeLabel = activeLang === 'kn' ? '▶ ಮುಂದುವರಿಸಿ' : activeLang === 'hi' ? '▶ जारी रखें' : activeLang === 'ta' ? '▶ தொடரவும்' : '▶ Resume';
+      if (btnText) btnText.textContent = resumeLabel;
       if (waveBars) waveBars.style.display = 'none';
       if (speakerIcon) speakerIcon.style.display = 'inline-block';
       return;
@@ -987,7 +1024,7 @@ class OrcaAIAssistant {
     if (this.isPaused) {
       window.speechSynthesis.resume();
       this.isPaused = false;
-      if (btnText) btnText.textContent = '⏸ Pause';
+      if (btnText) btnText.textContent = t('btn_pause') || '⏸ Pause';
       if (waveBars) waveBars.style.display = 'inline-flex';
       if (speakerIcon) speakerIcon.style.display = 'none';
       return;
@@ -995,41 +1032,51 @@ class OrcaAIAssistant {
 
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(textToSpeak);
-    const isKn = /[\u0C80-\u0CFF]/.test(textToSpeak) || this.currentLanguage === 'kn';
-    const isHi = /[\u0900-\u097F]/.test(textToSpeak) || this.currentLanguage === 'hi';
+    const isKn = activeLang === 'kn' || /[\u0C80-\u0CFF]/.test(textToSpeak);
+    const isHi = activeLang === 'hi' || /[\u0900-\u097F]/.test(textToSpeak);
+    const isTa = activeLang === 'ta' || /[\u0B80-\u0BFF]/.test(textToSpeak);
 
-    utterance.lang = isKn ? 'kn-IN' : isHi ? 'hi-IN' : 'en-US';
+    utterance.lang = isKn ? 'kn-IN' : isHi ? 'hi-IN' : isTa ? 'ta-IN' : 'en-US';
     utterance.rate = 0.95;
+
+    // Pick matching browser voice for Indian language TTS if available
+    const voices = window.speechSynthesis.getVoices ? window.speechSynthesis.getVoices() : [];
+    if (voices && voices.length > 0) {
+      let matchedVoice = null;
+      if (isKn) {
+        matchedVoice = voices.find(v => v.lang && (v.lang === 'kn-IN' || v.lang.startsWith('kn') || v.name.toLowerCase().includes('kannada')));
+      } else if (isHi) {
+        matchedVoice = voices.find(v => v.lang && (v.lang === 'hi-IN' || v.lang.startsWith('hi') || v.name.toLowerCase().includes('hindi')));
+      } else if (isTa) {
+        matchedVoice = voices.find(v => v.lang && (v.lang === 'ta-IN' || v.lang.startsWith('ta') || v.name.toLowerCase().includes('tamil')));
+      }
+      if (matchedVoice) {
+        utterance.voice = matchedVoice;
+      }
+    }
 
     utterance.onstart = () => {
       this.isSpeaking = true;
       this.isPaused = false;
       if (playBtn) playBtn.classList.add('active');
       if (stopBtn) stopBtn.style.display = 'inline-flex';
-      if (btnText) btnText.textContent = '⏸ Pause';
+      if (btnText) btnText.textContent = t('btn_pause') || '⏸ Pause';
       if (waveBars) waveBars.style.display = 'inline-flex';
       if (speakerIcon) speakerIcon.style.display = 'none';
     };
 
-    utterance.onend = () => {
+    const resetUI = () => {
       this.isSpeaking = false;
       this.isPaused = false;
       if (playBtn) playBtn.classList.remove('active');
       if (stopBtn) stopBtn.style.display = 'none';
-      if (btnText) btnText.textContent = '🔊 Listen';
+      if (btnText) btnText.textContent = t('btn_listen') || '🔊 Listen';
       if (waveBars) waveBars.style.display = 'none';
       if (speakerIcon) speakerIcon.style.display = 'inline-block';
     };
 
-    utterance.onerror = () => {
-      this.isSpeaking = false;
-      this.isPaused = false;
-      if (playBtn) playBtn.classList.remove('active');
-      if (stopBtn) stopBtn.style.display = 'none';
-      if (btnText) btnText.textContent = '🔊 Listen';
-      if (waveBars) waveBars.style.display = 'none';
-      if (speakerIcon) speakerIcon.style.display = 'inline-block';
-    };
+    utterance.onend = resetUI;
+    utterance.onerror = resetUI;
 
     this.currentSpeechUtterance = utterance;
     window.speechSynthesis.speak(utterance);
@@ -1037,11 +1084,12 @@ class OrcaAIAssistant {
 
   stopVoicePlayback(playBtn, stopBtn, btnText, waveBars, speakerIcon) {
     if (window.speechSynthesis) window.speechSynthesis.cancel();
+    const t = (k) => (window.orcaI18n ? window.orcaI18n.t(k) : k);
     this.isSpeaking = false;
     this.isPaused = false;
     if (playBtn) playBtn.classList.remove('active');
     if (stopBtn) stopBtn.style.display = 'none';
-    if (btnText) btnText.textContent = '🔊 Listen';
+    if (btnText) btnText.textContent = t('btn_listen') || '🔊 Listen';
     if (waveBars) waveBars.style.display = 'none';
     if (speakerIcon) speakerIcon.style.display = 'inline-block';
   }

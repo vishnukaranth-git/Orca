@@ -6,7 +6,7 @@
 
 class OrcaApp {
   constructor() {
-    this.currentView = 'ask-orca';
+    this.currentView = 'landing';
     this.mapController = null;
     this.agentNetwork = null;
     this.satelliteLab = null;
@@ -52,8 +52,8 @@ class OrcaApp {
     this.fetchLiveTelemetry();
     this.loadPFZData();
 
-    // Default view: Ask ORCA (Primary Agentic AI Experience)
-    this.switchView('ask-orca');
+    // Default view: Full-Screen Cinematic Landing Page
+    this.switchView('landing');
 
     // Popover click-outside dismissal
     document.addEventListener('click', (e) => {
@@ -179,27 +179,29 @@ class OrcaApp {
     const card = document.getElementById('route-results-card');
     if (!card) return;
 
+    const t = (k) => (window.orcaI18n ? window.orcaI18n.t(k) : k);
+
     const warningsHtml = (route.restricted_zone_warnings && route.restricted_zone_warnings.length > 0)
       ? route.restricted_zone_warnings.map(w => `<div style="color:#fbbf24;font-size:11px;margin-top:4px;">⚠ ${w}</div>`).join('')
-      : `<div style="color:#22d3b6;font-size:11px;margin-top:4px;">✓ Safe Channel Clear of Marine Sanctuaries & Military Sectors</div>`;
+      : `<div style="color:#22d3b6;font-size:11px;margin-top:4px;">${t('route_clear_text')}</div>`;
 
     card.innerHTML = `
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;border-bottom:1px solid rgba(36,160,200,0.2);padding-bottom:6px;">
         <b style="font-family:'Rajdhani',sans-serif;font-size:14px;color:#fff;">${route.route_type}</b>
-        <span class="telemetry-tag" style="color:#22d3b6;">PASSAGE CLEARED</span>
+        <span class="telemetry-tag" style="color:#22d3b6;">${t('route_passage_cleared')}</span>
       </div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;font-size:11.5px;margin-bottom:8px;">
-        <div><span style="color:var(--text-muted);">Distance:</span> <b style="font-family:var(--font-mono);color:#fff;">${route.distance_km} km</b></div>
-        <div><span style="color:var(--text-muted);">Nautical:</span> <b style="font-family:var(--font-mono);color:#fff;">${route.distance_nm} NM</b></div>
-        <div><span style="color:var(--text-muted);">Est. Transit:</span> <b style="font-family:var(--font-mono);color:#22d3b6;">${route.estimated_transit_hours} hrs</b></div>
+        <div><span style="color:var(--text-muted);">${t('route_distance')}</span> <b style="font-family:var(--font-mono);color:#fff;">${route.distance_km} km</b></div>
+        <div><span style="color:var(--text-muted);">${t('route_nautical')}</span> <b style="font-family:var(--font-mono);color:#fff;">${route.distance_nm} NM</b></div>
+        <div><span style="color:var(--text-muted);">${t('route_transit')}</span> <b style="font-family:var(--font-mono);color:#22d3b6;">${route.estimated_transit_hours} hrs</b></div>
       </div>
       <div style="background:rgba(3,14,24,0.7);padding:8px;border-radius:4px;margin-bottom:8px;">
-        <div style="font-size:10px;font-family:var(--font-mono);color:var(--text-muted);">SAFETY CHECK & GEOFENCING:</div>
+        <div style="font-size:10px;font-family:var(--font-mono);color:var(--text-muted);">${t('route_safety_check')}</div>
         ${warningsHtml}
       </div>
       <button id="btn-recenter-route" class="orca-recenter-btn" style="width:100%;display:flex;align-items:center;justify-content:center;gap:6px;background:rgba(34,211,182,0.12);border:1px solid rgba(34,211,182,0.45);color:#22d3b6;padding:7px 10px;border-radius:4px;cursor:pointer;font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:0.04em;transition:all 0.18s ease;">
         <i data-lucide="crosshair" style="width:13px;height:13px;"></i>
-        <span>RE-FRAME CORRIDOR OVERVIEW</span>
+        <span>${t('route_recenter_btn')}</span>
       </button>
     `;
     card.style.display = 'block';
@@ -217,6 +219,15 @@ class OrcaApp {
   switchView(viewId) {
     this.currentView = viewId;
 
+    const appContainer = document.getElementById('orca-app');
+    if (appContainer) {
+      if (viewId === 'landing') {
+        appContainer.classList.add('is-landing-mode');
+      } else {
+        appContainer.classList.remove('is-landing-mode');
+      }
+    }
+
     // Update Nav buttons
     document.querySelectorAll('.nav-tab-btn').forEach(btn => {
       btn.classList.toggle('active', btn.dataset.view === viewId);
@@ -224,8 +235,20 @@ class OrcaApp {
 
     // Update View Panels
     document.querySelectorAll('.view-panel').forEach(panel => {
-      panel.classList.toggle('active', panel.id === `view-${viewId}`);
+      const isTarget = (panel.id === `view-${viewId}`);
+      panel.classList.toggle('active', isTarget);
+      if (isTarget && viewId === 'landing') {
+        panel.scrollTop = 0;
+      }
     });
+
+    // Landing Video Playback Check
+    if (viewId === 'landing') {
+      const landingVid = document.getElementById('landing-hero-video');
+      if (landingVid && landingVid.paused) {
+        landingVid.play().catch(e => console.log('Autoplay deferred until user interaction'));
+      }
+    }
 
     // Invalidate map size so background map is always active & responsive across all views
     if (this.mapController && this.mapController.map) {
@@ -554,6 +577,7 @@ class OrcaApp {
       this.pfzZones = this.getFallbackPFZZones();
     }
 
+    const t = (k) => (window.orcaI18n ? window.orcaI18n.t(k) : k);
     const origin = this.getActiveReferenceOrigin();
 
     // Compute live distance from active reference origin for every zone
@@ -585,7 +609,7 @@ class OrcaApp {
     ];
 
     if (this.currentSort === 'all') {
-      if (filterLabel) filterLabel.textContent = 'ALL 8 ZONES (CANONICAL)';
+      if (filterLabel) filterLabel.textContent = `${t('filter_all').toUpperCase()} (CANONICAL)`;
       list.sort((a, b) => {
         const idxA = CANONICAL_ORDER.indexOf(a.zone_id);
         const idxB = CANONICAL_ORDER.indexOf(b.zone_id);
@@ -593,16 +617,16 @@ class OrcaApp {
         return (a.zone_name || '').localeCompare(b.zone_name || '');
       });
     } else if (this.currentSort === 'nearest') {
-      if (filterLabel) filterLabel.textContent = 'NEAREST (COASTAL PROXIMITY)';
+      if (filterLabel) filterLabel.textContent = `${t('rank_nearest')} (COASTAL PROXIMITY)`;
       list.sort((a, b) => (parseFloat(a.distance_km) || 0) - (parseFloat(b.distance_km) || 0));
     } else if (this.currentSort === 'safest') {
-      if (filterLabel) filterLabel.textContent = 'SAFEST (WEATHER & METOCEAN)';
+      if (filterLabel) filterLabel.textContent = `${t('rank_safest')} (WEATHER & METOCEAN)`;
       list.sort((a, b) => (parseFloat(b.safety_score) || 0) - (parseFloat(a.safety_score) || 0));
     } else if (this.currentSort === 'potential') {
-      if (filterLabel) filterLabel.textContent = 'HIGHEST CATCH (CHL-A & SST)';
+      if (filterLabel) filterLabel.textContent = `${t('rank_highest_catch')} (CHL-A & SST)`;
       list.sort((a, b) => (parseFloat(b.potential_score) || 0) - (parseFloat(a.potential_score) || 0));
     } else { // 'best' or 'orca'
-      if (filterLabel) filterLabel.textContent = 'BEST OVERALL (ORCA SCORE)';
+      if (filterLabel) filterLabel.textContent = `${t('rank_best_overall')} (ORCA SCORE)`;
       list.sort((a, b) => (parseFloat(b.orca_score) || 0) - (parseFloat(a.orca_score) || 0));
     }
 
@@ -610,15 +634,15 @@ class OrcaApp {
       const rank = idx + 1;
       let rankTag = '';
       if (this.currentSort === 'best' || this.currentSort === 'orca') {
-        rankTag = `<span class="pfz-card-rank-tag best">#${rank} BEST OVERALL</span>`;
+        rankTag = `<span class="pfz-card-rank-tag best">#${rank} ${t('rank_best_overall')}</span>`;
       } else if (this.currentSort === 'nearest') {
-        rankTag = `<span class="pfz-card-rank-tag nearest">#${rank} NEAREST · ${z.distance_km} KM</span>`;
+        rankTag = `<span class="pfz-card-rank-tag nearest">#${rank} ${t('rank_nearest')} · ${z.distance_km} KM</span>`;
       } else if (this.currentSort === 'safest') {
-        rankTag = `<span class="pfz-card-rank-tag safest">#${rank} SAFEST · SCORE ${z.safety_score}</span>`;
+        rankTag = `<span class="pfz-card-rank-tag safest">#${rank} ${t('rank_safest')} · SCORE ${z.safety_score}</span>`;
       } else if (this.currentSort === 'potential') {
-        rankTag = `<span class="pfz-card-rank-tag potential">#${rank} HIGHEST CATCH · ${z.potential_score}</span>`;
+        rankTag = `<span class="pfz-card-rank-tag potential">#${rank} ${t('rank_highest_catch')} · ${z.potential_score}</span>`;
       } else {
-        rankTag = `<span class="pfz-card-rank-tag all">SECTOR ${rank} OF ${list.length}</span>`;
+        rankTag = `<span class="pfz-card-rank-tag all">${t('rank_sector_of')} ${rank} / ${list.length}</span>`;
       }
 
       const isBest = this.currentSort === 'best' || this.currentSort === 'orca';
@@ -636,7 +660,7 @@ class OrcaApp {
               </div>
               <div class="pfz-card-zone-name">${z.zone_name}</div>
               <div class="pfz-card-coords-tag" style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);">
-                COORDINATES: ${z.latitude.toFixed(2)}°N, ${z.longitude.toFixed(2)}°E
+                ${t('card_coordinates')} ${z.latitude.toFixed(2)}°N, ${z.longitude.toFixed(2)}°E
               </div>
             </div>
             <div class="pfz-full-orca-badge ${isBest ? 'highlighted' : ''}">
@@ -646,26 +670,26 @@ class OrcaApp {
 
           <div class="pfz-card-metrics-grid">
             <div class="pfz-metric-cell ${isPotential ? 'active-metric' : ''}">
-              <span class="lbl">Potential</span>
+              <span class="lbl">${t('card_potential')}</span>
               <span class="val ${isPotential ? 'highlight-active' : 'green'}">${z.potential_score}/100</span>
             </div>
             <div class="pfz-metric-cell ${isSafest ? 'active-metric' : ''}">
-              <span class="lbl">Safety</span>
+              <span class="lbl">${t('card_safety')}</span>
               <span class="val ${isSafest ? 'highlight-active' : ''}">${z.safety_score}/100</span>
             </div>
             <div class="pfz-metric-cell ${isNearest ? 'active-metric' : ''}">
-              <span class="lbl">Distance</span>
+              <span class="lbl">${t('card_distance')}</span>
               <span class="val ${isNearest ? 'highlight-active' : ''}">${z.distance_km} km</span>
             </div>
             <div class="pfz-metric-cell">
-              <span class="lbl">Depth</span>
+              <span class="lbl">${t('card_depth')}</span>
               <span class="val">-${z.depth_m}m</span>
             </div>
           </div>
 
           <div class="pfz-species-row">
             <i data-lucide="fish"></i>
-            <span><b>Target Species:</b> ${z.target_species}</span>
+            <span><b>${t('card_target_species')}</b> ${z.target_species}</span>
           </div>
 
           <div class="pfz-rationale-box">
@@ -674,7 +698,7 @@ class OrcaApp {
 
           <button class="pfz-select-plot-btn" onclick="event.stopPropagation(); orcaApp.inspectPFZ(${z.latitude}, ${z.longitude})">
             <i data-lucide="crosshair" style="width:13px;height:13px;"></i>
-            <span>OK, PLOT THIS ON MAP &rarr;</span>
+            <span>${t('card_btn_plot')}</span>
           </button>
         </div>
       `;
@@ -689,6 +713,8 @@ class OrcaApp {
     const container = document.getElementById('disaster-feed-container');
     if (!container) return;
 
+    const t = (k) => (window.orcaI18n ? window.orcaI18n.t(k) : k);
+
     try {
       const resp = await fetch(`${this.getApiBase()}/api/disasters`);
       if (resp.ok) {
@@ -697,14 +723,14 @@ class OrcaApp {
         
         container.innerHTML = hazards.map(h => {
           let lat = 12.78, lng = 75.12;
-          const t = (h.title + " " + (h.description || "")).toLowerCase();
-          if (t.includes("japan")) { lat = 34.5; lng = 137.5; }
-          else if (t.includes("vietnam")) { lat = 16.0; lng = 108.5; }
-          else if (t.includes("cyclone") || t.includes("twentythree") || t.includes("nwpacific") || t.includes("philippine")) { lat = 17.5; lng = 124.0; }
-          else if (t.includes("bengal") || t.includes("odisha") || t.includes("andhra")) { lat = 18.5; lng = 87.0; }
-          else if (t.includes("arabian") || t.includes("gujarat") || t.includes("karnataka")) { lat = 14.5; lng = 73.5; }
-          else if (t.includes("lakshadweep")) { lat = 10.5; lng = 72.5; }
-          else if (t.includes("andaman")) { lat = 11.5; lng = 93.0; }
+          const titLower = (h.title + " " + (h.description || "")).toLowerCase();
+          if (titLower.includes("japan")) { lat = 34.5; lng = 137.5; }
+          else if (titLower.includes("vietnam")) { lat = 16.0; lng = 108.5; }
+          else if (titLower.includes("cyclone") || titLower.includes("twentythree") || titLower.includes("nwpacific") || titLower.includes("philippine")) { lat = 17.5; lng = 124.0; }
+          else if (titLower.includes("bengal") || titLower.includes("odisha") || titLower.includes("andhra")) { lat = 18.5; lng = 87.0; }
+          else if (titLower.includes("arabian") || titLower.includes("gujarat") || titLower.includes("karnataka")) { lat = 14.5; lng = 73.5; }
+          else if (titLower.includes("lakshadweep")) { lat = 10.5; lng = 72.5; }
+          else if (titLower.includes("andaman")) { lat = 11.5; lng = 93.0; }
 
           const safeTitle = (h.title || 'Marine Hazard').replace(/'/g, "\\'").replace(/"/g, '&quot;');
           const sevClass = (h.severity || 'watch').toLowerCase();
@@ -726,13 +752,13 @@ class OrcaApp {
               </div>
 
               <div class="disaster-action-box">
-                <b>RECOMMENDED MARITIME ACTION:</b>
+                <b>${t('disaster_action_lbl')}</b>
                 <span>${h.recommended_action || 'Avoid affected maritime sectors; monitor local port control on VHF Ch 16.'}</span>
               </div>
 
               <button class="disaster-select-plot-btn" onclick="event.stopPropagation(); orcaApp.inspectHazard(${lat}, ${lng}, '${safeTitle}')">
                 <i data-lucide="crosshair" style="width:13px;height:13px;"></i>
-                <span>OK, PLOT THIS ON MAP &rarr;</span>
+                <span>${t('card_btn_plot')}</span>
               </button>
             </div>
           `;
@@ -759,6 +785,35 @@ class OrcaApp {
         this.mapController.flyTo(lat, lon, 8.5);
       }
     });
+  }
+
+  syncHistoricalToRegion(regionKey) {
+    const regionStationMap = {
+      'arabian_sea': 'mangalore',
+      'bay_of_bengal': 'chennai',
+      'lakshadweep_sea': 'kochi',
+      'andaman_sea': 'andaman',
+      'gulf_of_mannar': 'mannar',
+      'gulf_of_sri_lanka': 'palk_strait',
+      'indian_ocean': 'equatorial'
+    };
+
+    const targetStationId = regionStationMap[regionKey];
+    if (!targetStationId) return;
+
+    const select = document.getElementById('hist-station-select');
+    if (select) {
+      for (let i = 0; i < select.options.length; i++) {
+        if (select.options[i].dataset.id === targetStationId) {
+          select.selectedIndex = i;
+          const parts = select.options[i].value.split(',');
+          const lat = parseFloat(parts[0]);
+          const lon = parseFloat(parts[1]);
+          this.loadHistoricalTrends(lat, lon);
+          break;
+        }
+      }
+    }
   }
 
   selectHistoricalStation(stationId, lat, lon, name) {
@@ -816,28 +871,98 @@ class OrcaApp {
     if (this.histSstChart) this.histSstChart.destroy();
 
     const labels = data.days || ['25 Aug', '26 Aug', '27 Aug', '28 Aug', '29 Aug', '30 Aug', '31 Aug'];
+    const waveData = (data.wave_heights_m && data.wave_heights_m.length > 0) ? data.wave_heights_m : [1.2, 1.4, 1.3, 1.1, 1.5, 1.3, 1.2];
+    const swellData = data.swell_wave_heights_m || waveData.map(w => +(w * 0.85).toFixed(2));
+    const sstData = (data.sst_celsius && data.sst_celsius.length > 0) ? data.sst_celsius : [28.2, 28.4, 28.5, 28.3, 28.6, 28.5, 28.4];
+
+    // Compute dynamic min/max with padding for wave chart
+    const minW = Math.max(0, +(Math.min(...waveData, ...swellData) - 0.2).toFixed(1));
+    const maxW = +(Math.max(...waveData, ...swellData) + 0.3).toFixed(1);
+
+    // Compute dynamic min/max with padding for SST chart
+    const minSst = +(Math.min(...sstData) - 0.4).toFixed(1);
+    const maxSst = +(Math.max(...sstData) + 0.4).toFixed(1);
 
     this.histWaveChart = new Chart(waveCtx, {
       type: 'line',
       data: {
         labels: labels,
-        datasets: [{
-          label: 'Wave Height (m)',
-          data: data.wave_heights_m || [1.2, 1.4, 1.3, 1.1, 1.5, 1.3, 1.2],
-          borderColor: '#22d3b6',
-          backgroundColor: 'rgba(34, 211, 182, 0.15)',
-          fill: true,
-          tension: 0.3
-        }]
+        datasets: [
+          {
+            label: 'Significant Wave Height (m)',
+            data: waveData,
+            borderColor: '#22d3b6',
+            backgroundColor: 'rgba(34, 211, 182, 0.18)',
+            pointBackgroundColor: '#22d3b6',
+            pointBorderColor: '#0a1926',
+            pointRadius: 4,
+            pointHoverRadius: 6,
+            fill: true,
+            tension: 0.32,
+            borderWidth: 2.2
+          },
+          {
+            label: 'Dominant Swell Height (m)',
+            data: swellData,
+            borderColor: '#38bdf8',
+            backgroundColor: 'transparent',
+            pointBackgroundColor: '#38bdf8',
+            pointBorderColor: '#0a1926',
+            pointRadius: 3,
+            borderDash: [4, 4],
+            fill: false,
+            tension: 0.32,
+            borderWidth: 1.8
+          }
+        ]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        scales: {
-          y: { grid: { color: 'rgba(36, 160, 200, 0.1)' }, ticks: { color: '#84a9ba' } },
-          x: { grid: { display: false }, ticks: { color: '#84a9ba' } }
+        interaction: {
+          mode: 'index',
+          intersect: false
         },
-        plugins: { legend: { display: false } }
+        scales: {
+          y: {
+            min: minW,
+            max: maxW,
+            grid: { color: 'rgba(36, 160, 200, 0.12)' },
+            ticks: {
+              color: '#84a9ba',
+              font: { family: "'JetBrains Mono', monospace", size: 10 },
+              callback: (v) => `${v} m`
+            }
+          },
+          x: {
+            grid: { display: false },
+            ticks: {
+              color: '#84a9ba',
+              font: { family: "'JetBrains Mono', monospace", size: 10 }
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            display: true,
+            labels: {
+              color: '#94a3b8',
+              font: { family: "'Inter', sans-serif", size: 10 },
+              boxWidth: 12,
+              padding: 6
+            }
+          },
+          tooltip: {
+            backgroundColor: 'rgba(7, 24, 38, 0.95)',
+            titleFont: { family: "'Rajdhani', sans-serif", size: 12 },
+            bodyFont: { family: "'JetBrains Mono', monospace", size: 11 },
+            borderColor: 'rgba(34, 211, 182, 0.4)',
+            borderWidth: 1,
+            callbacks: {
+              label: (ctx) => ` ${ctx.dataset.label}: ${ctx.raw} m`
+            }
+          }
+        }
       }
     });
 
@@ -847,21 +972,57 @@ class OrcaApp {
         labels: labels,
         datasets: [{
           label: 'Sea Surface Temp (°C)',
-          data: data.sst_celsius || [28.2, 28.4, 28.5, 28.3, 28.6, 28.5, 28.4],
+          data: sstData,
           borderColor: '#f59e0b',
-          backgroundColor: 'rgba(245, 158, 11, 0.15)',
+          backgroundColor: 'rgba(245, 158, 11, 0.16)',
+          pointBackgroundColor: '#f59e0b',
+          pointBorderColor: '#0a1926',
+          pointRadius: 4,
+          pointHoverRadius: 6,
           fill: true,
-          tension: 0.3
+          tension: 0.32,
+          borderWidth: 2.2
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        scales: {
-          y: { min: 27, max: 30, grid: { color: 'rgba(36, 160, 200, 0.1)' }, ticks: { color: '#84a9ba' } },
-          x: { grid: { display: false }, ticks: { color: '#84a9ba' } }
+        interaction: {
+          mode: 'index',
+          intersect: false
         },
-        plugins: { legend: { display: false } }
+        scales: {
+          y: {
+            min: minSst,
+            max: maxSst,
+            grid: { color: 'rgba(36, 160, 200, 0.12)' },
+            ticks: {
+              color: '#84a9ba',
+              font: { family: "'JetBrains Mono', monospace", size: 10 },
+              callback: (v) => `${v} °C`
+            }
+          },
+          x: {
+            grid: { display: false },
+            ticks: {
+              color: '#84a9ba',
+              font: { family: "'JetBrains Mono', monospace", size: 10 }
+            }
+          }
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: 'rgba(7, 24, 38, 0.95)',
+            titleFont: { family: "'Rajdhani', sans-serif", size: 12 },
+            bodyFont: { family: "'JetBrains Mono', monospace", size: 11 },
+            borderColor: 'rgba(245, 158, 11, 0.4)',
+            borderWidth: 1,
+            callbacks: {
+              label: (ctx) => ` Sea Surface Temp: ${ctx.raw} °C`
+            }
+          }
+        }
       }
     });
   }
