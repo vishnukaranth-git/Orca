@@ -7,72 +7,71 @@ from pathlib import Path
 from datetime import datetime, timezone
 from typing import Dict, List, Optional, Any
 
-if os.getenv("VERCEL"):
-    DATA_DIR = Path("/tmp/orca_data")
-else:
-    DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data"
-
-try:
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
-except Exception:
-    DATA_DIR = Path("/tmp/orca_data")
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
-
+DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data"
+DATA_DIR.mkdir(parents=True, exist_ok=True)
 USERS_FILE = DATA_DIR / "users.json"
 HISTORY_FILE = DATA_DIR / "chat_history.json"
 
 class AuthHistoryStore:
-    def __init__(self):
-        try:
-            from app.config import get_settings
-            settings = get_settings()
-            self.supabase_url = (settings.supabase_url or os.getenv("SUPABASE_URL", "")).strip().rstrip("/")
-            self.supabase_key = (settings.supabase_key or os.getenv("SUPABASE_KEY", "")).strip()
-        except Exception:
-            self.supabase_url = os.getenv("SUPABASE_URL", "").strip().rstrip("/")
-            self.supabase_key = os.getenv("SUPABASE_KEY", "").strip()
+    @property
+    def supabase_url(self) -> str:
+        url = os.getenv("SUPABASE_URL", "")
+        if not url:
+            try:
+                from app.config import get_settings
+                url = get_settings().supabase_url or ""
+            except Exception:
+                url = ""
+        return url.strip().rstrip("/")
 
-        self.use_supabase = bool(self.supabase_url and self.supabase_key)
+    @property
+    def supabase_key(self) -> str:
+        key = os.getenv("SUPABASE_KEY", "")
+        if not key:
+            try:
+                from app.config import get_settings
+                key = get_settings().supabase_key or ""
+            except Exception:
+                key = ""
+        return key.strip()
+
+    @property
+    def use_supabase(self) -> bool:
+        return bool(self.supabase_url and self.supabase_key)
+
+    def __init__(self):
         self._load_data()
 
     def _get_supabase_headers(self) -> Dict[str, str]:
+        key = self.supabase_key
         return {
-            "apikey": self.supabase_key,
-            "Authorization": f"Bearer {self.supabase_key}",
+            "apikey": key,
+            "Authorization": f"Bearer {key}",
             "Content-Type": "application/json",
             "Prefer": "return=representation"
         }
 
     def _load_data(self):
-        self.users = {}
-        self.history = {}
+        if not USERS_FILE.exists():
+            USERS_FILE.write_text(json.dumps({}), encoding="utf-8")
+        if not HISTORY_FILE.exists():
+            HISTORY_FILE.write_text(json.dumps({}), encoding="utf-8")
+
         try:
-            if not USERS_FILE.exists():
-                USERS_FILE.write_text(json.dumps({}), encoding="utf-8")
-            else:
-                self.users = json.loads(USERS_FILE.read_text(encoding="utf-8"))
+            self.users = json.loads(USERS_FILE.read_text(encoding="utf-8"))
         except Exception:
             self.users = {}
 
         try:
-            if not HISTORY_FILE.exists():
-                HISTORY_FILE.write_text(json.dumps({}), encoding="utf-8")
-            else:
-                self.history = json.loads(HISTORY_FILE.read_text(encoding="utf-8"))
+            self.history = json.loads(HISTORY_FILE.read_text(encoding="utf-8"))
         except Exception:
             self.history = {}
 
     def _save_users(self):
-        try:
-            USERS_FILE.write_text(json.dumps(self.users, indent=2), encoding="utf-8")
-        except Exception:
-            pass
+        USERS_FILE.write_text(json.dumps(self.users, indent=2), encoding="utf-8")
 
     def _save_history(self):
-        try:
-            HISTORY_FILE.write_text(json.dumps(self.history, indent=2), encoding="utf-8")
-        except Exception:
-            pass
+        HISTORY_FILE.write_text(json.dumps(self.history, indent=2), encoding="utf-8")
 
     def _hash_pw(self, password: str) -> str:
         return hashlib.sha256(password.encode("utf-8")).hexdigest()
@@ -91,11 +90,10 @@ class AuthHistoryStore:
         user_name = name.strip() if name else email_clean.split("@")[0].capitalize()
         password_hash = self._hash_pw(pw_clean)
 
-        # 1. Supabase Database Path
+        # 1. Supabase Cloud Database Path
         if self.use_supabase:
             try:
                 headers = self._get_supabase_headers()
-                # Check if email exists
                 check_url = f"{self.supabase_url}/rest/v1/orca_users?email=eq.{email_clean}&select=id"
                 with httpx.Client(timeout=8.0) as client:
                     check_res = client.get(check_url, headers=headers)
@@ -180,45 +178,69 @@ class AuthHistoryStore:
                     res = client.get(fetch_url, headers=headers)
                     if res.status_code == 200:
                         records = res.json()
-                        if not records or len(records) == 0:
-                            raise ValueError("No registered station account found with this email.")
-                        user_rec = records[0]
-                        if user_rec.get("password_hash") != expected_hash:
-                            raise ValueError("Incorrect security password. Please try again.")
+                        if records and len(records) > 0:
+                            user_rec = records[0]
+                            if user_rec.get("password_hash") != expected_hash:
+                                raise ValueError("Incorrect security password. Please try again.")
 
-                        token = f"orca_token_{uuid.uuid4().hex}"
-                        return {
-                            "user": {
+                            token = f"orca_token_{uuid.uuid4().hex}"
+                            # Also cache locally
+                            self.users[email_clean] = {
                                 "id": str(user_rec["id"]),
                                 "email": user_rec["email"],
                                 "name": user_rec["name"],
+                                "password_hash": user_rec["password_hash"],
                                 "created_at": str(user_rec.get("created_at", ""))
-                            },
-                            "token": token
-                        }
+                            }
+                            self._save_users()
+                            return {
+                                "user": {
+                                    "id": str(user_rec["id"]),
+                                    "email": user_rec["email"],
+                                    "name": user_rec["name"],
+                                    "created_at": str(user_rec.get("created_at", ""))
+                                },
+                                "token": token
+                            }
             except ValueError:
                 raise
             except Exception as e:
                 print(f"[Supabase Auth Warning] Login failed with Supabase: {e}. Falling back to local storage.")
 
-        # 2. Local Fallback
+        # 2. Local Fallback & Cloud Sync
         user = self.users.get(email_clean)
-        if not user:
-            raise ValueError("No account found with this email.")
+        if user:
+            if user.get("password_hash") != expected_hash:
+                raise ValueError("Incorrect security password. Please try again.")
 
-        if user.get("password_hash") != expected_hash:
-            raise ValueError("Incorrect password. Please try again.")
+            # If user was found locally but not in Supabase, auto-sync to Supabase cloud
+            if self.use_supabase:
+                try:
+                    headers = self._get_supabase_headers()
+                    insert_url = f"{self.supabase_url}/rest/v1/orca_users"
+                    insert_body = {
+                        "email": user["email"],
+                        "name": user.get("name", user["email"].split("@")[0]),
+                        "password_hash": user["password_hash"]
+                    }
+                    with httpx.Client(timeout=5.0) as client:
+                        client.post(insert_url, headers=headers, json=insert_body)
+                except Exception as sync_e:
+                    print(f"[Supabase Sync Notice] Cloud user backfill notice: {sync_e}")
 
-        token = f"orca_token_{uuid.uuid4().hex}"
-        return {
-            "user": {
-                "id": user["id"],
-                "email": user["email"],
-                "name": user["name"],
-                "created_at": user["created_at"]
-            },
-            "token": token
-        }
+            token = f"orca_token_{uuid.uuid4().hex}"
+            return {
+                "user": {
+                    "id": user["id"],
+                    "email": user["email"],
+                    "name": user["name"],
+                    "created_at": user["created_at"]
+                },
+                "token": token
+            }
+
+        raise ValueError("No registered station account found with this email. Please click 'Create Account' to sign up.")
+
 
     def get_user_history(self, user_id: str) -> List[Dict[str, Any]]:
         if self.use_supabase:
