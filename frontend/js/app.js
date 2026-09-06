@@ -26,6 +26,47 @@ class OrcaApp {
     return window.location.port === '3000' ? 'http://localhost:8000' : '';
   }
 
+  getViewFromUrl() {
+    const rawPath = window.location.pathname.toLowerCase().replace(/\/+$/, '') || '/';
+    const ROUTE_MAP = {
+      '/': 'landing',
+      '': 'landing',
+      '/index.html': 'landing',
+      '/landing': 'landing',
+      '/ask-orca': 'ask-orca',
+      '/command-center': 'command',
+      '/command': 'command',
+      '/fishing-zones': 'pfz',
+      '/pfz': 'pfz',
+      '/disaster-watch': 'disasters',
+      '/disasters': 'disasters',
+      '/satellite-lab': 'satellite',
+      '/satellite': 'satellite',
+      '/safe-routes': 'routes',
+      '/routes': 'routes',
+      '/historical-trends': 'historical',
+      '/historical': 'historical',
+      '/what-if': 'simulator',
+      '/simulator': 'simulator'
+    };
+    return ROUTE_MAP[rawPath] || 'landing';
+  }
+
+  getRouteFromView(viewId) {
+    const VIEW_TO_ROUTE = {
+      'landing': '/',
+      'ask-orca': '/ask-orca',
+      'command': '/command-center',
+      'pfz': '/fishing-zones',
+      'disasters': '/disaster-watch',
+      'satellite': '/satellite-lab',
+      'routes': '/safe-routes',
+      'historical': '/historical-trends',
+      'simulator': '/what-if'
+    };
+    return VIEW_TO_ROUTE[viewId] || '/';
+  }
+
   init() {
     console.log("Initializing ORCA Marine Intelligence Platform (Indian Ocean & Asian Waters)...");
 
@@ -52,8 +93,15 @@ class OrcaApp {
     this.fetchLiveTelemetry();
     this.loadPFZData();
 
-    // Default view: Full-Screen Cinematic Landing Page
-    this.switchView('landing');
+    // Initial View: Determine from current URL path
+    const initialView = this.getViewFromUrl();
+    this.switchView(initialView, false);
+
+    // Listen for browser navigation (back/forward buttons)
+    window.addEventListener('popstate', (e) => {
+      const targetView = (e.state && e.state.viewId) ? e.state.viewId : this.getViewFromUrl();
+      this.switchView(targetView, false);
+    });
 
     // Popover click-outside dismissal
     document.addEventListener('click', (e) => {
@@ -216,8 +264,15 @@ class OrcaApp {
     }
   }
 
-  switchView(viewId) {
+  switchView(viewId, updateHistory = true) {
     this.currentView = viewId;
+
+    if (updateHistory && typeof window !== 'undefined' && window.history) {
+      const targetPath = this.getRouteFromView(viewId);
+      if (window.location.pathname !== targetPath) {
+        window.history.pushState({ viewId }, '', targetPath);
+      }
+    }
 
     const appContainer = document.getElementById('orca-app');
     if (appContainer) {
@@ -255,6 +310,9 @@ class OrcaApp {
       setTimeout(() => {
         this.mapController.map.invalidateSize();
       }, 100);
+      setTimeout(() => {
+        this.mapController.map.invalidateSize();
+      }, 350);
 
       // Manage view-specific map layers (so routes only appear on safe-routes view, etc.)
       if (this.mapController.layers.routes) {
