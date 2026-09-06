@@ -103,6 +103,12 @@
           <button class="lang-pill-btn" data-lang="hi">हिन्दी</button>
           <button class="lang-pill-btn" data-lang="ta">தமிழ்</button>
         </div>
+        <div class="sidebar-fs-wrapper" style="padding:4px 0 0 0;">
+          <button class="sidebar-fs-btn" onclick="window.toggleOrcaFullscreen()" title="Toggle Fullscreen Mode (F11)">
+            <i data-lucide="maximize" class="fs-icon-state" style="width:13px;height:13px;"></i>
+            <span class="fullscreen-text">Fullscreen</span>
+          </button>
+        </div>
       </div>
     </aside>
 
@@ -273,18 +279,37 @@
               </div>
             </div>
 
-            <!-- Right: Language Selector -->
+            <!-- Right: Actions, Language & Fullscreen Controls -->
             <div class="landing-nav-right">
+              <!-- Direct Launch Console Button -->
+              <button class="landing-nav-console-btn" onclick="orcaApp.switchView('command')" title="Launch Full-Screen Interactive Mission Console">
+                <i data-lucide="layout-dashboard"></i>
+                <span>Mission Console</span>
+              </button>
+
+              <!-- Language Selector -->
               <div class="landing-lang-selector" title="Language Switcher">
                 <button class="lang-pill-btn active" data-lang="en">EN</button>
                 <button class="lang-pill-btn" data-lang="kn">ಕನ್ನಡ</button>
                 <button class="lang-pill-btn" data-lang="hi">हिन्दी</button>
                 <button class="lang-pill-btn" data-lang="ta">தமிழ்</button>
               </div>
+
+              <!-- Fullscreen Toggle Button -->
+              <button class="landing-fullscreen-btn" id="btn-toggle-fullscreen" title="Toggle Fullscreen Mode (F11)" onclick="window.toggleOrcaFullscreen()">
+                <i data-lucide="maximize" id="fullscreen-icon"></i>
+                <span class="fullscreen-text">Fullscreen</span>
+              </button>
+
+              <!-- Officer Sign In -->
+              <button class="landing-nav-auth-btn" onclick="orcaAuth.openAccessPortal('login')" title="Officer Sign In">
+                <i data-lucide="log-in"></i>
+                <span>Sign In</span>
+              </button>
             </div>
           </header>
 
-          <!-- Main Hero Content Box (Center-Left Negative Space) -->
+          <!-- Main Hero Content Box (Full Screen Edge-to-Edge Responsive) -->
           <div class="landing-hero-body">
             <div class="landing-eyebrow">
               <i data-lucide="sparkles"></i>
@@ -298,16 +323,33 @@
               Ask complex marine questions in natural language. Discover evidence, analyze ocean conditions, and make informed decisions.
             </p>
             <div class="landing-cta-group">
-              <button class="landing-primary-cta" onclick="orcaAuth.openAccessPortal('signup')">
-                <span data-i18n="landing_cta_generate">Generate Analysis</span>
+              <button class="landing-primary-cta" onclick="orcaApp.switchView('command')">
+                <i data-lucide="layout-dashboard"></i>
+                <span data-i18n="landing_cta_generate">Launch Full-Screen Console</span>
                 <i data-lucide="arrow-right"></i>
               </button>
-              <button class="landing-secondary-cta" onclick="document.getElementById('landing-workflow-section')?.scrollIntoView({ behavior: 'smooth' });">
-                <span data-i18n="landing_cta_explore">Explore ORCA</span>
+              <button class="landing-secondary-cta" onclick="orcaAuth.openAccessPortal('signup')">
+                <i data-lucide="user-plus"></i>
+                <span>Create Account</span>
+              </button>
+              <button class="landing-ghost-cta" onclick="document.getElementById('landing-workflow-section')?.scrollIntoView({ behavior: 'smooth' });">
+                <span data-i18n="landing_cta_explore">Explore Architecture</span>
                 <i data-lucide="chevron-down"></i>
               </button>
             </div>
           </div>
+
+          <!-- Bottom Telemetry & Fullscreen Status Footer -->
+          <footer class="landing-hero-bottom-bar">
+            <div class="hero-live-telemetry">
+              <span class="live-pulse-dot"></span>
+              <span>LIVE INDIAN OCEAN BASIN TELEMETRY · ISRO &amp; INCOIS SATELLITE LINKS SYNCHRONIZED</span>
+            </div>
+            <button class="hero-fs-pill" onclick="window.toggleOrcaFullscreen()" title="Toggle Fullscreen Display">
+              <i data-lucide="maximize" class="fs-icon-state"></i>
+              <span>FULLSCREEN MODE</span>
+            </button>
+          </footer>
         </div>
 
         <!-- Section 11: Below-Hero Workflow Section (Light Theme) -->

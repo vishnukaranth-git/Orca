@@ -1113,8 +1113,49 @@ class OrcaApp {
   }
 }
 
+// Native Fullscreen Controller
+window.toggleOrcaFullscreen = function() {
+  try {
+    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+      const el = document.documentElement;
+      if (el.requestFullscreen) {
+        el.requestFullscreen().catch(err => console.warn("Fullscreen request:", err));
+      } else if (el.webkitRequestFullscreen) {
+        el.webkitRequestFullscreen();
+      } else if (el.msRequestFullscreen) {
+        el.msRequestFullscreen();
+      }
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      } else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
+      }
+    }
+  } catch (e) {
+    console.warn("Fullscreen toggle exception", e);
+  }
+};
+
+const syncFullscreenIcons = () => {
+  const isFull = Boolean(document.fullscreenElement || document.webkitFullscreenElement);
+  document.querySelectorAll('#fullscreen-icon, .fs-icon-state').forEach(ic => {
+    ic.setAttribute('data-lucide', isFull ? 'minimize' : 'maximize');
+  });
+  document.querySelectorAll('.fullscreen-text').forEach(tx => {
+    tx.textContent = isFull ? 'Exit Fullscreen' : 'Fullscreen';
+  });
+  if (window.lucide) lucide.createIcons();
+};
+
+document.addEventListener('fullscreenchange', syncFullscreenIcons);
+document.addEventListener('webkitfullscreenchange', syncFullscreenIcons);
+
 // Global App bootstrap
 window.addEventListener('DOMContentLoaded', () => {
   window.orcaApp = new OrcaApp();
   window.orcaApp.init();
 });
+
