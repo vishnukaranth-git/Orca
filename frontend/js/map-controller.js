@@ -838,20 +838,28 @@ class OrcaMapController {
   }
 
   focusRegion(regionKey) {
+    document.querySelectorAll('.region-selector-pill').forEach(pill => {
+      pill.classList.toggle('active', pill.dataset.region === regionKey);
+    });
+
     if (regionKey === 'all') {
       this.locate();
       this.inspectRegion('arabian_sea');
       if (window.orcaApp && typeof window.orcaApp.syncHistoricalToRegion === 'function') {
-        window.orcaApp.syncHistoricalToRegion('arabian_sea');
+        window.orcaApp.syncHistoricalToRegion('all');
       }
       return;
     }
 
     const reg = this.marineRegions[regionKey];
-    if (!reg || !this.map) return;
-
-    this.map.flyToBounds(reg.bounds, { duration: 1.2, padding: [40, 40], maxZoom: reg.zoom });
-    this.inspectRegion(regionKey);
+    if (reg && this.map) {
+      if (reg.bounds) {
+        this.map.flyToBounds(reg.bounds, { duration: 1.2, padding: [40, 40], maxZoom: reg.zoom || 7 });
+      } else if (reg.center) {
+        this.map.flyTo(reg.center, reg.zoom || 6.5, { duration: 1.2 });
+      }
+      this.inspectRegion(regionKey);
+    }
 
     if (window.orcaApp && typeof window.orcaApp.syncHistoricalToRegion === 'function') {
       window.orcaApp.syncHistoricalToRegion(regionKey);
@@ -1932,7 +1940,12 @@ class OrcaMapController {
 
   fitRouteBounds() {
     if (!this.map || !this.currentRouteWaypoints || this.currentRouteWaypoints.length < 2) return;
-    const latlngs = this.currentRouteWaypoints.map(wp => [wp.lat, wp.lng]);
+    const latlngs = this.currentRouteWaypoints.map(wp => [
+      parseFloat(wp.lat !== undefined ? wp.lat : wp.latitude),
+      parseFloat(wp.lng !== undefined ? wp.lng : wp.longitude)
+    ]).filter(coord => !isNaN(coord[0]) && !isNaN(coord[1]));
+
+    if (latlngs.length < 2) return;
     const bounds = L.latLngBounds(latlngs);
     if (!bounds.isValid()) return;
 
@@ -1950,7 +1963,6 @@ class OrcaMapController {
     }
 
     // Limit leftPad so that at least 55% of the map width is open and available for bounds fitting!
-    // This strictly prevents Leaflet from receiving negative/NaN sizing on any screen resolution.
     const safeLeftPad = Math.max(30, Math.min(dockW + 25, Math.floor(mapW * 0.42)));
     const safeRightPad = Math.max(25, Math.min(60, Math.floor(mapW * 0.08)));
     const safeTopPad = Math.max(30, Math.min(60, Math.floor(mapH * 0.1)));
@@ -1976,8 +1988,24 @@ class OrcaMapController {
     this.layers.routes.clearLayers();
     if (!waypoints || waypoints.length < 2) return;
 
-    this.currentRouteWaypoints = waypoints;
-    const latlngs = waypoints.map(wp => [wp.lat, wp.lng]);
+    if (this.map && !this.map.hasLayer(this.layers.routes)) {
+      this.layers.routes.addTo(this.map);
+    }
+
+    const normalizedWps = waypoints.map(wp => {
+      const lat = parseFloat(wp.lat !== undefined ? wp.lat : wp.latitude);
+      const lng = parseFloat(wp.lng !== undefined ? wp.lng : wp.longitude);
+      return {
+        ...wp,
+        lat: isNaN(lat) ? 12.0 : lat,
+        lng: isNaN(lng) ? 75.0 : lng,
+        latitude: isNaN(lat) ? 12.0 : lat,
+        longitude: isNaN(lng) ? 75.0 : lng
+      };
+    });
+
+    this.currentRouteWaypoints = normalizedWps;
+    const latlngs = normalizedWps.map(wp => [wp.lat, wp.lng]);
 
     // 1. Draw Fairway Corridor Buffer Polygon (Semi-transparent bathymetric safety envelope)
     try {
@@ -2024,7 +2052,7 @@ class OrcaMapController {
     }).addTo(this.layers.routes);
 
     // 4. Waypoint Markers & Beacons
-    waypoints.forEach((wp, idx) => {
+    normalizedWps.forEach((wp, idx) => {
       const isOrigin = idx === 0;
       const isDestination = idx === waypoints.length - 1;
 
