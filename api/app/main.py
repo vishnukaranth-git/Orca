@@ -34,6 +34,13 @@ app.add_middleware(
 )
 
 @app.middleware("http")
+async def fix_vercel_path(request: Request, call_next):
+    forwarded = request.headers.get("x-forwarded-uri") or request.headers.get("x-matched-path")
+    if forwarded and request.scope.get("path") in ("/api/index.py", "/api/index", "/api"):
+        request.scope["path"] = forwarded.split("?")[0]
+    return await call_next(request)
+
+@app.middleware("http")
 async def ids(request: Request, call_next):
     request.state.request_id = str(uuid.uuid4())
     response = await call_next(request)

@@ -73,12 +73,9 @@ class AuthHistoryStore:
         if not email_clean or "@" not in email_clean:
             raise ValueError("Please provide a valid email address.")
         
-        # Validation: password must contain only letters/alphabetical characters as requested
         pw_clean = password.strip()
         if not pw_clean:
             raise ValueError("Password cannot be empty.")
-        if not pw_clean.isalpha():
-            raise ValueError("Password must contain only letters and name characters (A-Z, a-z).")
         if len(pw_clean) < 3:
             raise ValueError("Password must be at least 3 characters.")
 
